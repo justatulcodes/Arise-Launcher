@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             AriseLauncherTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "Welcome to Arise Launcher",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
