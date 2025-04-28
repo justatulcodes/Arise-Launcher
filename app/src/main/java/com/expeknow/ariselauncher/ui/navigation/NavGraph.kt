@@ -9,9 +9,9 @@ import com.expeknow.ariselauncher.ui.screens.applist.AppListScreen
 import com.expeknow.ariselauncher.ui.screens.settings.SettingsScreen
 
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object AppList : Screen("applist")
-    object Settings : Screen("settings")
+    data object Home : Screen("home")
+    data object AppList : Screen("applist")
+    data object Settings : Screen("settings")
 }
 
 @Composable
