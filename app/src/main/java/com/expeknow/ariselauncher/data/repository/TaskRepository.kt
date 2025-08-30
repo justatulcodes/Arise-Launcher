@@ -10,8 +10,8 @@ class TaskRepository {
         return tasks.filter { !it.isCompleted }
     }
 
-    fun addTask(title: String, description: String = ""): Task {
-        val task = Task(title = title, description = description)
+    fun addTask(title: String, description: String = "", points: Int = 0): Task {
+        val task = Task(title = title, description = description, points = points)
         tasks.add(task)
         return task
     }

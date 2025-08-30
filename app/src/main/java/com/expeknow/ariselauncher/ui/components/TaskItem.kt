@@ -14,52 +14,125 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import com.expeknow.ariselauncher.ui.theme.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme.typography
 import com.expeknow.ariselauncher.data.model.Task
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Article
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TaskItem(
     task: Task,
     onTaskCompleted: (String) -> Unit
 ) {
-    Card(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .padding(vertical = 12.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(SurfaceCard),
+        verticalAlignment = Alignment.Top
     ) {
-        Row(
+        Checkbox(
+            checked = task.isCompleted,
+            onCheckedChange = { if (it) onTaskCompleted(task.id) },
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .weight(1f)
+                .padding(top = 8.dp, end = 16.dp)
         ) {
-            Checkbox(
-                checked = task.isCompleted,
-                onCheckedChange = { if (it) onTaskCompleted(task.id) }
+            Text(
+                text = task.title,
+                style = MaterialTheme.typography.titleSmall,
+                color = TaskTitle
             )
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp)
-            ) {
-                Text(
-                    text = task.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                if (task.description.isNotBlank()) {
-                    Text(
-                        text = task.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "+${task.points} pts",
+                style = MaterialTheme.typography.bodySmall,
+                color = AccentGreen
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(modifier = Modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                task.relatedArticle?.let {
+                    BadgeLink(it, icon = Icons.Filled.Article)
+                }
+                task.relatedVideos.forEach {
+                    BadgeLink(it, icon = Icons.Filled.PlayArrow)
+                }
+                task.relatedMediaLinks.forEach {
+                    BadgeLink(it, icon = Icons.Filled.Link)
                 }
             }
         }
     }
 }
+
+@Composable
+fun BadgeLink(text: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(7.dp))
+            .background(DividerGray)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = AccentGreen,
+            modifier = Modifier.size(14.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = BannerTextGray,
+            maxLines = 1
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TaskItemPreview() {
+    TaskItem(
+        task = Task(
+            id = "example-task-id",
+            title = "Task 1",
+            description = "Description 1",
+            isCompleted = false,
+            relatedArticle = "Article 1",
+            relatedVideos = listOf("Video 1", "Video 2"),
+            relatedMediaLinks = listOf("Link 1", "Link 2"),
+            points = 10
+        ),
+        onTaskCompleted = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BadgeLinkPreview() {
+    BadgeLink(
+        text = "Badge Link",
+        icon = Icons.Default.Link
+    )
+}
+
+
