@@ -1,7 +1,7 @@
 [versions]
 accompanistPermissions = "0.32.0"
 activityComposeVersion = "1.10.1"
-agp = "8.5.2"
+agp = "8.6.0"
 androidxJunit = "1.1.5"
 composeBomVersion = "2025.04.01"
 coreKtxVersion = "1.12.0"
@@ -12,6 +12,7 @@ lifecycleRuntimeKtxVersion = "2.8.7"
 materialIconsExtended = "1.7.8"
 navigationCompose = "2.8.9"
 runtimeLivedata = "1.8.0"
+foundation = "1.9.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -34,6 +35,7 @@ ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
