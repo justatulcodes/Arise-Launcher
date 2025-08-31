@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,6 +21,7 @@ fun AppDrawerScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = AppDrawerTheme()
+    val context = LocalContext.current
 
     if (!state.isUnlocked) {
         CountdownScreen(
@@ -43,7 +45,7 @@ fun AppDrawerScreen(
             )
 
             // Warning Banner
-            WarningBanner()
+//            WarningBanner()
 
             // App Categories
             Box(
@@ -66,7 +68,7 @@ fun AppDrawerScreen(
                                 category = category,
                                 apps = apps,
                                 onAppClick = { app: AppDrawerApp ->
-                                    viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                    viewModel.onEvent(AppDrawerEvent.SelectApp(app, context))
                                 },
                                 theme = theme
                             )

@@ -1,5 +1,6 @@
 package com.expeknow.ariselauncher.ui.screens.apps
 
+import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Color
@@ -8,6 +9,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 data class AppDrawerApp(
     val id: String,
     val name: String,
+    val packageName: String,
     val icon: ImageVector,
     val category: AppCategory,
     val pointCost: Int,
@@ -37,6 +39,7 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "1",
         "Phone",
+        "com.google.android.dialer",
         Icons.Default.Phone,
         AppCategory.ESSENTIAL,
         0,
@@ -45,15 +48,25 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "2",
         "Messages",
+        "com.google.android.apps.messaging",
         Icons.Default.Message,
         AppCategory.ESSENTIAL,
         0,
         "Text messaging"
     ),
-    AppDrawerApp("3", "Mail", Icons.Default.Email, AppCategory.ESSENTIAL, 0, "Email communication"),
+    AppDrawerApp(
+        "3",
+        "Mail",
+        "com.google.android.gm",
+        Icons.Default.Email,
+        AppCategory.ESSENTIAL,
+        0,
+        "Email communication"
+    ),
     AppDrawerApp(
         "4",
         "Calendar",
+        "com.google.android.calendar",
         Icons.Default.CalendarToday,
         AppCategory.ESSENTIAL,
         0,
@@ -64,6 +77,7 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "5",
         "Camera",
+        "com.google.android.GoogleCamera",
         Icons.Default.PhotoCamera,
         AppCategory.PRODUCTIVITY,
         0,
@@ -72,6 +86,7 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "6",
         "Maps",
+        "com.google.android.apps.maps",
         Icons.Default.Place,
         AppCategory.PRODUCTIVITY,
         0,
@@ -80,6 +95,7 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "7",
         "Calculator",
+        "com.google.android.calculator",
         Icons.Default.Calculate,
         AppCategory.PRODUCTIVITY,
         0,
@@ -88,15 +104,25 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "8",
         "Files",
+        "com.marc.files",
         Icons.Default.InsertDriveFile,
         AppCategory.PRODUCTIVITY,
         0,
         "File management"
     ),
-    AppDrawerApp("9", "Notes", Icons.Default.Note, AppCategory.PRODUCTIVITY, 0, "Quick notes"),
+    AppDrawerApp(
+        "9",
+        "Notion",
+        "notion.id",
+        Icons.Default.Note,
+        AppCategory.PRODUCTIVITY,
+        0,
+        "Quick notes"
+    ),
     AppDrawerApp(
         "10",
-        "Slack",
+        "Google Chat",
+        "com.google.android.apps.dynamite",
         Icons.Default.Forum,
         AppCategory.PRODUCTIVITY,
         2,
@@ -107,6 +133,7 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "11",
         "Instagram",
+        "com.instagram.android",
         Icons.Default.CameraAlt,
         AppCategory.SOCIAL,
         25,
@@ -115,24 +142,18 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "12",
         "Twitter",
+        "com.twitter.android",
         Icons.Default.Chat,
         AppCategory.SOCIAL,
         20,
         "Microblogging platform"
-    ),
-    AppDrawerApp(
-        "13",
-        "Facebook",
-        Icons.Default.People,
-        AppCategory.SOCIAL,
-        30,
-        "Social networking"
     ),
 
     // Entertainment Apps (Medium Point Cost)
     AppDrawerApp(
         "14",
         "YouTube",
+        "com.rvx.android.youtube",
         Icons.Default.VideoLibrary,
         AppCategory.ENTERTAINMENT,
         15,
@@ -141,6 +162,7 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "15",
         "Music Streaming",
+        "com.spotify.music",
         Icons.Default.MusicNote,
         AppCategory.ENTERTAINMENT,
         8,
@@ -148,7 +170,8 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     ),
     AppDrawerApp(
         "16",
-        "Music",
+        "YT Music",
+        "anddea.youtube.music",
         Icons.Default.QueueMusic,
         AppCategory.ENTERTAINMENT,
         5,
@@ -157,45 +180,27 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
     AppDrawerApp(
         "17",
         "Gallery",
+        "com.google.android.apps.photos",
         Icons.Default.Photo,
         AppCategory.ENTERTAINMENT,
         3,
         "Photo gallery"
     ),
 
-    // Games (Very High Point Cost)
-    AppDrawerApp(
-        "18",
-        "Games",
-        Icons.Default.SportsEsports,
-        AppCategory.GAMES,
-        50,
-        "Mobile gaming"
-    ),
-
-    // Shopping Apps (Medium Point Cost)
-    AppDrawerApp(
-        "19",
-        "Shopping",
-        Icons.Default.ShoppingCart,
-        AppCategory.SHOPPING,
-        12,
-        "Online shopping"
-    ),
-    AppDrawerApp(
-        "20",
-        "Food Delivery",
-        Icons.Default.Restaurant,
-        AppCategory.SHOPPING,
-        10,
-        "Food ordering"
-    ),
-
     // Additional Apps
-    AppDrawerApp("21", "Chrome", Icons.Default.Public, AppCategory.PRODUCTIVITY, 3, "Web browsing"),
+    AppDrawerApp(
+        "21",
+        "Chrome",
+        "com.android.chrome",
+        Icons.Default.Public,
+        AppCategory.PRODUCTIVITY,
+        3,
+        "Web browsing"
+    ),
     AppDrawerApp(
         "22",
         "Settings",
+        "com.android.settings",
         Icons.Default.Settings,
         AppCategory.ESSENTIAL,
         0,
@@ -206,7 +211,7 @@ private fun getDefaultApps(): List<AppDrawerApp> = listOf(
 sealed class AppDrawerEvent {
     data class UpdateCountdown(val countdown: Int) : AppDrawerEvent()
     data object UnlockDrawer : AppDrawerEvent()
-    data class SelectApp(val app: AppDrawerApp) : AppDrawerEvent()
+    data class SelectApp(val app: AppDrawerApp, val context : Context) : AppDrawerEvent()
     data object ShowWarning : AppDrawerEvent()
     data object HideWarning : AppDrawerEvent()
     data object ConfirmAppOpen : AppDrawerEvent()

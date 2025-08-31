@@ -480,7 +480,7 @@ fun SimpleTaskList(
 }
 
 @Composable
-private fun SimpleTaskItem(
+fun SimpleTaskItem(
     task: Task,
     onTaskClick: (String) -> Unit,
     onToggleTask: (String) -> Unit,
