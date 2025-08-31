@@ -19,11 +19,19 @@ import com.expeknow.ariselauncher.ui.screens.settings.SettingsScreen
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.expeknow.ariselauncher.AriseLauncherApplication
+import com.expeknow.ariselauncher.data.repository.AppRepository
 import com.expeknow.ariselauncher.ui.theme.BannerTextGray
 import com.expeknow.ariselauncher.ui.components.AppBottomNavigationBar
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.drive.DriveScreen
+import com.expeknow.ariselauncher.ui.screens.home.HomeViewModel
 
 sealed class Screen(val route: String) {
     data object Home : Screen("home")
@@ -70,7 +78,13 @@ fun AppNavigation(navController: NavHostController) {
 //            modifier = Modifier.padding(paddingValues)
         ) {
             composable(Screen.Focus.route) {
-                HomeScreen(navController)
+                val context = LocalContext.current
+                val appRepository = remember { AppRepository(context) }
+                val taskRepository = (context.applicationContext as AriseLauncherApplication).taskRepository
+                val viewModel: HomeViewModel = viewModel { HomeViewModel(appRepository, taskRepository) }
+                val state by viewModel.state.collectAsStateWithLifecycle()
+
+                HomeScreen(navController, viewModel, state)
             }
             composable(Screen.Points.route) {
                 PointsScreen(navController)

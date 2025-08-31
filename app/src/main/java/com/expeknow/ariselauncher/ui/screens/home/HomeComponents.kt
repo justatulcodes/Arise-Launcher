@@ -19,17 +19,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.*
-import com.expeknow.ariselauncher.ui.theme.*
-import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun EnhancedPointsHeader(
@@ -528,16 +526,16 @@ private fun SimpleTaskItem(
                 )
             }
 
-            if (task.links.isNotEmpty()) {
+            if (task.relatedLinks.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row {
-                    task.links.take(2).forEach { link ->
+                    task.relatedLinks.take(2).forEach { link ->
                         TaskLinkChip(link = link, theme = theme)
                         Spacer(modifier = Modifier.width(8.dp))
                     }
-                    if (task.links.size > 2) {
+                    if (task.relatedLinks.size > 2) {
                         Text(
-                            "+${task.links.size - 2} more",
+                            "+${task.relatedLinks.size - 2} more",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White.copy(alpha = 0.4f)
                         )
@@ -832,151 +830,300 @@ fun TasksCompletedCelebration(
     theme: HomeTheme
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "celebration")
-    val bounceAnimation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
+
+    // Main pulsing animation for the central icon
+    val pulseAnimation by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 1.2f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = EaseInOut),
+            animation = tween(1500, easing = EaseInOut),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "bounce"
+        label = "pulse"
     )
 
-    Column(
+    // Floating icons data with different animations
+    val floatingIcons = listOf(
+        Triple(Icons.Filled.Star, "0ms", Offset(50f, 80f)),
+        Triple(Icons.Filled.WorkspacePremium, "500ms", Offset(300f, 120f)),
+        Triple(Icons.Filled.Bolt, "1000ms", Offset(80f, 200f)),
+        Triple(Icons.Filled.EmojiEvents, "1500ms", Offset(280f, 60f)),
+        Triple(Icons.Filled.TrackChanges, "2000ms", Offset(40f, 160f)),
+        Triple(Icons.Filled.CheckCircle, "2500ms", Offset(320f, 180f))
+    )
+
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
+            .background(
+                brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                    colors = listOf(
+                        theme.accent.copy(alpha = 0.1f),
+                        Color.Transparent
+                    ),
+                    radius = 400f
+                )
+            ),
+        contentAlignment = Alignment.Center
     ) {
-        // Animated celebration icon
+        // Background subtle pattern
         Box(
             modifier = Modifier
-                .size(96.dp)
+                .fillMaxSize()
                 .background(
-                    theme.bg,
-                    CircleShape
+                    brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.02f),
+                            Color.Transparent
+                        ),
+                        radius = 200f
+                    )
                 )
-                .border(
-                    2.dp,
-                    theme.border,
-                    CircleShape
+        )
+
+        // Floating celebration icons
+        floatingIcons.forEachIndexed { index, (icon, delay, position) ->
+            val bounceAnimation by infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 20f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(
+                        durationMillis = 2000 + (index * 200),
+                        delayMillis = delay.removeSuffix("ms").toInt(),
+                        easing = EaseInOut
+                    ),
+                    repeatMode = RepeatMode.Reverse
                 ),
-            contentAlignment = Alignment.Center
+                label = "bounce$index"
+            )
+
+            Box(
+                modifier = Modifier
+                    .offset(
+                        x = position.x.dp,
+                        y = (position.y - bounceAnimation).dp
+                    )
+                    .size(24.dp)
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = theme.accent.copy(alpha = 0.6f),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+
+        // Central celebration content
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(32.dp)
         ) {
-            Icon(
-                Icons.Filled.CheckCircle,
-                contentDescription = null,
-                tint = theme.accent,
-                modifier = Modifier.size((48 + bounceAnimation * 8).dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            "ALL TASKS COMPLETED",
-            style = MaterialTheme.typography.headlineSmall,
-            color = theme.accent,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            "Outstanding discipline and focus!",
-            style = MaterialTheme.typography.bodyLarge,
-            color = Color.White.copy(alpha = 0.7f)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row {
-            AssistChip(
-                onClick = { },
-                label = { Text("$completedCount Tasks Done") },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = theme.border,
-                    labelColor = theme.accent
-                )
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            AssistChip(
-                onClick = { },
-                label = { Text("+$pointsEarned Points") },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = Color(0xFF4ADE80).copy(alpha = 0.1f),
-                    labelColor = Color(0xFF4ADE80)
-                )
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Color.Black.copy(alpha = 0.2f),
-                    RoundedCornerShape(8.dp)
-                )
-                .border(
-                    2.dp,
-                    theme.border,
-                    RoundedCornerShape(8.dp)
-                )
-                .padding(16.dp)
-        ) {
-            Text(
-                "\"Excellence is not a skill, it's an attitude. Today you've proven yours.\"",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.8f),
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row {
-            repeat(3) { index ->
-                val icons = listOf(
-                    Icons.Filled.EmojiEvents,
-                    Icons.Filled.WorkspacePremium,
-                    Icons.Filled.Star
-                )
-                val colors = listOf(Color(0xFFFFD700), theme.accent, Color.White)
-
+            // Main celebration icon with pulsing ring
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                // Pulsing ring effect
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size((120 * pulseAnimation).dp)
                         .background(
-                            theme.bg,
-                            RoundedCornerShape(8.dp)
+                            Color.Transparent,
+                            CircleShape
                         )
                         .border(
-                            1.dp,
+                            2.dp,
+                            theme.border.copy(alpha = 0.3f),
+                            CircleShape
+                        )
+                )
+
+                // Main icon container
+                Box(
+                    modifier = Modifier
+                        .size(96.dp)
+                        .background(
+                            theme.bg.copy(alpha = 0.8f),
+                            CircleShape
+                        )
+                        .border(
+                            2.dp,
                             theme.border,
-                            RoundedCornerShape(8.dp)
+                            CircleShape
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        icons[index],
+                        Icons.Filled.CheckCircle,
                         contentDescription = null,
-                        tint = colors[index],
-                        modifier = Modifier.size(20.dp)
+                        tint = theme.accent,
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Celebration text
+            Text(
+                "ALL TASKS COMPLETED",
+                style = MaterialTheme.typography.headlineMedium,
+                color = theme.accent,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.2.sp
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                "Outstanding discipline and focus!",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 18.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Stats badges
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            theme.border.copy(alpha = 0.3f),
+                            RoundedCornerShape(12.dp)
+                        )
+                        .border(
+                            1.dp,
+                            theme.border,
+                            RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        "$completedCount Tasks Done",
+                        color = theme.accent,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            Color(0xFF4ADE80).copy(alpha = 0.2f),
+                            RoundedCornerShape(12.dp)
+                        )
+                        .border(
+                            1.dp,
+                            Color(0xFF4ADE80).copy(alpha = 0.4f),
+                            RoundedCornerShape(12.dp)
+                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        "+$pointsEarned Points",
+                        color = Color(0xFF4ADE80),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Motivational quote with border accent
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Color.Black.copy(alpha = 0.3f),
+                        RoundedCornerShape(12.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = theme.border,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(start = 4.dp)
+            ) {
+                Row {
+                    Box(
+                        modifier = Modifier
+                            .width(4.dp)
+                            .height(60.dp)
+                            .background(
+                                theme.accent,
+                                RoundedCornerShape(2.dp)
+                            )
                     )
 
-                    if (index == 1) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(Color(0xFF4ADE80), CircleShape)
-                                .align(Alignment.TopEnd)
-                                .offset(x = 4.dp, y = (-4).dp)
+                    Text(
+                        "\"Excellence is not a skill, it's an attitude. Today you've proven yours.\"",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Achievement badges
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                val achievements = listOf(
+                    Triple(Icons.Filled.EmojiEvents, Color(0xFFFFD700), "Trophy"),
+                    Triple(Icons.Filled.WorkspacePremium, theme.accent, "Crown"),
+                    Triple(Icons.Filled.Star, Color.White, "Star")
+                )
+
+                achievements.forEach { (icon, color, desc) ->
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .background(
+                                theme.bg.copy(alpha = 0.6f),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .border(
+                                1.dp,
+                                theme.border,
+                                RoundedCornerShape(12.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            icon,
+                            contentDescription = desc,
+                            tint = color,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
-                if (index < 2) Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
+
+            // Next steps suggestion
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    "Ready for tomorrow's challenges?",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.5f)
+                )
+                Text(
+                    "Your consistency builds your legacy",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.4f),
+                    fontSize = 12.sp
+                )
             }
         }
     }
@@ -1171,8 +1318,8 @@ private fun EssentialAppsBarPreview() {
 @Composable
 private fun TasksCompletedCelebrationPreview() {
     TasksCompletedCelebration(
-        completedCount = 8,
-        pointsEarned = 120,
+        completedCount = 12,
+        pointsEarned = 285,
         theme = HomeTheme()
     )
 }

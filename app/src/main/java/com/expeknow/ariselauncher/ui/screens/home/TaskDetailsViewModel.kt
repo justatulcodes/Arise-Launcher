@@ -76,7 +76,7 @@ class TaskDetailsViewModel(
                 points = 25,
                 category = TaskCategory.PHYSICAL,
                 priority = 1,
-                links = listOf(
+                relatedLinks = listOf(
                     TaskLink(
                         url = "https://youtube.com/watch?v=workout",
                         title = "Morning Strength Routine",
@@ -100,7 +100,7 @@ class TaskDetailsViewModel(
                 points = 40,
                 category = TaskCategory.WORK,
                 priority = 2,
-                links = listOf(
+                relatedLinks = listOf(
                     TaskLink(
                         url = "https://docs.google.com/proposal",
                         title = "Q4 Project Proposal Draft",
@@ -123,7 +123,7 @@ class TaskDetailsViewModel(
                 points = 35,
                 category = TaskCategory.INTELLIGENCE,
                 priority = 1,
-                links = listOf(
+                relatedLinks = listOf(
                     TaskLink(
                         url = "https://example.com/cognitive-science-chapter",
                         title = "Chapter 5: Mental Models",
@@ -140,7 +140,7 @@ class TaskDetailsViewModel(
                 points = 40,
                 category = TaskCategory.WEALTH,
                 priority = 1,
-                links = listOf(
+                relatedLinks = listOf(
                     TaskLink(
                         url = "https://youtube.com/investment-strategy",
                         title = "Investment Strategy for Beginners",

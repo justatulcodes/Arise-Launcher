@@ -1,6 +1,5 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,6 +9,7 @@ import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.repository.AppRepository
 import com.expeknow.ariselauncher.data.repository.TaskRepository
 import com.expeknow.ariselauncher.data.model.*
+import kotlinx.coroutines.CoroutineScope
 
 class HomeViewModel(
     private val appRepository: AppRepository,
@@ -26,8 +26,17 @@ class HomeViewModel(
     private fun loadInitialData() {
         viewModelScope.launch {
             loadApps()
-            loadTasks()
-            loadMockTasks() // Add some mock tasks for demonstration
+            observeTasks()
+            getCurrentPoints()
+//            loadMockTasks() // Add some mock tasks for demonstration
+        }
+    }
+
+    private suspend fun getCurrentPoints() {
+        taskRepository.getTotalPointsEarned().collect { points ->
+            if(points != null) {
+                _state.value = _state.value.copy(currentPoints = points)
+            }
         }
     }
 
@@ -41,54 +50,38 @@ class HomeViewModel(
 
             is HomeEvent.LoadTasks -> {
                 viewModelScope.launch {
-                    loadTasks()
+                    observeTasks()
                 }
             }
 
             is HomeEvent.CompleteTask -> {
                 viewModelScope.launch {
                     taskRepository.completeTask(event.taskId)
-                    loadTasks()
-                    updateTaskStats()
                 }
             }
 
             is HomeEvent.ToggleTask -> {
                 viewModelScope.launch {
-                    val currentTasks = _state.value.tasks
-                    val updatedTasks = currentTasks.map { task ->
-                        if (task.id == event.taskId) {
-                            task.copy(isCompleted = !task.isCompleted)
-                        } else task
-                    }
-                    _state.value = _state.value.copy(tasks = updatedTasks)
-                    updateTaskStats()
-
-                    // Update repository
-                    if (updatedTasks.find { it.id == event.taskId }?.isCompleted == true) {
-                        taskRepository.completeTask(event.taskId)
+                    val task = taskRepository.getTaskById(event.taskId)
+                    task?.let {
+                        if (it.isCompleted) {
+                            taskRepository.uncompleteTask(event.taskId)
+                        } else {
+                            taskRepository.completeTask(event.taskId)
+                        }
                     }
                 }
             }
 
             is HomeEvent.AddTask -> {
                 viewModelScope.launch {
-                    val newTask = Task(
+                    taskRepository.addTask(
                         title = event.title,
                         description = event.description,
                         points = event.points,
-                        category = event.category,
-                        priority = _state.value.tasks.size + 1
+                        category = event.category
                     )
-                    val updatedTasks = _state.value.tasks + newTask
-                    _state.value = _state.value.copy(
-                        tasks = updatedTasks,
-                        showAddTaskDialog = false
-                    )
-                    updateTaskStats()
-
-                    // Add to repository
-                    taskRepository.addTask(event.title, event.description, event.points)
+                    _state.value = _state.value.copy(showAddTaskDialog = false)
                 }
             }
 
@@ -180,95 +173,90 @@ class HomeViewModel(
         _state.value = _state.value.copy(apps = apps)
     }
 
-    private suspend fun loadTasks() {
-        val tasks = taskRepository.getAllTasks()
-        _state.value = _state.value.copy(tasks = tasks)
-        updateTaskStats()
+    private fun observeTasks() {
+        viewModelScope.launch {
+            taskRepository.getActiveTasks().collect { tasks ->
+                _state.value = _state.value.copy(tasks = tasks)
+                updateTaskStats(tasks)
+            }
+        }
     }
 
     private fun loadMockTasks() {
         // Add some mock tasks for demonstration
-        val mockTasks = listOf(
-            Task(
-                id = "1",
-                title = "Complete morning workout",
-                description = "A comprehensive 45-minute workout routine focusing on strength training and cardio to boost energy and productivity for the day.",
-                points = 25,
-                category = TaskCategory.PHYSICAL,
-                priority = 1,
-                links = listOf(
-                    TaskLink(
-                        url = "https://youtube.com/watch?v=workout",
-                        title = "Morning Strength Routine",
-                        type = TaskLinkType.VIDEO,
-                        thumbnail = "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=120&fit=crop",
-                        description = "A 20-minute strength training routine perfect for mornings"
+        viewModelScope.launch {
+            val mockTasks = listOf(
+                Task(
+                    title = "Complete morning workout",
+                    description = "A comprehensive 45-minute workout routine focusing on strength training and cardio to boost energy and productivity for the day.",
+                    points = 25,
+                    category = TaskCategory.PHYSICAL,
+                    priority = 1,
+                    relatedLinks = listOf(
+                        TaskLink(
+                            url = "https://youtube.com/watch?v=workout",
+                            title = "Morning Strength Routine",
+                            type = TaskLinkType.VIDEO,
+                            thumbnail = "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=120&fit=crop",
+                            description = "A 20-minute strength training routine perfect for mornings"
+                        )
                     )
-                )
-            ),
-            Task(
-                id = "2",
-                title = "Review project proposal",
-                description = "Thoroughly review the Q4 project proposal, analyze budget requirements, timeline feasibility, and resource allocation.",
-                points = 40,
-                category = TaskCategory.WORK,
-                priority = 2,
-                links = listOf(
-                    TaskLink(
-                        url = "https://docs.google.com/proposal",
-                        title = "Q4 Project Proposal Draft",
-                        type = TaskLinkType.ARTICLE,
-                        description = "Complete project proposal with timeline and budget"
+                ),
+                Task(
+                    title = "Review project proposal",
+                    description = "Thoroughly review the Q4 project proposal, analyze budget requirements, timeline feasibility, and resource allocation.",
+                    points = 40,
+                    category = TaskCategory.WORK,
+                    priority = 2,
+                    relatedLinks = listOf(
+                        TaskLink(
+                            url = "https://docs.google.com/proposal",
+                            title = "Q4 Project Proposal Draft",
+                            type = TaskLinkType.ARTICLE,
+                            description = "Complete project proposal with timeline and budget"
+                        )
                     )
+                ),
+                Task(
+                    title = "Read 30 pages of cognitive science book",
+                    description = "Study advanced cognitive psychology concepts to enhance thinking patterns and mental models.",
+                    points = 35,
+                    category = TaskCategory.INTELLIGENCE,
+                    priority = 1
+                ),
+                Task(
+                    title = "Research investment opportunities",
+                    description = "Analyze potential investment opportunities in emerging markets and cryptocurrency.",
+                    points = 40,
+                    category = TaskCategory.WEALTH,
+                    priority = 1
+                ),
+                Task(
+                    title = "Complete daily meditation",
+                    description = "20-minute mindfulness meditation session to improve focus and reduce stress.",
+                    points = 15,
+                    category = TaskCategory.PERSONAL,
+                    priority = 1,
+                    isCompleted = true
                 )
-            ),
-            Task(
-                id = "3",
-                title = "Read 30 pages of cognitive science book",
-                description = "Study advanced cognitive psychology concepts to enhance thinking patterns and mental models.",
-                points = 35,
-                category = TaskCategory.INTELLIGENCE,
-                priority = 1
-            ),
-            Task(
-                id = "4",
-                title = "Research investment opportunities",
-                description = "Analyze potential investment opportunities in emerging markets and cryptocurrency.",
-                points = 40,
-                category = TaskCategory.WEALTH,
-                priority = 1
-            ),
-            Task(
-                id = "5",
-                title = "Complete daily meditation",
-                description = "20-minute mindfulness meditation session to improve focus and reduce stress.",
-                points = 15,
-                category = TaskCategory.PERSONAL,
-                priority = 1,
-                isCompleted = true
             )
-        )
 
-        _state.value = _state.value.copy(tasks = mockTasks)
-        updateTaskStats()
+            // Insert mock tasks into the database
+            mockTasks.forEach { task ->
+                taskRepository.insertTask(task)
+            }
+        }
     }
 
-    private fun updateTaskStats() {
-        val currentTasks = _state.value.tasks
-        val completedCount = currentTasks.count { it.isCompleted }
-        val totalCount = currentTasks.size
-        val pointsEarned = currentTasks.filter { it.isCompleted }.sumOf { it.points }
+    private fun updateTaskStats(tasks: List<Task>) {
+        val completedCount = tasks.count { it.isCompleted }
+        val totalCount = tasks.size
+        val pointsEarned = tasks.filter { it.isCompleted }.sumOf { it.points }
 
         _state.value = _state.value.copy(
             completedTasks = completedCount,
             totalTasks = totalCount,
-            currentPoints = _state.value.currentPoints + (pointsEarned - getPreviousPointsEarned())
+            currentPoints = pointsEarned
         )
-    }
-
-    private fun getPreviousPointsEarned(): Int {
-        // This would typically track the previous points earned to calculate the difference
-        // For now, return 0 to simplify
-        return 0
     }
 }
