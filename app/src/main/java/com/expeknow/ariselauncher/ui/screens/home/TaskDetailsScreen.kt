@@ -1,31 +1,21 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.expeknow.ariselauncher.data.model.Task
+import com.expeknow.ariselauncher.AriseLauncherApplication
 import com.expeknow.ariselauncher.data.repository.TaskRepository
-import com.expeknow.ariselauncher.ui.theme.*
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
@@ -33,7 +23,8 @@ fun TaskDetailsScreen(
     navController: NavController,
     id: String
 ) {
-    val taskRepository = remember { TaskRepository() }
+    val context = LocalContext.current
+    val taskRepository = (context.applicationContext as AriseLauncherApplication).taskRepository
     val viewModel: TaskDetailsViewModel = viewModel { TaskDetailsViewModel(taskRepository) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = TaskDetailsTheme()
@@ -95,7 +86,7 @@ fun TaskDetailsScreen(
 
                     // Resources & Links Section
                     ResourcesLinksSection(
-                        links = task.links,
+                        links = task.relatedLinks,
                         expandedLinkId = state.expandedLinkId,
                         onExpandLink = { linkId ->
                             viewModel.onEvent(TaskDetailsEvent.ExpandLink(linkId))

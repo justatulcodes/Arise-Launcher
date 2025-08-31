@@ -21,13 +21,13 @@ enum class HomeMode {
 }
 
 enum class PointsTrend {
-    INCREASING, DECREASING
+    INCREASING, DECREASING, STABLE
 }
 
 data class HomeState(
-    val currentPoints: Int = 245,
-    val pointChange: Int = 15,
-    val pointsTrend: PointsTrend = PointsTrend.INCREASING,
+    val currentPoints: Int = 0,
+    val pointChange: Int = 0,
+    val pointsTrend: PointsTrend = PointsTrend.STABLE,
     val completedTasks: Int = 0,
     val totalTasks: Int = 0,
     val apps: List<AppInfo> = emptyList(),

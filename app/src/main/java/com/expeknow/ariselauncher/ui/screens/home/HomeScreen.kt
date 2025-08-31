@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.expeknow.ariselauncher.AriseLauncherApplication
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.data.repository.AppRepository
 import com.expeknow.ariselauncher.data.repository.TaskRepository
@@ -27,15 +28,12 @@ import androidx.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: HomeViewModel,
+    state: HomeState
 ) {
-    val context = LocalContext.current
-    val appRepository = remember { AppRepository(context) }
-    val taskRepository = remember { TaskRepository() }
-    val viewModel: HomeViewModel = viewModel { HomeViewModel(appRepository, taskRepository) }
-    val appDrawerViewModel: AppDrawerViewModel = viewModel()
 
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val appDrawerViewModel: AppDrawerViewModel = viewModel()
     val theme = HomeTheme()
 
     // Bottom sheet state
@@ -298,9 +296,9 @@ fun HomeScreen(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun HomeScreenPreview() {
-    // Create a mock navigation controller (null for preview)
-    HomeScreen(navController = androidx.navigation.compose.rememberNavController())
-}
+//@Preview(showBackground = true, backgroundColor = 0xFF000000)
+//@Composable
+//private fun HomeScreenPreview() {
+//    // Create a mock navigation controller (null for preview)
+//    HomeScreen(navController = androidx.navigation.compose.rememberNavController())
+//}

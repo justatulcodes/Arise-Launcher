@@ -11,7 +11,6 @@ class AppRepository(private val context: Context) {
         val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
-
         val apps = packageManager.queryIntentActivities(mainIntent, PackageManager.MATCH_DEFAULT_ONLY)
         return apps.mapNotNull { resolveInfo ->
             val packageName = resolveInfo.activityInfo.packageName
