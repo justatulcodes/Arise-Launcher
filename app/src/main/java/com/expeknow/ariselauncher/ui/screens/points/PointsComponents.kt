@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.*
@@ -500,4 +501,149 @@ private fun ActivityItem(
             )
         }
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PointsHeaderPreview() {
+    // Create a sample rank for preview
+    val sampleRank = Rank(
+        name = "Warrior",
+        minPoints = 100,
+        maxPoints = 299,
+        description = "Sample rank for preview",
+        icon = androidx.compose.material.icons.Icons.Filled.Star,
+        colors = RankColors(
+            background = Color(0xFF1F1F1F),
+            border = Color.White.copy(alpha = 0.2f),
+            accent = Color.White
+        )
+    )
+
+    PointsHeader(
+        selectedTabIndex = 0,
+        onTabSelect = {},
+        currentRank = sampleRank
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun CurrentStatusCardPreview() {
+    // Create sample ranks for preview
+    val currentRank = Rank(
+        name = "Warrior",
+        minPoints = 100,
+        maxPoints = 299,
+        description = "Building consistent habits",
+        icon = androidx.compose.material.icons.Icons.Filled.Star,
+        colors = RankColors(
+            background = Color(0xFF1F1F1F),
+            border = Color.White.copy(alpha = 0.2f),
+            accent = Color.White
+        )
+    )
+
+    val nextRank = Rank(
+        name = "Champion",
+        minPoints = 300,
+        maxPoints = 599,
+        description = "Master of discipline",
+        icon = androidx.compose.material.icons.Icons.Filled.EmojiEvents,
+        colors = RankColors(
+            background = Color(0xFF1F1F1F),
+            border = Color(0xFFFFD700).copy(alpha = 0.3f),
+            accent = Color(0xFFFFD700)
+        )
+    )
+
+    CurrentStatusCard(
+        currentPoints = 245,
+        currentRank = currentRank,
+        nextRank = nextRank,
+        progressToNext = 65f
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun StatsGridPreview() {
+    val sampleRank = Rank(
+        name = "Warrior",
+        minPoints = 100,
+        maxPoints = 299,
+        description = "Building consistent habits",
+        icon = androidx.compose.material.icons.Icons.Filled.Star,
+        colors = RankColors(
+            background = Color(0xFF1F1F1F),
+            border = Color.White.copy(alpha = 0.2f),
+            accent = Color.White
+        )
+    )
+
+    StatsGrid(
+        totalEarned = 520,
+        totalBurned = 275,
+        currentRank = sampleRank
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PointSystemCardPreview() {
+    val sampleRank = Rank(
+        name = "Warrior",
+        minPoints = 100,
+        maxPoints = 299,
+        description = "Building consistent habits",
+        icon = androidx.compose.material.icons.Icons.Filled.Star,
+        colors = RankColors(
+            background = Color(0xFF1F1F1F),
+            border = Color.White.copy(alpha = 0.2f),
+            accent = Color.White
+        )
+    )
+
+    PointSystemCard(currentRank = sampleRank)
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun RecentActivityCardPreview() {
+    val sampleRank = Rank(
+        name = "Warrior",
+        minPoints = 100,
+        maxPoints = 299,
+        description = "Building consistent habits",
+        icon = androidx.compose.material.icons.Icons.Filled.Star,
+        colors = RankColors(
+            background = Color(0xFF1F1F1F),
+            border = Color.White.copy(alpha = 0.2f),
+            accent = Color.White
+        )
+    )
+
+    val sampleActivities = listOf(
+        PointActivity(
+            "1",
+            ActivityType.EARN,
+            25,
+            "Completed morning workout",
+            "2h ago",
+            androidx.compose.material.icons.Icons.Filled.FitnessCenter
+        ),
+        PointActivity(
+            "2",
+            ActivityType.BURN,
+            -10,
+            "Instagram usage (5min)",
+            "3h ago",
+            androidx.compose.material.icons.Icons.Filled.Smartphone
+        )
+    )
+
+    RecentActivityCard(
+        activities = sampleActivities,
+        currentRank = sampleRank
+    )
 }

@@ -20,6 +20,9 @@ import com.expeknow.ariselauncher.data.repository.TaskRepository
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
 import com.expeknow.ariselauncher.ui.theme.*
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,9 +33,14 @@ fun HomeScreen(
     val appRepository = remember { AppRepository(context) }
     val taskRepository = remember { TaskRepository() }
     val viewModel: HomeViewModel = viewModel { HomeViewModel(appRepository, taskRepository) }
+    val appDrawerViewModel: AppDrawerViewModel = viewModel()
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = HomeTheme()
+
+    // Bottom sheet state
+    val bottomSheetState = rememberModalBottomSheetState()
+    var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -183,26 +191,6 @@ fun HomeScreen(
                 }
             }
 
-            // Motivational Quote
-            Box(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                MotivationalQuote(theme = theme)
-            }
-
-            // Essential Apps Bar
-            EssentialAppsBar(
-                onAppClick = { appName ->
-                    viewModel.onEvent(HomeEvent.LaunchApp(appName))
-                },
-                onOpenFullApps = {
-                    viewModel.onEvent(HomeEvent.ShowEssentialAppsSheet)
-                },
-                theme = theme
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Mode Status Banner
             Box(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
@@ -225,7 +213,17 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // Essential Apps Bar
+            EssentialAppsBar(
+                onAppClick = { appName ->
+                    viewModel.onEvent(HomeEvent.LaunchApp(appName))
+                },
+                onOpenFullApps = {
+                    showAppDrawerBottomSheet = true
+                },
+                theme = theme
+            )
+
         }
 
         // Floating Action Button for Focused Mode
@@ -250,11 +248,39 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.HideEssentialAppsSheet)
             },
             onOpenFullApps = {
-                // Navigate to full app drawer
                 viewModel.onEvent(HomeEvent.HideEssentialAppsSheet)
+                showAppDrawerBottomSheet = true
             },
             theme = theme
         )
+    }
+
+    // App Drawer Bottom Sheet
+    if (showAppDrawerBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showAppDrawerBottomSheet = false },
+            sheetState = bottomSheetState,
+            containerColor = Color.Black,
+            contentColor = Color.White,
+            dragHandle = {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .width(32.dp)
+                        .height(4.dp)
+                        .background(
+                            Color.White.copy(alpha = 0.3f),
+                            androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
+                        )
+                )
+            }
+        ) {
+            AppDrawerScreen(
+                navController = navController,
+                onClose = { showAppDrawerBottomSheet = false },
+                viewModel = appDrawerViewModel
+            )
+        }
     }
 
     // Add Task Dialog
@@ -270,4 +296,11 @@ fun HomeScreen(
             }
         )
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun HomeScreenPreview() {
+    // Create a mock navigation controller (null for preview)
+    HomeScreen(navController = androidx.navigation.compose.rememberNavController())
 }

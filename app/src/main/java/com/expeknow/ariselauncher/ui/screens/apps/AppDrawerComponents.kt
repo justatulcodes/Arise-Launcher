@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -509,4 +510,89 @@ fun AppWarningDialog(
             }
         )
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun CountdownScreenPreview() {
+    CountdownScreen(
+        countdown = 30,
+        theme = AppDrawerTheme(),
+        onReturnToTasks = {}
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppDrawerHeaderPreview() {
+    AppDrawerHeader(
+        onClose = {},
+        theme = AppDrawerTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun WarningBannerPreview() {
+    WarningBanner()
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppCategorySectionPreview() {
+    val sampleApps = listOf(
+        AppDrawerApp(
+            id = "1",
+            name = "Phone",
+            icon = Icons.Default.Phone,
+            category = AppCategory.ESSENTIAL,
+            pointCost = 0,
+            description = "Make calls"
+        ),
+        AppDrawerApp(
+            id = "2",
+            name = "Instagram",
+            icon = Icons.Default.CameraAlt,
+            category = AppCategory.SOCIAL,
+            pointCost = 25,
+            description = "Social media"
+        )
+    )
+
+    AppCategorySection(
+        category = AppCategory.ESSENTIAL,
+        apps = sampleApps,
+        onAppClick = {},
+        theme = AppDrawerTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppDrawerFooterPreview() {
+    AppDrawerFooter(
+        currentPoints = 245,
+        totalFreeApps = 8,
+        totalPremiumApps = 12,
+        theme = AppDrawerTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppWarningDialogPreview() {
+    val sampleApp = AppDrawerApp(
+        id = "1",
+        name = "Instagram",
+        icon = Icons.Default.CameraAlt,
+        category = AppCategory.SOCIAL,
+        pointCost = 25,
+        description = "Social media platform"
+    )
+
+    AppWarningDialog(
+        app = sampleApp,
+        onConfirm = {},
+        onDismiss = {}
+    )
 }

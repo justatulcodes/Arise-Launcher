@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
@@ -31,6 +32,7 @@ import com.expeknow.ariselauncher.data.repository.AppRepository
 fun AppListScreen(navController: NavController) {
     val context = LocalContext.current
     val appRepository = remember { AppRepository(context) }
+
     val viewModel: AppListViewModel = viewModel { AppListViewModel(appRepository, context) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = AppListTheme()
@@ -103,6 +105,15 @@ private fun AppListHeader(
     }
 }
 
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppListHeaderPreview() {
+    AppListHeader(
+        onSettingsClick = {},
+        theme = AppListTheme()
+    )
+}
+
 @Composable
 private fun AppsList(
     apps: List<AppInfo>,
@@ -149,5 +160,54 @@ private fun AppListItem(
             style = MaterialTheme.typography.bodyLarge,
             color = theme.textPrimary
         )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppListItemPreview() {
+    // Create a sample AppInfo with a mock drawable icon
+    val context = LocalContext.current
+    val mockDrawable = androidx.core.content.ContextCompat.getDrawable(
+        context, android.R.drawable.ic_menu_gallery
+    ) ?: context.getDrawable(android.R.drawable.ic_menu_camera)!!
+
+    val sampleApp = AppInfo(
+        name = "Sample App",
+        packageName = "com.example.sampleapp",
+        icon = mockDrawable
+    )
+
+    AppListItem(
+        app = sampleApp,
+        onClick = {},
+        theme = AppListTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppListScreenPreview() {
+    // Since AppListScreen requires NavController and complex state,
+    // we'll create a simplified preview
+    val theme = AppListTheme()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(theme.background)
+            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+    ) {
+        AppListHeader(
+            onSettingsClick = {},
+            theme = theme
+        )
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = theme.textPrimary)
+        }
     }
 }

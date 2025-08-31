@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -342,4 +343,73 @@ fun DangerZoneCard(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewSettingsCard() {
+    SettingsCard(theme = SettingsTheme()) {
+        Text("Settings Card")
+    }
+}
+
+@Preview
+@Composable
+fun PreviewSettingsToggleItem() {
+    SettingsToggleItem(
+        title = "Toggle Item",
+        subtitle = "Subtitle",
+        checked = true,
+        onCheckedChange = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun PreviewSettingsSliderItem() {
+    SettingsSliderItem(
+        title = "Slider Item",
+        value = 50f,
+        onValueChange = {},
+        valueRange = 0f..100f,
+        steps = 10,
+        unit = "%",
+        description = "Description",
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun PreviewAppListItem() {
+    AppListItem(
+        app = SettingsAppInfo(
+            id = "id",
+            name = "App Name",
+            icon = Icons.Default.Android,
+            category = AppCategory.ESSENTIAL,
+            essential = true
+        ),
+        onEssentialToggle = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun PreviewSettingsSectionTitle() {
+    SettingsSectionTitle(
+        title = "Section Title",
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun PreviewDangerZoneCard() {
+    DangerZoneCard(
+        onResetPoints = {},
+        onFactoryReset = {}
+    )
 }
