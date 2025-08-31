@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import androidx.compose.ui.tooling.preview.Preview
 
 data class DriveTheme(
     val background: Color = Color.Black,
@@ -82,6 +83,96 @@ fun DriveHeader(
             }
         }
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun DriveHeaderPreview() {
+    DriveHeader(
+        currentTab = "quotes",
+        onTabSelect = {},
+        theme = DriveTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun FeaturedQuoteCardPreview() {
+    val sampleQuote = MotivationalQuote(
+        id = "1",
+        text = "The only impossible journey is the one you never begin",
+        author = "Tony Robbins",
+        category = "motivation"
+    )
+
+    FeaturedQuoteCard(
+        quote = sampleQuote,
+        onNextQuote = {},
+        theme = DriveTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun CategoryQuoteCardPreview() {
+    CategoryQuoteCard(
+        icon = Icons.Filled.Lightbulb,
+        category = "DISCIPLINE",
+        quote = "Self-discipline is the magic power that makes you virtually unstoppable.",
+        theme = DriveTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun EmergencyMotivationCardPreview() {
+    EmergencyMotivationCard(theme = DriveTheme())
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun VisionBoardSectionPreview() {
+    val sampleVisionCards = listOf(
+        VisionCard(
+            id = "1",
+            title = "Dream Home",
+            description = "My ideal living space",
+            imageUrl = "https://example.com/image.jpg",
+            category = "wealth"
+        )
+    )
+
+    VisionBoardSection(
+        visionCards = sampleVisionCards,
+        onAddVision = {},
+        onEditVision = {},
+        theme = DriveTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun WhyRemindersSectionPreview() {
+    val sampleWhyReasons = listOf(
+        WhyReason(
+            id = "1",
+            title = "Family",
+            description = "To provide a better life for my loved ones"
+        ),
+        WhyReason(
+            id = "2",
+            title = "Freedom",
+            description = "To have the freedom to choose my path"
+        )
+    )
+
+    WhyRemindersSection(
+        whyReasons = sampleWhyReasons,
+        onEditWhy = {},
+        onAddWhy = {},
+        onDeleteWhy = {},
+        theme = DriveTheme()
+    )
 }
 
 @Composable

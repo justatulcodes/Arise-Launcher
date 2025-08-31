@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -94,5 +95,15 @@ fun AppDrawerScreen(
         onDismiss = {
             viewModel.onEvent(AppDrawerEvent.HideWarning)
         }
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppDrawerScreenPreview() {
+    AppDrawerScreen(
+        navController = androidx.navigation.compose.rememberNavController(),
+        onClose = {},
+        viewModel = viewModel()
     )
 }

@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.repository.TaskRepository
 import com.expeknow.ariselauncher.ui.theme.*
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun TaskDetailsScreen(
@@ -72,7 +73,6 @@ fun TaskDetailsScreen(
                         theme = theme
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Points Reward Section
                     PointsRewardSection(
@@ -123,4 +123,13 @@ fun TaskDetailsScreen(
             }
         }
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun TaskDetailsScreenPreview() {
+    TaskDetailsScreen(
+        navController = androidx.navigation.compose.rememberNavController(),
+        id = "preview-task-id"
+    )
 }

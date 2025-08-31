@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.ui.theme.*
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun EnhancedPointsHeader(
@@ -1114,4 +1115,73 @@ private fun AppIcon(
             fontWeight = if (isCenter) FontWeight.Medium else FontWeight.Normal
         )
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun EnhancedPointsHeaderPreview() {
+    EnhancedPointsHeader(
+        currentPoints = 245,
+        pointChange = 15,
+        pointsTrend = PointsTrend.INCREASING,
+        completed = 5,
+        total = 8,
+        onPointsClick = {},
+        theme = HomeTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun ModeTogglePreview() {
+    ModeToggle(
+        mode = HomeMode.SIMPLE,
+        onModeToggle = {},
+        theme = HomeTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun EnhancedProgressBarPreview() {
+    EnhancedProgressBar(
+        completed = 5,
+        total = 8,
+        theme = HomeTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun MotivationalQuotePreview() {
+    MotivationalQuote(theme = HomeTheme())
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun EssentialAppsBarPreview() {
+    EssentialAppsBar(
+        onAppClick = {},
+        onOpenFullApps = {},
+        theme = HomeTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun TasksCompletedCelebrationPreview() {
+    TasksCompletedCelebration(
+        completedCount = 8,
+        pointsEarned = 120,
+        theme = HomeTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun FloatingAddButtonPreview() {
+    FloatingAddButton(
+        onClick = {},
+        theme = HomeTheme()
+    )
 }

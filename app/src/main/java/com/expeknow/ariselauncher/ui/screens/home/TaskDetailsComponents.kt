@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.*
@@ -447,4 +448,42 @@ private fun getLinkEmoji(type: TaskLinkType) = when (type) {
     TaskLinkType.VIDEO -> "📹"
     TaskLinkType.ARTICLE -> "📄"
     TaskLinkType.LINK -> "🔗"
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun TaskDetailsHeaderPreview() {
+    TaskDetailsHeader(
+        onBackClick = {},
+        theme = TaskDetailsTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PointsRewardSectionPreview() {
+    PointsRewardSection(
+        points = 25,
+        theme = TaskDetailsTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun CompletionStatusBannerPreview() {
+    CompletionStatusBanner(
+        isCompleted = false,
+        onToggleComplete = {},
+        theme = TaskDetailsTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun CompletionStatusBannerCompletedPreview() {
+    CompletionStatusBanner(
+        isCompleted = true,
+        onToggleComplete = {},
+        theme = TaskDetailsTheme()
+    )
 }

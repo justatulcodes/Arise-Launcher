@@ -3,12 +3,15 @@ package com.expeknow.ariselauncher.ui.screens.settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -223,4 +226,82 @@ fun ResourcesSection(
             color = Color.White.copy(alpha = 0.6f)
         )
     }
+}
+
+// Add preview functions at the end of the file
+@Preview
+@Composable
+fun TaskCompletionSectionPreview() {
+    TaskCompletionSection(
+        hideCompletedTasks = true,
+        onToggle = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun TunnelVisionSectionPreview() {
+    TunnelVisionSection(
+        tunnelVisionMode = true,
+        onToggle = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun AccessDelaysSectionPreview() {
+    AccessDelaysSection(
+        appDrawerDelay = 10f,
+        distractionAppsDelay = 5f,
+        onAppDrawerDelayChange = {},
+        onDistractionDelayChange = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun PointSystemSectionPreview() {
+    PointSystemSection(
+        pointThreshold = 100f,
+        warningsEnabled = true,
+        onThresholdChange = {},
+        onWarningsToggle = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun EssentialAppsSectionPreview() {
+    EssentialAppsSection(
+        apps = listOf(
+            SettingsAppInfo(
+                id = "1",
+                name = "App 1",
+                essential = true,
+                icon = Icons.Default.Android,
+                category = AppCategory.ESSENTIAL
+            ),
+            SettingsAppInfo(
+                id = "2",
+                name = "App 2",
+                essential = false,
+                icon = Icons.Default.Apps,
+                category = AppCategory.PRODUCTIVITY
+            )
+        ),
+        onAppToggle = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun ResourcesSectionPreview() {
+    ResourcesSection(
+        theme = SettingsTheme()
+    )
 }
