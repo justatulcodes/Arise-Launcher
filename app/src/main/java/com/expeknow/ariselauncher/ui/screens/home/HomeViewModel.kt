@@ -27,15 +27,15 @@ class HomeViewModel(
         viewModelScope.launch {
             loadApps()
             observeTasks()
-            getCurrentPoints()
+            observePoints()
 //            loadMockTasks() // Add some mock tasks for demonstration
         }
     }
 
-    private suspend fun getCurrentPoints() {
-        taskRepository.getTotalPointsEarned().collect { points ->
-            if(points != null) {
-                _state.value = _state.value.copy(currentPoints = points)
+    private fun observePoints() {
+        viewModelScope.launch {
+            taskRepository.getTotalPointsEarned().collect { points ->
+                _state.value = _state.value.copy(currentPoints = points ?: 0)
             }
         }
     }
@@ -251,12 +251,12 @@ class HomeViewModel(
     private fun updateTaskStats(tasks: List<Task>) {
         val completedCount = tasks.count { it.isCompleted }
         val totalCount = tasks.size
-        val pointsEarned = tasks.filter { it.isCompleted }.sumOf { it.points }
+        // Removed local points calculation since we're observing from database
 
         _state.value = _state.value.copy(
             completedTasks = completedCount,
-            totalTasks = totalCount,
-            currentPoints = pointsEarned
+            totalTasks = totalCount
+            // Removed currentPoints update here
         )
     }
 }

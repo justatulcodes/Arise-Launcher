@@ -358,11 +358,11 @@ private fun AppGridItem(
             fontWeight = FontWeight.Medium
         )
 
-        Text(
-            text = app.description,
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White.copy(alpha = 0.4f)
-        )
+//        Text(
+//            text = app.description,
+//            style = MaterialTheme.typography.labelSmall,
+//            color = Color.White.copy(alpha = 0.4f)
+//        )
     }
 }
 
@@ -547,7 +547,8 @@ private fun AppCategorySectionPreview() {
             icon = Icons.Default.Phone,
             category = AppCategory.ESSENTIAL,
             pointCost = 0,
-            description = "Make calls"
+            description = "Make calls",
+            packageName = "com.android.phone"
         ),
         AppDrawerApp(
             id = "2",
@@ -555,7 +556,9 @@ private fun AppCategorySectionPreview() {
             icon = Icons.Default.CameraAlt,
             category = AppCategory.SOCIAL,
             pointCost = 25,
-            description = "Social media"
+            description = "Social media",
+            packageName = "com.android.phone"
+
         )
     )
 
@@ -587,7 +590,9 @@ private fun AppWarningDialogPreview() {
         icon = Icons.Default.CameraAlt,
         category = AppCategory.SOCIAL,
         pointCost = 25,
-        description = "Social media platform"
+        description = "Social media platform",
+        packageName = "com.android.phone"
+
     )
 
     AppWarningDialog(

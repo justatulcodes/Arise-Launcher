@@ -7,6 +7,15 @@ import com.expeknow.ariselauncher.data.repository.TaskRepository
 
 class AriseLauncherApplication : Application() {
 
+    val context = this
+
+    override fun onCreate() {
+        super.onCreate()
+        // Initialization code if needed
+    }
+
+
+
     // Database instance
     private val database by lazy { AriseLauncherDatabase.getDatabase(this) }
 

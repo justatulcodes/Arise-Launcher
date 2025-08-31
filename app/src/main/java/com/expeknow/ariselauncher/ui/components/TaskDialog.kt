@@ -17,17 +17,24 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalWindowInfo
 import com.expeknow.ariselauncher.ui.theme.*
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
 @Composable
@@ -39,6 +46,17 @@ fun TaskDialog(
     var description by remember { mutableStateOf("") }
     var pointsValue by remember { mutableStateOf(10f) }
     val points = pointsValue.roundToInt()
+    val windowInfo = LocalWindowInfo.current
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(windowInfo) {
+        snapshotFlow { windowInfo.isWindowFocused }.collect { isWindowFocused ->
+            if (isWindowFocused) {
+                delay(200)
+                focusRequester.requestFocus()
+            }
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -52,7 +70,8 @@ fun TaskDialog(
                     placeholder = { Text("Enter task name...", color = Color.White) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = 8.dp)
+                        .focusRequester(focusRequester),
                     singleLine = true,
                 )
 

@@ -75,7 +75,7 @@ fun AppNavigation(navController: NavHostController) {
         NavHost(
             navController = navController,
             startDestination = Screen.Focus.route,
-//            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues)
         ) {
             composable(Screen.Focus.route) {
                 val context = LocalContext.current

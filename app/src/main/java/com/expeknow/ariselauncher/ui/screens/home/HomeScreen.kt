@@ -1,8 +1,10 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -40,11 +42,15 @@ fun HomeScreen(
     val bottomSheetState = rememberModalBottomSheetState()
     var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
 
+    BackHandler {
+        // do nothing as its a launcher
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+//            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
     ) {
         // Calculated values for the entire screen
         val allTasksCompleted = state.totalTasks > 0 && state.completedTasks == state.totalTasks
@@ -69,16 +75,14 @@ fun HomeScreen(
                 theme = theme
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
             // Mode Toggle
-            ModeToggle(
-                mode = state.mode,
-                onModeToggle = { viewModel.onEvent(HomeEvent.ToggleMode) },
-                theme = theme
-            )
+//            ModeToggle(
+//                mode = state.mode,
+//                onModeToggle = { viewModel.onEvent(HomeEvent.ToggleMode) },
+//                theme = theme
+//            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+//            Spacer(modifier = Modifier.height(16.dp))
 
             // Progress Bar
             EnhancedProgressBar(
@@ -110,43 +114,73 @@ fun HomeScreen(
                             }
 
                             Column {
-                                SimpleTaskList(
-                                    tasks = simpleTasks,
-                                    onTaskClick = { taskId ->
-                                        navController.navigate(Screen.TaskDetails.routeFor(taskId))
-                                    },
-                                    onToggleTask = { taskId ->
-                                        viewModel.onEvent(HomeEvent.ToggleTask(taskId))
-                                    },
-                                    theme = theme
-                                )
+//                                SimpleTaskList(
+//                                    tasks = simpleTasks,
+//                                    onTaskClick = { taskId ->
+//                                        navController.navigate(Screen.TaskDetails.routeFor(taskId))
+//                                    },
+//                                    onToggleTask = { taskId ->
+//                                        viewModel.onEvent(HomeEvent.ToggleTask(taskId))
+//                                    },
+//                                    theme = theme
+//                                )
 
-                                Spacer(modifier = Modifier.weight(1f))
+                                Box {
+                                    LazyColumn(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 24.dp),
+                                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                                    ) {
+                                        items(simpleTasks) { task ->
+                                            SimpleTaskItem(
+                                                task = task,
+                                                onTaskClick = {
+                                                    navController.navigate(Screen.TaskDetails.routeFor(task.id))
+                                                },
+                                                onToggleTask = {
+                                                    viewModel.onEvent(HomeEvent.ToggleTask(task.id))
+                                                },
+                                                theme = theme
+                                            )
+                                        }
 
-                                // Add Task Button for Simple Mode
-                                OutlinedButton(
-                                    onClick = { viewModel.onEvent(HomeEvent.ShowAddTaskDialog) },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 24.dp)
-                                        .padding(bottom = 16.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = Color.White.copy(alpha = 0.6f)
-                                    ),
-                                    border = ButtonDefaults.outlinedButtonBorder.copy(
-                                        brush = androidx.compose.ui.graphics.SolidColor(
-                                            Color.White.copy(alpha = 0.2f)
+                                        item {
+                                            Spacer(modifier = Modifier.height(56.dp))
+                                        }
+                                    }
+
+                                    // Add Task Button for Simple Mode
+                                    OutlinedButton(
+                                        onClick = { viewModel.onEvent(HomeEvent.ShowAddTaskDialog) },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .align(Alignment.BottomCenter)
+                                            .padding(horizontal = 24.dp)
+                                            .padding(bottom = 16.dp),
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            contentColor = Color.White.copy(alpha = 0.8f),
+                                            containerColor = Color.Black
+                                        ),
+                                        border = ButtonDefaults.outlinedButtonBorder.copy(
+                                            brush = androidx.compose.ui.graphics.SolidColor(
+                                                Color.White.copy(alpha = 0.2f)
+                                            )
                                         )
-                                    )
-                                ) {
-                                    Icon(
-                                        androidx.compose.material.icons.Icons.Filled.Add,
-                                        contentDescription = "Add Task",
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("ADD TASK")
+                                    ) {
+                                        Icon(
+                                            androidx.compose.material.icons.Icons.Filled.Add,
+                                            contentDescription = "Add Task",
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("ADD TASK")
+                                    }
+
                                 }
+
+
+
                             }
                         }
 
@@ -190,26 +224,26 @@ fun HomeScreen(
             }
 
             // Mode Status Banner
-            Box(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        if (state.mode == HomeMode.SIMPLE) "TUNNEL VISION MODE ACTIVE" else "FOCUSED DEVELOPMENT MODE ACTIVE",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = theme.accent.copy(alpha = 0.8f)
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        if (state.mode == HomeMode.SIMPLE) "Stay focused. Complete your goals." else "Transform yourself through disciplined action.",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White.copy(alpha = 0.6f)
-                    )
-                }
-            }
+//            Box(
+//                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+//            ) {
+//                Column(
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    Text(
+//                        if (state.mode == HomeMode.SIMPLE) "TUNNEL VISION MODE ACTIVE" else "FOCUSED DEVELOPMENT MODE ACTIVE",
+//                        style = MaterialTheme.typography.labelSmall,
+//                        color = theme.accent.copy(alpha = 0.8f)
+//                    )
+//                    Spacer(modifier = Modifier.height(2.dp))
+//                    Text(
+//                        if (state.mode == HomeMode.SIMPLE) "Stay focused. Complete your goals." else "Transform yourself through disciplined action.",
+//                        style = MaterialTheme.typography.labelSmall,
+//                        color = Color.White.copy(alpha = 0.6f)
+//                    )
+//                }
+//            }
 
             // Essential Apps Bar
             EssentialAppsBar(
