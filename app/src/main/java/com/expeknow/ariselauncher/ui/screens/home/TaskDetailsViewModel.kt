@@ -61,115 +61,165 @@ class TaskDetailsViewModel(
             is TaskDetailsEvent.NavigateBack -> {
                 // Handle navigation - this would typically involve a navigation callback
             }
+
+            // Editing events
+            is TaskDetailsEvent.StartEditingTitle -> {
+                _state.value.task?.let { task ->
+                    _state.value = _state.value.copy(
+                        isEditingTitle = true,
+                        editingTitleText = task.title
+                    )
+                }
+            }
+
+            is TaskDetailsEvent.StartEditingDescription -> {
+                _state.value.task?.let { task ->
+                    _state.value = _state.value.copy(
+                        isEditingDescription = true,
+                        editingDescriptionText = task.description
+                    )
+                }
+            }
+
+            is TaskDetailsEvent.StartAddingLink -> {
+                _state.value = _state.value.copy(
+                    isAddingLink = true,
+                    newLinkTitle = "",
+                    newLinkUrl = "",
+                    newLinkDescription = "",
+                    newLinkType = TaskLinkType.LINK
+                )
+            }
+
+            is TaskDetailsEvent.CancelEditing -> {
+                _state.value = _state.value.copy(
+                    isEditingTitle = false,
+                    isEditingDescription = false,
+                    isAddingLink = false,
+                    editingTitleText = "",
+                    editingDescriptionText = "",
+                    newLinkTitle = "",
+                    newLinkUrl = "",
+                    newLinkDescription = ""
+                )
+            }
+
+            is TaskDetailsEvent.UpdateTitleText -> {
+                _state.value = _state.value.copy(editingTitleText = event.text)
+            }
+
+            is TaskDetailsEvent.UpdateDescriptionText -> {
+                _state.value = _state.value.copy(editingDescriptionText = event.text)
+            }
+
+            is TaskDetailsEvent.SaveTitle -> {
+                _state.value.task?.let { task ->
+                    val updatedTask = task.copy(title = _state.value.editingTitleText)
+                    _state.value = _state.value.copy(
+                        task = updatedTask,
+                        isEditingTitle = false,
+                        editingTitleText = ""
+                    )
+
+                    viewModelScope.launch {
+                        taskRepository.updateTask(updatedTask)
+                    }
+                }
+            }
+
+            is TaskDetailsEvent.SaveDescription -> {
+                _state.value.task?.let { task ->
+                    val updatedTask = task.copy(description = _state.value.editingDescriptionText)
+                    _state.value = _state.value.copy(
+                        task = updatedTask,
+                        isEditingDescription = false,
+                        editingDescriptionText = ""
+                    )
+
+                    viewModelScope.launch {
+                        taskRepository.updateTask(updatedTask)
+                    }
+                }
+            }
+
+            // Link management events
+            is TaskDetailsEvent.UpdateNewLinkTitle -> {
+                _state.value = _state.value.copy(newLinkTitle = event.title)
+            }
+
+            is TaskDetailsEvent.UpdateNewLinkUrl -> {
+                _state.value = _state.value.copy(newLinkUrl = event.url)
+            }
+
+            is TaskDetailsEvent.UpdateNewLinkDescription -> {
+                _state.value = _state.value.copy(newLinkDescription = event.description)
+            }
+
+            is TaskDetailsEvent.UpdateNewLinkType -> {
+                _state.value = _state.value.copy(newLinkType = event.type)
+            }
+
+            is TaskDetailsEvent.SaveNewLink -> {
+                _state.value.task?.let { task ->
+                    if (_state.value.newLinkTitle.isNotBlank() && _state.value.newLinkUrl.isNotBlank()) {
+                        val newLink = TaskLink(
+                            title = _state.value.newLinkTitle,
+                            url = _state.value.newLinkUrl,
+                            type = _state.value.newLinkType,
+                            description = _state.value.newLinkDescription.takeIf { it.isNotBlank() }
+                        )
+
+                        val updatedTask = task.copy(
+                            relatedLinks = task.relatedLinks + newLink
+                        )
+
+                        _state.value = _state.value.copy(
+                            task = updatedTask,
+                            isAddingLink = false,
+                            newLinkTitle = "",
+                            newLinkUrl = "",
+                            newLinkDescription = ""
+                        )
+
+                        viewModelScope.launch {
+                            taskRepository.updateTask(updatedTask)
+                        }
+                    }
+                }
+            }
+
+            is TaskDetailsEvent.RemoveLink -> {
+                _state.value.task?.let { task ->
+                    val updatedTask = task.copy(
+                        relatedLinks = task.relatedLinks.filter { it.id != event.linkId }
+                    )
+                    _state.value = _state.value.copy(task = updatedTask)
+
+                    viewModelScope.launch {
+                        taskRepository.updateTask(updatedTask)
+                    }
+                }
+            }
         }
     }
 
     private fun loadTask(taskId: String) {
         _state.value = _state.value.copy(isLoading = true)
 
-        // Mock task data with enhanced fields
-        val mockTask = when (taskId) {
-            "1" -> Task(
-                id = taskId,
-                title = "Complete morning workout",
-                description = "A comprehensive 45-minute workout routine focusing on strength training and cardio to boost energy and productivity for the day.",
-                points = 25,
-                category = TaskCategory.PHYSICAL,
-                priority = 1,
-                relatedLinks = listOf(
-                    TaskLink(
-                        url = "https://youtube.com/watch?v=workout",
-                        title = "Morning Strength Routine",
-                        type = TaskLinkType.VIDEO,
-                        thumbnail = "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=120&fit=crop",
-                        description = "A 20-minute strength training routine perfect for mornings. This video covers proper form for basic exercises including push-ups, squats, and planks."
-                    ),
-                    TaskLink(
-                        url = "https://example.com/workout-plan",
-                        title = "Complete Workout Plan PDF",
-                        type = TaskLinkType.ARTICLE,
-                        description = "Downloadable workout plan with step-by-step instructions and progress tracking sheets."
-                    )
+        viewModelScope.launch {
+            val task = taskRepository.getTaskById(taskId)
+            if (task != null) {
+                _state.value = _state.value.copy(
+                    task = task,
+                    isLoading = false,
+                    showCompletionBanner = task.isCompleted
                 )
-            )
-
-            "2" -> Task(
-                id = taskId,
-                title = "Review project proposal",
-                description = "Thoroughly review the Q4 project proposal, analyze budget requirements, timeline feasibility, and resource allocation.",
-                points = 40,
-                category = TaskCategory.WORK,
-                priority = 2,
-                relatedLinks = listOf(
-                    TaskLink(
-                        url = "https://docs.google.com/proposal",
-                        title = "Q4 Project Proposal Draft",
-                        type = TaskLinkType.ARTICLE,
-                        description = "Complete project proposal with timeline, budget breakdown, and team assignments for Q4 deliverables."
-                    ),
-                    TaskLink(
-                        url = "https://example.com/budget-template",
-                        title = "Budget Analysis Template",
-                        type = TaskLinkType.LINK,
-                        description = "Excel template for analyzing project costs and resource allocation."
-                    )
-                )
-            )
-
-            "3" -> Task(
-                id = taskId,
-                title = "Read 30 pages of cognitive science book",
-                description = "Study advanced cognitive psychology concepts to enhance thinking patterns and mental models.",
-                points = 35,
-                category = TaskCategory.INTELLIGENCE,
-                priority = 1,
-                relatedLinks = listOf(
-                    TaskLink(
-                        url = "https://example.com/cognitive-science-chapter",
-                        title = "Chapter 5: Mental Models",
-                        type = TaskLinkType.ARTICLE,
-                        description = "Essential reading on how mental models shape our understanding and decision-making processes."
-                    )
-                )
-            )
-
-            "4" -> Task(
-                id = taskId,
-                title = "Research investment opportunities",
-                description = "Analyze potential investment opportunities in emerging markets and cryptocurrency.",
-                points = 40,
-                category = TaskCategory.WEALTH,
-                priority = 1,
-                relatedLinks = listOf(
-                    TaskLink(
-                        url = "https://youtube.com/investment-strategy",
-                        title = "Investment Strategy for Beginners",
-                        type = TaskLinkType.VIDEO,
-                        description = "Comprehensive guide to building a diversified investment portfolio with focus on long-term growth."
-                    ),
-                    TaskLink(
-                        url = "https://example.com/market-analysis",
-                        title = "Current Market Analysis Report",
-                        type = TaskLinkType.ARTICLE,
-                        description = "Latest market trends and analysis for emerging markets and cryptocurrency sectors."
-                    )
-                )
-            )
-
-            else -> Task(
-                id = taskId,
-                title = "Sample Task",
-                description = "This is a sample task for demonstration purposes.",
-                points = 20,
-                category = TaskCategory.PERSONAL,
-                priority = 1
-            )
+            } else {
+                // Handle task not found - for simplicity, just set loading to false
+                _state.value = _state.value.copy(isLoading = false)
+            }
         }
 
-        _state.value = _state.value.copy(
-            task = mockTask,
-            isLoading = false,
-            showCompletionBanner = mockTask.isCompleted
-        )
+
     }
 }
