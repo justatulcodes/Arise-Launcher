@@ -11,10 +11,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class AppDrawerViewModel(
-    private val taskRepositoryImpl: TaskRepositoryImpl
+@HiltViewModel
+class AppDrawerViewModel @Inject constructor(
+    private val taskRepositoryImpl: TaskRepository,
+    private val pointsLogRepositoryImpl: PointsLogRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppDrawerState())
@@ -27,7 +34,7 @@ class AppDrawerViewModel(
 
     private fun observePoints() {
         viewModelScope.launch {
-            taskRepositoryImpl.getAvailablePoints().collect { points ->
+            pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
                 _state.value = _state.value.copy(currentPoints = points)
             }
         }
@@ -64,9 +71,11 @@ class AppDrawerViewModel(
                 // Deduct points if the app has a cost
                 if (event.app.pointCost > 0) {
                     viewModelScope.launch {
-                        taskRepositoryImpl.spendPoints(
+                        pointsLogRepositoryImpl.spendPoints(
                             event.app.pointCost,
-                            "Launched ${event.app.name}"
+                            "NIL",
+                            "Launched ${event.app.name}",
+
                         )
                     }
                 }

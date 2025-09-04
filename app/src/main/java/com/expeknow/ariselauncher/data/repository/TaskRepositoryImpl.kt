@@ -1,18 +1,10 @@
 package com.expeknow.ariselauncher.data.repository
 
-import android.content.Context
-import android.content.SharedPreferences
-import com.expeknow.ariselauncher.data.datasource.`interface`.TaskDataSource
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
-import com.expeknow.ariselauncher.data.model.ActivityType
-import com.expeknow.ariselauncher.data.model.PointActivity
-import com.expeknow.ariselauncher.data.model.PointsHistory
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 
 class TaskRepositoryImpl(
     private val offlineDataSource: TaskDataSource,

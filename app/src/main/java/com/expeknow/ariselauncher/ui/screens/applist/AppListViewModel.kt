@@ -9,10 +9,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class AppListViewModel(
-    private val appRepositoryImpl: AppRepositoryImpl,
-    private val context: Context
+@HiltViewModel
+class AppListViewModel @Inject constructor(
+    private val appRepositoryImpl: AppRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppListState())
@@ -50,9 +53,9 @@ class AppListViewModel(
     }
 
     private fun launchApp(app: AppInfo) {
-        val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-        intent?.let {
-            context.startActivity(it)
-        }
+//        val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+//        intent?.let {
+//            context.startActivity(it)
+//        }
     }
 }

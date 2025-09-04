@@ -32,7 +32,7 @@ fun AppListScreen(navController: NavController) {
     val context = LocalContext.current
     val appRepositoryImpl = remember { AppRepositoryImpl(context) }
 
-    val viewModel: AppListViewModel = viewModel { AppListViewModel(appRepositoryImpl, context) }
+    val viewModel: AppListViewModel = viewModel { AppListViewModel(appRepositoryImpl) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = AppListTheme()
 

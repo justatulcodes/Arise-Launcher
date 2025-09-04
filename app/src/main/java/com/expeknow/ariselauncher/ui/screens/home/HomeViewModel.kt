@@ -9,12 +9,19 @@ import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.model.*
+import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 
-class HomeViewModel(
-    private val appRepositoryImpl: AppRepositoryImpl,
-    private val taskRepositoryImpl: TaskRepositoryImpl
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val appRepositoryImpl: AppRepository,
+    private val taskRepositoryImpl: TaskRepository,
+    private val pointsLogRepositoryImpl: PointsLogRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -38,7 +45,7 @@ class HomeViewModel(
 
     private fun observePoints() {
         viewModelScope.launch {
-            taskRepositoryImpl.getAvailablePoints().collect { points ->
+            pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
                 _state.value = _state.value.copy(currentPoints = points)
             }
         }

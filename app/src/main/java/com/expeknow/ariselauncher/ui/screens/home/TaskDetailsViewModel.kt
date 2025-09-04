@@ -8,9 +8,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 
-class TaskDetailsViewModel(
-    private val taskRepositoryImpl: TaskRepositoryImpl
+@HiltViewModel
+class TaskDetailsViewModel @Inject constructor(
+    private val taskRepositoryImpl: TaskRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TaskDetailsState())

@@ -1,4 +1,4 @@
-package com.expeknow.ariselauncher.data.datasource.`interface`
+package com.expeknow.ariselauncher.data.datasource.interfaces
 
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory

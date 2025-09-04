@@ -1,20 +1,18 @@
 package com.expeknow.ariselauncher.di
 
-import com.expeknow.ariselauncher.data.database.AriseLauncherDatabase
 import com.expeknow.ariselauncher.data.database.PointsLogDao
 import com.expeknow.ariselauncher.data.database.TaskDao
 import com.expeknow.ariselauncher.data.database.TaskLinkDao
 import com.expeknow.ariselauncher.data.datasource.OfflinePointsLogDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflineTaskDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflineTaskLinkDataSource
-import com.expeknow.ariselauncher.data.datasource.`interface`.PointsLogDataSource
-import com.expeknow.ariselauncher.data.datasource.`interface`.TaskDataSource
-import com.expeknow.ariselauncher.data.datasource.`interface`.TaskLinkDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.PointsLogDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TaskLinkDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 
 @Module
