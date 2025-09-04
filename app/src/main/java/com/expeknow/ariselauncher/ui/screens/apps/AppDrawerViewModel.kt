@@ -2,27 +2,36 @@ package com.expeknow.ariselauncher.ui.screens.apps
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.expeknow.ariselauncher.AriseLauncherApplication
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 
-class AppDrawerViewModel : ViewModel() {
+class AppDrawerViewModel(
+    private val taskRepositoryImpl: TaskRepositoryImpl
+) : ViewModel() {
 
     private val _state = MutableStateFlow(AppDrawerState())
     val state: StateFlow<AppDrawerState> = _state.asStateFlow()
 
     init {
         startCountdown()
+        observePoints()
     }
 
+    private fun observePoints() {
+        viewModelScope.launch {
+            taskRepositoryImpl.getAvailablePoints().collect { points ->
+                _state.value = _state.value.copy(currentPoints = points)
+            }
+        }
+    }
     private fun startCountdown() {
         viewModelScope.launch {
             while (_state.value.countdown > 0 && !_state.value.isUnlocked) {
@@ -46,15 +55,21 @@ class AppDrawerViewModel : ViewModel() {
             }
 
             is AppDrawerEvent.SelectApp -> {
-//                if (event.app.pointCost > 0) {
-//                    _state.value = _state.value.copy(
-//                        selectedApp = event.app,
-//                        showWarning = true
-//                    )
-//                } else {
-//                    // Open app immediately for free apps
-//                    openApp(event.app)
-//                }
+                // Check if user has enough points
+                if (event.app.pointCost > 0 && _state.value.currentPoints < event.app.pointCost) {
+                    // Not enough points - could show a toast or warning
+                    return
+                }
+
+                // Deduct points if the app has a cost
+                if (event.app.pointCost > 0) {
+                    viewModelScope.launch {
+                        taskRepositoryImpl.spendPoints(
+                            event.app.pointCost,
+                            "Launched ${event.app.name}"
+                        )
+                    }
+                }
                 openApp(event.app, event.context)
             }
 

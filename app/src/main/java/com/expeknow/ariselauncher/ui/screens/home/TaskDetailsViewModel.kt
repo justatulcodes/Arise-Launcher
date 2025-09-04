@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.model.*
-import com.expeknow.ariselauncher.data.repository.TaskRepository
+import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 
 class TaskDetailsViewModel(
-    private val taskRepository: TaskRepository
+    private val taskRepositoryImpl: TaskRepositoryImpl
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TaskDetailsState())
@@ -24,7 +24,7 @@ class TaskDetailsViewModel(
 
             is TaskDetailsEvent.CompleteTask -> {
                 viewModelScope.launch {
-                    taskRepository.completeTask(event.taskId)
+                    taskRepositoryImpl.completeTask(event.taskId)
                     // Reload task to get updated state
                     loadTask(event.taskId)
                 }
@@ -40,7 +40,7 @@ class TaskDetailsViewModel(
 
                     viewModelScope.launch {
                         if (updatedTask.isCompleted) {
-                            taskRepository.completeTask(event.taskId)
+                            taskRepositoryImpl.completeTask(event.taskId)
                         }
                     }
                 }
@@ -122,7 +122,7 @@ class TaskDetailsViewModel(
                     )
 
                     viewModelScope.launch {
-                        taskRepository.updateTask(updatedTask)
+                        taskRepositoryImpl.updateTask(updatedTask)
                     }
                 }
             }
@@ -137,7 +137,7 @@ class TaskDetailsViewModel(
                     )
 
                     viewModelScope.launch {
-                        taskRepository.updateTask(updatedTask)
+                        taskRepositoryImpl.updateTask(updatedTask)
                     }
                 }
             }
@@ -182,7 +182,7 @@ class TaskDetailsViewModel(
                         )
 
                         viewModelScope.launch {
-                            taskRepository.updateTask(updatedTask)
+                            taskRepositoryImpl.updateTask(updatedTask)
                         }
                     }
                 }
@@ -196,7 +196,7 @@ class TaskDetailsViewModel(
                     _state.value = _state.value.copy(task = updatedTask)
 
                     viewModelScope.launch {
-                        taskRepository.updateTask(updatedTask)
+                        taskRepositoryImpl.updateTask(updatedTask)
                     }
                 }
             }
@@ -207,7 +207,7 @@ class TaskDetailsViewModel(
         _state.value = _state.value.copy(isLoading = true)
 
         viewModelScope.launch {
-            val task = taskRepository.getTaskById(taskId)
+            val task = taskRepositoryImpl.getTaskById(taskId)
             if (task != null) {
                 _state.value = _state.value.copy(
                     task = task,

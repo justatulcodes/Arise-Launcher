@@ -3,21 +3,15 @@ package com.expeknow.ariselauncher
 import android.app.Application
 import com.expeknow.ariselauncher.data.database.AriseLauncherDatabase
 import com.expeknow.ariselauncher.data.datasource.OfflineDataSource
-import com.expeknow.ariselauncher.data.repository.TaskRepository
+import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class AriseLauncherApplication : Application() {
-
-    val context = this
-
-    override fun onCreate() {
-        super.onCreate()
-        // Initialization code if needed
-    }
-
-
-
     // Database instance
-    private val database by lazy { AriseLauncherDatabase.getDatabase(this) }
+    private val database by lazy {
+        AriseLauncherDatabase.getDatabase(this)
+    }
 
     // Data source instance
     private val offlineDataSource by lazy {
@@ -28,5 +22,5 @@ class AriseLauncherApplication : Application() {
     }
 
     // Repository instance
-    val taskRepository by lazy { TaskRepository(offlineDataSource) }
+    val taskRepositoryImpl by lazy { TaskRepositoryImpl(offlineDataSource, this) }
 }

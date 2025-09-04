@@ -48,6 +48,22 @@ data class Task(
     val completedAt: Long? = null
 )
 
+@Entity(tableName = "points_log")
+data class PointsLog(
+    @PrimaryKey
+    val id: String = UUID.randomUUID().toString(),
+    val taskId: String,
+    val taskName : String,
+    val type: PointsLogType,
+    val points: Int,
+    val timestamp: Long = System.currentTimeMillis()
+)
+
+enum class PointsLogType {
+    EARNED, SPENT
+}
+
+
 class TaskConverters {
     @TypeConverter
     fun fromTaskLinkList(value: List<TaskLink>): String {

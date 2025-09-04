@@ -2,12 +2,14 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id ("com.google.dagger.hilt.android")
     alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.expeknow.ariselauncher"
     compileSdk = 35
+
 
     defaultConfig {
         applicationId = "com.expeknow.ariselauncher"
@@ -59,6 +61,10 @@ dependencies {
 
     // Gson for JSON serialization in Room type converters
     implementation("com.google.code.gson:gson:2.10.1")
+
+    //hilt
+    implementation("com.google.dagger:hilt-android:2.56.2")
+    ksp("com.google.dagger:hilt-android-compiler:2.56.2")
 
     //add coil dependency
     implementation(libs.coil.compose)

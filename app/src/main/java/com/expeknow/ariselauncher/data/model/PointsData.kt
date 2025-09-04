@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.google.gson.annotations.Expose
 
 data class PointActivity(
     val id: String,
@@ -11,12 +12,23 @@ data class PointActivity(
     val points: Int,
     val activity: String,
     val time: String,
-    val icon: ImageVector
+    val iconType: String = "CheckCircle" // Serializable icon identifier
 )
 
 enum class ActivityType {
     EARN, BURN
 }
+
+fun getIconByType(iconType: String): ImageVector {
+    return when (iconType) {
+        "Smartphone" -> Icons.Filled.Smartphone
+        "CheckCircle" -> Icons.Filled.CheckCircle
+        else -> Icons.Filled.CheckCircle
+    }
+}
+
+val PointActivity.icon: ImageVector
+    get() = getIconByType(iconType)
 
 data class Rank(
     val name: String,

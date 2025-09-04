@@ -1,13 +1,22 @@
 package com.expeknow.ariselauncher.data.repository
 
+import android.content.Context
+import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.expeknow.ariselauncher.data.datasource.OfflineDataSource
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
+import com.expeknow.ariselauncher.data.model.ActivityType
+import com.expeknow.ariselauncher.data.model.PointActivity
+import com.expeknow.ariselauncher.data.model.PointsHistory
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 
-class TaskRepository(
-    private val offlineDataSource: OfflineDataSource
+class TaskRepositoryImpl(
+    private val offlineDataSource: OfflineDataSource,
 ) {
+
 
     fun getAllTasks(): Flow<List<Task>> = offlineDataSource.getAllTasks()
 
@@ -46,8 +55,13 @@ class TaskRepository(
 
     suspend fun deleteTaskById(taskId: String) = offlineDataSource.deleteTaskById(taskId)
 
-    suspend fun completeTask(taskId: String) =
+    suspend fun completeTask(taskId: String) {
+        val task = getTaskById(taskId)
         offlineDataSource.markTaskAsCompleted(taskId)
+        if(task != null)
+        offlineDataSource.insertPointsLogWithTask(task)
+
+    }
 
     suspend fun uncompleteTask(taskId: String) =
         offlineDataSource.markTaskAsIncomplete(taskId)
@@ -56,5 +70,4 @@ class TaskRepository(
 
     fun getCompletedTaskCount(): Flow<Int> = offlineDataSource.getCompletedTaskCount()
 
-    fun getTotalPointsEarned(): Flow<Int?> = offlineDataSource.getTotalPointsEarned()
 }

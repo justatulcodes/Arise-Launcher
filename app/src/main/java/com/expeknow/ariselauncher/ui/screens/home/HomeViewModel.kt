@@ -6,14 +6,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.expeknow.ariselauncher.data.repository.AppRepository
-import com.expeknow.ariselauncher.data.repository.TaskRepository
+import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.model.*
-import kotlinx.coroutines.CoroutineScope
+import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 
 class HomeViewModel(
-    private val appRepository: AppRepository,
-    private val taskRepository: TaskRepository
+    private val appRepositoryImpl: AppRepositoryImpl,
+    private val taskRepositoryImpl: TaskRepositoryImpl
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -31,11 +32,14 @@ class HomeViewModel(
 //            loadMockTasks() // Add some mock tasks for demonstration
         }
     }
+    fun getCategorizedApps(): Map<AppCategory, List<AppDrawerApp>> {
+        return _state.value.apps.groupBy { it.category }
+    }
 
     private fun observePoints() {
         viewModelScope.launch {
-            taskRepository.getTotalPointsEarned().collect { points ->
-                _state.value = _state.value.copy(currentPoints = points ?: 0)
+            taskRepositoryImpl.getAvailablePoints().collect { points ->
+                _state.value = _state.value.copy(currentPoints = points)
             }
         }
     }
@@ -56,18 +60,18 @@ class HomeViewModel(
 
             is HomeEvent.CompleteTask -> {
                 viewModelScope.launch {
-                    taskRepository.completeTask(event.taskId)
+                    taskRepositoryImpl.completeTask(event.taskId)
                 }
             }
 
             is HomeEvent.ToggleTask -> {
                 viewModelScope.launch {
-                    val task = taskRepository.getTaskById(event.taskId)
+                    val task = taskRepositoryImpl.getTaskById(event.taskId)
                     task?.let {
                         if (it.isCompleted) {
-                            taskRepository.uncompleteTask(event.taskId)
+                            taskRepositoryImpl.uncompleteTask(event.taskId)
                         } else {
-                            taskRepository.completeTask(event.taskId)
+                            taskRepositoryImpl.completeTask(event.taskId)
                         }
                     }
                 }
@@ -75,7 +79,7 @@ class HomeViewModel(
 
             is HomeEvent.AddTask -> {
                 viewModelScope.launch {
-                    taskRepository.addTask(
+                    taskRepositoryImpl.addTask(
                         title = event.title,
                         description = event.description,
                         points = event.points,
@@ -167,15 +171,26 @@ class HomeViewModel(
     }
 
     private suspend fun loadApps() {
-        val apps = appRepository.getInstalledApps().filter {
+        val apps = appRepositoryImpl.getInstalledApps().filter {
             it.name in listOf("Phone", "Messages") || it.name.contains("App")
         }.take(3)
-        _state.value = _state.value.copy(apps = apps)
+
+//        //convert object of AppInfo into AppDrawerApp
+//        val appDrawerApps = apps.map { appInfo ->
+//            AppDrawerApp(
+//                id = "",
+//                packageName = appInfo.packageName,
+//                icon = appInfo.icon,
+//                name = appInfo.name,
+//
+//            )
+//
+//        _state.value = _state.value.copy(apps = apps)
     }
 
     private fun observeTasks() {
         viewModelScope.launch {
-            taskRepository.getActiveTasks().collect { tasks ->
+            taskRepositoryImpl.getActiveTasks().collect { tasks ->
                 _state.value = _state.value.copy(tasks = tasks)
                 updateTaskStats(tasks)
             }
@@ -243,7 +258,7 @@ class HomeViewModel(
 
             // Insert mock tasks into the database
             mockTasks.forEach { task ->
-                taskRepository.insertTask(task)
+                taskRepositoryImpl.insertTask(task)
             }
         }
     }

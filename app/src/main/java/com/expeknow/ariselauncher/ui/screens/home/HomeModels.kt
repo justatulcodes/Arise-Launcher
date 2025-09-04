@@ -6,6 +6,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import com.expeknow.ariselauncher.ui.screens.apps.getDefaultApps
 
 data class FocusCategory(
     val id: TaskCategory,
@@ -25,12 +27,16 @@ enum class PointsTrend {
 }
 
 data class HomeState(
+    val countdown: Int = 10,
+    val isUnlocked: Boolean = false,
+    val selectedApp: AppDrawerApp? = null,
+    val showWarning: Boolean = false,
     val currentPoints: Int = 0,
     val pointChange: Int = 0,
     val pointsTrend: PointsTrend = PointsTrend.STABLE,
     val completedTasks: Int = 0,
     val totalTasks: Int = 0,
-    val apps: List<AppInfo> = emptyList(),
+    val apps: List<AppDrawerApp> = getDefaultApps(),
     val tasks: List<Task> = emptyList(),
     val showAddTaskDialog: Boolean = false,
     val showEssentialAppsSheet: Boolean = false,

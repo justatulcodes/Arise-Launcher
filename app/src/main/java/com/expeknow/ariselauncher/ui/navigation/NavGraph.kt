@@ -20,32 +20,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import com.expeknow.ariselauncher.AriseLauncherApplication
-import com.expeknow.ariselauncher.data.repository.AppRepository
+import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
 import com.expeknow.ariselauncher.ui.theme.BannerTextGray
 import com.expeknow.ariselauncher.ui.components.AppBottomNavigationBar
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.drive.DriveScreen
 import com.expeknow.ariselauncher.ui.screens.home.HomeViewModel
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsViewModel
-
-sealed class Screen(val route: String) {
-    data object Home : Screen("home")
-    data object AppList : Screen("applist")
-    data object Settings : Screen("settings")
-    data object Focus : Screen("focus")
-    data object Points : Screen("points")
-    data object Drive : Screen("drive")
-    data object Apps : Screen("apps")
-    data object Ctrl : Screen("ctrl")
-    data class TaskDetails(val id: String) : Screen("taskdetails/{id}") {
-        companion object {
-            fun routeFor(id: String) = "taskdetails/$id"
-        }
-    }
-}
+import com.expeknow.ariselauncher.ui.screens.points.PointsViewModel
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -77,21 +66,32 @@ fun AppNavigation(navController: NavHostController) {
         ) {
             composable(Screen.Focus.route) {
                 val context = LocalContext.current
-                val appRepository = remember { AppRepository(context) }
-                val taskRepository = (context.applicationContext as AriseLauncherApplication).taskRepository
-                val viewModel: HomeViewModel = viewModel { HomeViewModel(appRepository, taskRepository) }
+                val appRepositoryImpl = remember { AppRepositoryImpl(context) }
+                val taskRepository = (context.applicationContext as AriseLauncherApplication).taskRepositoryImpl
+                val viewModel: HomeViewModel = viewModel { HomeViewModel(appRepositoryImpl, taskRepository) }
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
                 HomeScreen(navController, viewModel, state)
             }
             composable(Screen.Points.route) {
-                PointsScreen(navController)
+                val context = LocalContext.current
+                val taskRepository =
+                    (context.applicationContext as AriseLauncherApplication).taskRepositoryImpl
+                val pointsViewModel: PointsViewModel = viewModel { PointsViewModel(taskRepository) }
+
+                PointsScreen(navController, pointsViewModel)
             }
             composable(Screen.Drive.route) {
                 DriveScreen(navController)
             }
             composable(Screen.Apps.route) {
-                AppDrawerScreen(navController)
+                val context = LocalContext.current
+                val taskRepository =
+                    (context.applicationContext as AriseLauncherApplication).taskRepositoryImpl
+                val appDrawerViewModel: AppDrawerViewModel =
+                    viewModel { AppDrawerViewModel(taskRepository) }
+
+                AppDrawerScreen(navController, {}, appDrawerViewModel)
             }
             composable(Screen.Ctrl.route) {
                 SettingsScreen(navController)
@@ -101,7 +101,7 @@ fun AppNavigation(navController: NavHostController) {
             }
             composable("taskdetails/{id}") { backStackEntry ->
                 val context = LocalContext.current
-                val taskRepository = (context.applicationContext as AriseLauncherApplication).taskRepository
+                val taskRepository = (context.applicationContext as AriseLauncherApplication).taskRepositoryImpl
                 val viewModel: TaskDetailsViewModel = viewModel { TaskDetailsViewModel(taskRepository) }
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -113,12 +113,13 @@ fun AppNavigation(navController: NavHostController) {
 }
 
 @Composable
-fun EmptyScreen(label: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("$label Page", style = MaterialTheme.typography.displayLarge, color = BannerTextGray)
-    }
-}
+inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
+    navController: NavController,
+): T {
 
-// Legacy function for backward compatibility - will be removed
-@Composable
-fun NavGraph(navController: NavHostController) = AppNavigation(navController)
+    val navGraphRoute = destination.parent?.route ?: return viewModel()
+    val parentEntry  = remember(this){
+        navController.getBackStackEntry(navGraphRoute)
+    }
+    return viewModel(parentEntry)
+}

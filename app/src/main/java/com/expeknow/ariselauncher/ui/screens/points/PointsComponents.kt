@@ -630,7 +630,7 @@ private fun RecentActivityCardPreview() {
             25,
             "Completed morning workout",
             "2h ago",
-            androidx.compose.material.icons.Icons.Filled.FitnessCenter
+            "CheckCircle"
         ),
         PointActivity(
             "2",
@@ -638,7 +638,7 @@ private fun RecentActivityCardPreview() {
             -10,
             "Instagram usage (5min)",
             "3h ago",
-            androidx.compose.material.icons.Icons.Filled.Smartphone
+            "Smartphone"
         )
     )
 
