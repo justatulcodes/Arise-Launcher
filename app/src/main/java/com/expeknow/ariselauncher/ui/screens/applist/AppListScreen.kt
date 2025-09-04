@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
@@ -26,14 +25,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.data.model.AppInfo
-import com.expeknow.ariselauncher.data.repository.AppRepository
+import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
 
 @Composable
 fun AppListScreen(navController: NavController) {
     val context = LocalContext.current
-    val appRepository = remember { AppRepository(context) }
+    val appRepositoryImpl = remember { AppRepositoryImpl(context) }
 
-    val viewModel: AppListViewModel = viewModel { AppListViewModel(appRepository, context) }
+    val viewModel: AppListViewModel = viewModel { AppListViewModel(appRepositoryImpl, context) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = AppListTheme()
 

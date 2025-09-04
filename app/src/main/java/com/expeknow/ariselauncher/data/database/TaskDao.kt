@@ -26,9 +26,6 @@ interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: Task)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTasks(tasks: List<Task>)
-
     @Update
     suspend fun updateTask(task: Task)
 
@@ -44,15 +41,10 @@ interface TaskDao {
     @Query("UPDATE tasks SET isCompleted = 0, completedAt = NULL WHERE id = :taskId")
     suspend fun markTaskAsIncomplete(taskId: String)
 
-    @Query("DELETE FROM tasks")
-    suspend fun deleteAllTasks()
-
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0")
     fun getActiveTaskCount(): Flow<Int>
 
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1")
     fun getCompletedTaskCount(): Flow<Int>
 
-    @Query("SELECT SUM(points) FROM tasks WHERE isCompleted = 1")
-    fun getTotalPointsEarned(): Flow<Int?>
 }

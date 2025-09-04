@@ -4,9 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import com.expeknow.ariselauncher.data.model.AppInfo
+import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 
-class AppRepository(private val context: Context) {
-    fun getInstalledApps(): List<AppInfo> {
+class AppRepositoryImpl(private val context: Context) : AppRepository {
+    override fun getInstalledApps(): List<AppInfo> {
         val packageManager = context.packageManager
         val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)

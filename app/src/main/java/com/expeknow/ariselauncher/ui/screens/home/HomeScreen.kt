@@ -13,19 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.AriseLauncherApplication
 import com.expeknow.ariselauncher.data.model.TaskCategory
-import com.expeknow.ariselauncher.data.repository.AppRepository
-import com.expeknow.ariselauncher.data.repository.TaskRepository
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
-import com.expeknow.ariselauncher.ui.theme.*
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
-import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +30,9 @@ fun HomeScreen(
     state: HomeState
 ) {
 
-    val appDrawerViewModel: AppDrawerViewModel = viewModel()
+    val context = LocalContext.current
+    val taskRepository = (context.applicationContext as AriseLauncherApplication).taskRepositoryImpl
+    val appDrawerViewModel: AppDrawerViewModel = viewModel { AppDrawerViewModel(taskRepository) }
     val theme = HomeTheme()
 
     // Bottom sheet state

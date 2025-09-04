@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.model.AppInfo
-import com.expeknow.ariselauncher.data.repository.AppRepository
+import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
 
 class AppListViewModel(
-    private val appRepository: AppRepository,
+    private val appRepositoryImpl: AppRepositoryImpl,
     private val context: Context
 ) : ViewModel() {
 
@@ -41,7 +41,7 @@ class AppListViewModel(
     private fun loadApps() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
-            val apps = appRepository.getInstalledApps()
+            val apps = appRepositoryImpl.getInstalledApps()
             _state.value = _state.value.copy(
                 apps = apps,
                 isLoading = false

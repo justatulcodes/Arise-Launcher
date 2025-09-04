@@ -30,11 +30,11 @@ data class AppDrawerState(
     val isUnlocked: Boolean = false,
     val selectedApp: AppDrawerApp? = null,
     val showWarning: Boolean = false,
-    val currentPoints: Int = 245,
+    val currentPoints: Int = 0,
     val apps: List<AppDrawerApp> = getDefaultApps()
 )
 
-private fun getDefaultApps(): List<AppDrawerApp> = listOf(
+fun getDefaultApps(): List<AppDrawerApp> = listOf(
     // Essential Apps
     AppDrawerApp(
         "1",

@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.expeknow.ariselauncher.ui.screens.home.HomeViewModel
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 
 @Composable
 fun AppDrawerScreen(
@@ -38,8 +40,8 @@ fun AppDrawerScreen(
             // Header
             AppDrawerHeader(
                 onClose = {
-                    viewModel.onEvent(AppDrawerEvent.CloseDrawer)
-                    onClose()
+//                    viewModel.onEvent(AppDrawerEvent.CloseDrawer)
+//                    onClose()
                 },
                 theme = theme
             )
@@ -88,16 +90,16 @@ fun AppDrawerScreen(
     }
 
     // Warning Dialog
-    AppWarningDialog(
-        app = state.selectedApp,
-        onConfirm = {
-            viewModel.onEvent(AppDrawerEvent.ConfirmAppOpen)
-            onClose()
-        },
-        onDismiss = {
-            viewModel.onEvent(AppDrawerEvent.HideWarning)
-        }
-    )
+//    AppWarningDialog(
+//        app = state.selectedApp,
+//        onConfirm = {
+//            viewModel.onEvent(AppDrawerEvent.ConfirmAppOpen)
+//            onClose()
+//        },
+//        onDismiss = {
+//            viewModel.onEvent(AppDrawerEvent.HideWarning)
+//        }
+//    )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)

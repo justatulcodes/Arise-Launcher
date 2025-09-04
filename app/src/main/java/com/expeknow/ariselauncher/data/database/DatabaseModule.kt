@@ -2,7 +2,7 @@ package com.expeknow.ariselauncher.data.database
 
 import android.content.Context
 import com.expeknow.ariselauncher.data.datasource.OfflineDataSource
-import com.expeknow.ariselauncher.data.repository.TaskRepository
+import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 
 object DatabaseModule {
 
@@ -18,8 +18,8 @@ object DatabaseModule {
         )
     }
 
-    fun provideTaskRepository(context: Context): TaskRepository {
+    fun provideTaskRepository(context: Context): TaskRepositoryImpl {
         val offlineDataSource = provideOfflineDataSource(context)
-        return TaskRepository(offlineDataSource)
+        return TaskRepositoryImpl(offlineDataSource, context)
     }
 }
