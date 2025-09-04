@@ -230,14 +230,14 @@ fun PointsGrowthChart(
             ) {
                 ChartStat(
                     icon = Icons.Filled.TrendingUp,
-                    text = "Peak: ${pointsHistory.maxOf { it.points }}",
+                    text = "Peak: to be set",
                     color = Color(0xFF4ADE80),
                     modifier = Modifier.padding(end = 16.dp)
                 )
 
                 ChartStat(
                     icon = Icons.Filled.TrendingDown,
-                    text = "Low: ${pointsHistory.minOf { it.points }}",
+                    text = "Low: to be set",
                     color = Color(0xFFF87171)
                 )
             }
