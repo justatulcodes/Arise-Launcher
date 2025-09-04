@@ -1,0 +1,42 @@
+package com.expeknow.ariselauncher.data.repository.interfaces
+
+import com.expeknow.ariselauncher.data.model.Task
+import com.expeknow.ariselauncher.data.model.TaskCategory
+import kotlinx.coroutines.flow.Flow
+
+interface TaskRepository {
+
+    fun getAllTasks(): Flow<List<Task>>
+
+    fun getActiveTasks(): Flow<List<Task>>
+
+    fun getCompletedTasks(): Flow<List<Task>>
+
+    fun getTasksByCategory(category: TaskCategory): Flow<List<Task>>
+
+    suspend fun getTaskById(taskId: String): Task?
+
+    suspend fun addTask(
+        title: String,
+        description: String = "",
+        points: Int = 0,
+        category: TaskCategory = TaskCategory.MISCELLANEOUS,
+        priority: Int = 1
+    ): Task
+
+    suspend fun insertTask(task: Task)
+
+    suspend fun updateTask(task: Task)
+
+    suspend fun deleteTask(task: Task)
+
+    suspend fun deleteTaskById(taskId: String)
+
+    suspend fun completeTask(taskId: String)
+
+    suspend fun uncompleteTask(taskId: String)
+
+    fun getActiveTaskCount(): Flow<Int>
+
+    fun getCompletedTaskCount(): Flow<Int>
+}

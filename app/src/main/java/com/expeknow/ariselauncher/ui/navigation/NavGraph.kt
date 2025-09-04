@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,7 +42,6 @@ fun AppNavigation(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Define routes that should show bottom navigation
     val bottomNavRoutes = setOf(
         Screen.Focus.route,
         Screen.Points.route,
@@ -116,10 +116,9 @@ fun AppNavigation(navController: NavHostController) {
 inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(
     navController: NavController,
 ): T {
-
-    val navGraphRoute = destination.parent?.route ?: return viewModel()
+    val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
     val parentEntry  = remember(this){
         navController.getBackStackEntry(navGraphRoute)
     }
-    return viewModel(parentEntry)
+    return hiltViewModel(parentEntry)
 }
