@@ -1,9 +1,9 @@
 package com.expeknow.ariselauncher.di
 
 import android.content.Context
-import com.expeknow.ariselauncher.data.datasource.`interface`.PointsLogDataSource
-import com.expeknow.ariselauncher.data.datasource.`interface`.TaskDataSource
-import com.expeknow.ariselauncher.data.datasource.`interface`.TaskLinkDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.PointsLogDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TaskLinkDataSource
 import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.TaskLinkRepositoryImpl

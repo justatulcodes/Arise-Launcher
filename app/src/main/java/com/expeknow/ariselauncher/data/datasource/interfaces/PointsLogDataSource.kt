@@ -1,4 +1,4 @@
-package com.expeknow.ariselauncher.data.datasource.`interface`
+package com.expeknow.ariselauncher.data.datasource.interfaces
 
 import com.expeknow.ariselauncher.data.model.PointsLog
 import com.expeknow.ariselauncher.data.model.PointsLogType

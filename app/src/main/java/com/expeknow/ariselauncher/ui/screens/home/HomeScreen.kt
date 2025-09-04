@@ -27,12 +27,10 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel,
+    appDrawerViewModel: AppDrawerViewModel,
     state: HomeState
 ) {
 
-    val context = LocalContext.current
-    val taskRepository = (context.applicationContext as AriseLauncherApplication).taskRepositoryImpl
-    val appDrawerViewModel: AppDrawerViewModel = viewModel { AppDrawerViewModel(taskRepository) }
     val theme = HomeTheme()
 
     // Bottom sheet state

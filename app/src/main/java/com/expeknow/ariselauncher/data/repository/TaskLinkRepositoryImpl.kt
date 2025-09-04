@@ -1,6 +1,6 @@
 package com.expeknow.ariselauncher.data.repository
 
-import com.expeknow.ariselauncher.data.datasource.`interface`.TaskLinkDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TaskLinkDataSource
 import com.expeknow.ariselauncher.data.model.TaskLink
 import com.expeknow.ariselauncher.data.model.TaskLinkType
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskLinkRepository

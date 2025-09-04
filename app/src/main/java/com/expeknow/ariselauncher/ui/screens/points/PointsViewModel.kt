@@ -9,9 +9,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.model.TaskStats
+import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class PointsViewModel(
-    private val taskRepositoryImpl: TaskRepositoryImpl
+@HiltViewModel
+class PointsViewModel @Inject constructor(
+    private val pointsLogRepositoryImpl: PointsLogRepository,
+    private val taskRepositoryImpl: TaskRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PointsState())
@@ -26,8 +33,8 @@ class PointsViewModel(
     private fun observePointsData() {
         viewModelScope.launch {
             combine(
-                taskRepositoryImpl.getTotalPointsEarned(),
-                taskRepositoryImpl.getAvailablePoints()
+                pointsLogRepositoryImpl.getTotalPointsEarned(),
+                pointsLogRepositoryImpl.getAvailablePoints()
             ) { earnedPoints, availablePoints ->
                 val earned = earnedPoints ?: 0
                 val spent = earned - availablePoints
@@ -75,12 +82,12 @@ class PointsViewModel(
 
     private fun loadPointActivities() {
         viewModelScope.launch {
-            val activities = taskRepositoryImpl.getPointActivities()
-            val history = taskRepositoryImpl.getPointsHistory()
-            _state.value = _state.value.copy(
-                activities = activities,
-                pointsHistory = history
-            )
+//            val activities = pointsLogRepositoryImpl.getPointActivities()
+//            val history = pointsLogRepositoryImpl.getPointsHistory()
+//            _state.value = _state.value.copy(
+//                activities = activities,
+//                pointsHistory = history
+//            )
         }
     }
 

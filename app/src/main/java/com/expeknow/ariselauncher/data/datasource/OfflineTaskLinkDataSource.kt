@@ -1,7 +1,7 @@
 package com.expeknow.ariselauncher.data.datasource
 
 import com.expeknow.ariselauncher.data.database.TaskLinkDao
-import com.expeknow.ariselauncher.data.datasource.`interface`.TaskLinkDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TaskLinkDataSource
 import com.expeknow.ariselauncher.data.model.TaskLink
 import com.expeknow.ariselauncher.data.model.TaskLinkType
 import kotlinx.coroutines.flow.Flow
