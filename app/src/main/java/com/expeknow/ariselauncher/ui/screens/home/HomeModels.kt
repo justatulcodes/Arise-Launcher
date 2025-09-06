@@ -7,7 +7,6 @@ import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
-import com.expeknow.ariselauncher.ui.screens.apps.getDefaultApps
 
 data class FocusCategory(
     val id: TaskCategory,
@@ -36,7 +35,7 @@ data class HomeState(
     val pointsTrend: PointsTrend = PointsTrend.STABLE,
     val completedTasks: Int = 0,
     val totalTasks: Int = 0,
-    val apps: List<AppDrawerApp> = getDefaultApps(),
+    val apps: List<AppDrawerApp> =emptyList(),
     val tasks: List<Task> = emptyList(),
     val showAddTaskDialog: Boolean = false,
     val showEssentialAppsSheet: Boolean = false,
@@ -65,7 +64,7 @@ sealed class HomeEvent {
     data object ShowEssentialAppsSheet : HomeEvent()
     data object HideEssentialAppsSheet : HomeEvent()
     data class NavigateToTaskDetails(val taskId: String) : HomeEvent()
-    data class LaunchApp(val appName: String) : HomeEvent()
+    data class LaunchApp(val app: AppDrawerApp) : HomeEvent()
     data object ToggleMode : HomeEvent()
     data object ToggleHideCompletedTasks : HomeEvent()
     data class StartEditingCategory(val categoryId: TaskCategory) : HomeEvent()

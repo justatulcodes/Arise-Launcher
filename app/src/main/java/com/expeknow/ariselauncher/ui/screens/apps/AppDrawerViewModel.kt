@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,15 +22,33 @@ import javax.inject.Inject
 @HiltViewModel
 class AppDrawerViewModel @Inject constructor(
     private val taskRepositoryImpl: TaskRepository,
-    private val pointsLogRepositoryImpl: PointsLogRepository
+    private val pointsLogRepositoryImpl: PointsLogRepository,
+    private val appRepositoryImpl: AppRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppDrawerState())
     val state: StateFlow<AppDrawerState> = _state.asStateFlow()
 
     init {
+        loadApps()
         startCountdown()
         observePoints()
+    }
+
+    private fun loadApps() {
+        val apps = appRepositoryImpl.getInstalledApps()
+
+        val appDrawerApps = apps.map { app ->
+            AppDrawerApp(
+                name = app.name,
+                packageName = app.packageName,
+                icon = app.icon,
+                id = app.packageName,
+                category = AppCategory.Utility,
+            )
+        }
+        _state.value = _state.value.copy(apps = appDrawerApps)
+
     }
 
     private fun observePoints() {
@@ -64,7 +83,6 @@ class AppDrawerViewModel @Inject constructor(
             is AppDrawerEvent.SelectApp -> {
                 // Check if user has enough points
                 if (event.app.pointCost > 0 && _state.value.currentPoints < event.app.pointCost) {
-                    // Not enough points - could show a toast or warning
                     return
                 }
 
@@ -79,7 +97,7 @@ class AppDrawerViewModel @Inject constructor(
                         )
                     }
                 }
-                openApp(event.app, event.context)
+                appRepositoryImpl.launchApp(event.app.packageName)
             }
 
             is AppDrawerEvent.ShowWarning -> {
@@ -107,29 +125,6 @@ class AppDrawerViewModel @Inject constructor(
             is AppDrawerEvent.CloseDrawer -> {
                 // Handle drawer close - this would typically involve navigation
             }
-        }
-    }
-
-    private fun openApp(app: AppDrawerApp, context : Context) {
-
-        try {
-            val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-            if (intent != null) {
-                // Fix for Android 13+
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                    intent.addCategory(Intent.CATEGORY_LAUNCHER)
-                }
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-            } else {
-                // App not found or no launcher activity
-                // Optionally redirect to Play Store
-                val playStoreIntent = Intent(Intent.ACTION_VIEW,
-                    "market://details?id=${app.packageName}".toUri())
-                context.startActivity(playStoreIntent)
-            }
-        } catch (e: Exception) {
-            // Handle error
         }
     }
 

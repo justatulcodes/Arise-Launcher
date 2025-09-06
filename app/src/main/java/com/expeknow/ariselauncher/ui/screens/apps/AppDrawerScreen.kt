@@ -58,8 +58,8 @@ fun AppDrawerScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight() // Add this to constrain the height
-                        .padding(16.dp),
+                        .fillMaxHeight()
+                        .padding(top = 16.dp, start = 16.dp, bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     val categorizedApps = viewModel.getCategorizedApps()
@@ -70,7 +70,7 @@ fun AppDrawerScreen(
                                 category = category,
                                 apps = apps,
                                 onAppClick = { app: AppDrawerApp ->
-                                    viewModel.onEvent(AppDrawerEvent.SelectApp(app, context))
+                                    viewModel.onEvent(AppDrawerEvent.SelectApp(app))
                                 },
                                 theme = theme
                             )
