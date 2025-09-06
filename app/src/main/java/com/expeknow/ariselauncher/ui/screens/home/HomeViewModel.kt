@@ -36,7 +36,6 @@ class HomeViewModel @Inject constructor(
             loadApps()
             observeTasks()
             observePoints()
-//            loadMockTasks() // Add some mock tasks for demonstration
         }
     }
     fun getCategorizedApps(): Map<AppCategory, List<AppDrawerApp>> {
@@ -169,30 +168,29 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.LaunchApp -> {
-                // Handle app launch - this would typically involve launching an intent
-                if (event.appName == "Apps") {
+                if (event.app.name == "Apps") {
                     _state.value = _state.value.copy(showEssentialAppsSheet = true)
+                }else {
+                    appRepositoryImpl.launchApp(event.app.packageName)
                 }
             }
         }
     }
 
-    private suspend fun loadApps() {
+    private fun loadApps() {
         val apps = appRepositoryImpl.getInstalledApps().filter {
             it.name in listOf("Phone", "Messages") || it.name.contains("App")
-        }.take(3)
+        }.take(2)
 
-//        //convert object of AppInfo into AppDrawerApp
-//        val appDrawerApps = apps.map { appInfo ->
-//            AppDrawerApp(
-//                id = "",
-//                packageName = appInfo.packageName,
-//                icon = appInfo.icon,
-//                name = appInfo.name,
-//
-//            )
-//
-//        _state.value = _state.value.copy(apps = apps)
+        val appDrawerApps = apps.map { appInfo ->
+            AppDrawerApp(
+                id = "",
+                packageName = appInfo.packageName,
+                icon = appInfo.icon,
+                name = appInfo.name,
+            )
+        }
+        _state.value = _state.value.copy(apps = appDrawerApps)
     }
 
     private fun observeTasks() {
@@ -200,72 +198,6 @@ class HomeViewModel @Inject constructor(
             taskRepositoryImpl.getActiveTasks().collect { tasks ->
                 _state.value = _state.value.copy(tasks = tasks)
                 updateTaskStats(tasks)
-            }
-        }
-    }
-
-    private fun loadMockTasks() {
-        // Add some mock tasks for demonstration
-        viewModelScope.launch {
-            val mockTasks = listOf(
-                Task(
-                    title = "Complete morning workout",
-                    description = "A comprehensive 45-minute workout routine focusing on strength training and cardio to boost energy and productivity for the day.",
-                    points = 25,
-                    category = TaskCategory.PHYSICAL,
-                    priority = 1,
-                    relatedLinks = listOf(
-                        TaskLink(
-                            url = "https://youtube.com/watch?v=workout",
-                            title = "Morning Strength Routine",
-                            type = TaskLinkType.VIDEO,
-                            thumbnail = "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=120&fit=crop",
-                            description = "A 20-minute strength training routine perfect for mornings"
-                        )
-                    )
-                ),
-                Task(
-                    title = "Review project proposal",
-                    description = "Thoroughly review the Q4 project proposal, analyze budget requirements, timeline feasibility, and resource allocation.",
-                    points = 40,
-                    category = TaskCategory.WORK,
-                    priority = 2,
-                    relatedLinks = listOf(
-                        TaskLink(
-                            url = "https://docs.google.com/proposal",
-                            title = "Q4 Project Proposal Draft",
-                            type = TaskLinkType.ARTICLE,
-                            description = "Complete project proposal with timeline and budget"
-                        )
-                    )
-                ),
-                Task(
-                    title = "Read 30 pages of cognitive science book",
-                    description = "Study advanced cognitive psychology concepts to enhance thinking patterns and mental models.",
-                    points = 35,
-                    category = TaskCategory.INTELLIGENCE,
-                    priority = 1
-                ),
-                Task(
-                    title = "Research investment opportunities",
-                    description = "Analyze potential investment opportunities in emerging markets and cryptocurrency.",
-                    points = 40,
-                    category = TaskCategory.WEALTH,
-                    priority = 1
-                ),
-                Task(
-                    title = "Complete daily meditation",
-                    description = "20-minute mindfulness meditation session to improve focus and reduce stress.",
-                    points = 15,
-                    category = TaskCategory.PERSONAL,
-                    priority = 1,
-                    isCompleted = true
-                )
-            )
-
-            // Insert mock tasks into the database
-            mockTasks.forEach { task ->
-                taskRepositoryImpl.insertTask(task)
             }
         }
     }

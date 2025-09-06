@@ -67,6 +67,9 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:2.56.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
+    //Drawable -> Painter
+    implementation("com.google.accompanist:accompanist-drawablepainter:0.37.3")
+
     //add coil dependency
     implementation(libs.coil.compose)
     implementation(libs.androidx.core.ktx.v1120)

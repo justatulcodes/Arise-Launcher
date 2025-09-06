@@ -11,11 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.expeknow.ariselauncher.AriseLauncherApplication
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
@@ -34,7 +31,9 @@ fun HomeScreen(
     val theme = HomeTheme()
 
     // Bottom sheet state
-    val bottomSheetState = rememberModalBottomSheetState()
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
     var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler {
@@ -240,8 +239,8 @@ fun HomeScreen(
 //                }
 //            }
 
-            // Essential Apps Bar
             EssentialAppsBar(
+                appsList = state.apps,
                 onAppClick = { appName ->
                     viewModel.onEvent(HomeEvent.LaunchApp(appName))
                 },
@@ -300,7 +299,8 @@ fun HomeScreen(
                             androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
                         )
                 )
-            }
+            },
+            modifier = Modifier.statusBarsPadding(),
         ) {
             AppDrawerScreen(
                 navController = navController,

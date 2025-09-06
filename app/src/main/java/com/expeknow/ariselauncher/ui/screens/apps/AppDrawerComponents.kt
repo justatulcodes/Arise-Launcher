@@ -1,5 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.apps
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,9 +17,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
+import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 @Composable
 fun CountdownScreen(
@@ -110,7 +119,7 @@ fun CountdownScreen(
                         containerColor = Color.Transparent,
                         contentColor = Color.White
                     ),
-                    border = androidx.compose.foundation.BorderStroke(
+                    border = BorderStroke(
                         width = 1.dp,
                         color = Color.White
                     )
@@ -153,13 +162,13 @@ fun AppDrawerHeader(
             )
         }
 
-        IconButton(onClick = onClose) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Close",
-                tint = Color.White.copy(alpha = 0.6f)
-            )
-        }
+//        IconButton(onClick = onClose) {
+//            Icon(
+//                imageVector = Icons.Default.Close,
+//                contentDescription = "Close",
+//                tint = Color.White.copy(alpha = 0.6f)
+//            )
+//        }
     }
 }
 
@@ -292,10 +301,10 @@ private fun AppGridItem(
     onAppClick: (AppDrawerApp) -> Unit,
     theme: AppDrawerTheme
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column() {
         Box(
             modifier = Modifier
-                .size(56.dp)
+                .size(64.dp)
                 .background(
                     Color.White.copy(alpha = 0.1f),
                     RoundedCornerShape(12.dp)
@@ -308,12 +317,13 @@ private fun AppGridItem(
                 .clickable { onAppClick(app) },
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = app.icon,
-                contentDescription = app.name,
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
+            app.icon?.toImageBitmap()?.let {
+                Image(
+                    contentDescription = app.name,
+                    modifier = Modifier.size(54.dp),
+                    bitmap = it
+                )
+            }
 
             if (app.pointCost > 0) {
                 Surface(
@@ -351,18 +361,20 @@ private fun AppGridItem(
 
         Spacer(modifier = Modifier.height(4.dp))
 
+        //trim app name if too long and add ...
+        val appName = if (app.name.length > 12) {
+            app.name.substring(0,9) + "..."
+        } else {
+            app.name
+        }
         Text(
-            text = app.name,
+            text = appName,
             style = MaterialTheme.typography.bodySmall,
             color = Color.White.copy(alpha = 0.8f),
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            textAlign = TextAlign.Center
         )
-
-//        Text(
-//            text = app.description,
-//            style = MaterialTheme.typography.labelSmall,
-//            color = Color.White.copy(alpha = 0.4f)
-//        )
     }
 }
 
@@ -472,7 +484,7 @@ fun AppWarningDialog(
                     Text(
                         text = "\"True discipline means resisting instant gratification.\"",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                            fontStyle = FontStyle.Italic
                         ),
                         color = Color.White.copy(alpha = 0.5f)
                     )
@@ -537,38 +549,38 @@ private fun WarningBannerPreview() {
     WarningBanner()
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun AppCategorySectionPreview() {
-    val sampleApps = listOf(
-        AppDrawerApp(
-            id = "1",
-            name = "Phone",
-            icon = Icons.Default.Phone,
-            category = AppCategory.ESSENTIAL,
-            pointCost = 0,
-            description = "Make calls",
-            packageName = "com.android.phone"
-        ),
-        AppDrawerApp(
-            id = "2",
-            name = "Instagram",
-            icon = Icons.Default.CameraAlt,
-            category = AppCategory.SOCIAL,
-            pointCost = 25,
-            description = "Social media",
-            packageName = "com.android.phone"
-
-        )
-    )
-
-    AppCategorySection(
-        category = AppCategory.ESSENTIAL,
-        apps = sampleApps,
-        onAppClick = {},
-        theme = AppDrawerTheme()
-    )
-}
+//@Preview(showBackground = true, backgroundColor = 0xFF000000)
+//@Composable
+//private fun AppCategorySectionPreview() {
+//    val sampleApps = listOf(
+//        AppDrawerApp(
+//            id = "1",
+//            name = "Phone",
+//            icon = Icons.Default.Phone,
+//            category = AppCategory.ESSENTIAL,
+//            pointCost = 0,
+//            description = "Make calls",
+//            packageName = "com.android.phone"
+//        ),
+//        AppDrawerApp(
+//            id = "2",
+//            name = "Instagram",
+//            icon = Icons.Default.CameraAlt,
+//            category = AppCategory.SOCIAL,
+//            pointCost = 25,
+//            description = "Social media",
+//            packageName = "com.android.phone"
+//
+//        )
+//    )
+//
+//    AppCategorySection(
+//        category = AppCategory.ESSENTIAL,
+//        apps = sampleApps,
+//        onAppClick = {},
+//        theme = AppDrawerTheme()
+//    )
+//}
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
@@ -581,23 +593,23 @@ private fun AppDrawerFooterPreview() {
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun AppWarningDialogPreview() {
-    val sampleApp = AppDrawerApp(
-        id = "1",
-        name = "Instagram",
-        icon = Icons.Default.CameraAlt,
-        category = AppCategory.SOCIAL,
-        pointCost = 25,
-        description = "Social media platform",
-        packageName = "com.android.phone"
-
-    )
-
-    AppWarningDialog(
-        app = sampleApp,
-        onConfirm = {},
-        onDismiss = {}
-    )
-}
+//@Preview(showBackground = true, backgroundColor = 0xFF000000)
+//@Composable
+//private fun AppWarningDialogPreview() {
+//    val sampleApp = AppDrawerApp(
+//        id = "1",
+//        name = "Instagram",
+//        icon = Icons.Default.CameraAlt,
+//        category = AppCategory.SOCIAL,
+//        pointCost = 25,
+//        description = "Social media platform",
+//        packageName = "com.android.phone"
+//
+//    )
+//
+//    AppWarningDialog(
+//        app = sampleApp,
+//        onConfirm = {},
+//        onDismiss = {}
+//    )
+//}
