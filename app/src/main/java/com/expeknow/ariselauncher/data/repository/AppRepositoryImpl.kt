@@ -6,8 +6,10 @@ import android.content.pm.PackageManager
 import android.util.Log
 import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
+import com.expeknow.ariselauncher.utils.LauncherUtils
 
 class AppRepositoryImpl(private val context: Context) : AppRepository {
+
     override fun getInstalledApps(): List<AppInfo> {
         val packageManager = context.packageManager
         val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
@@ -34,5 +36,13 @@ class AppRepositoryImpl(private val context: Context) : AppRepository {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(it)
         }
+    }
+
+    override fun isDefaultLauncher(): Boolean {
+        return LauncherUtils.isDefaultLauncher(context)
+    }
+
+    override fun openDefaultLauncherSettings() {
+        LauncherUtils.openDefaultLauncherSettings(context)
     }
 }

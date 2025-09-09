@@ -14,6 +14,7 @@ interface TaskDataSource {
     suspend fun updateTask(task: Task)
     suspend fun deleteTask(task: Task)
     suspend fun deleteTaskById(taskId: String)
+    suspend fun deleteAllTasks()
     suspend fun markTaskAsCompleted(taskId: String, completedAt: Long = System.currentTimeMillis())
     suspend fun markTaskAsIncomplete(taskId: String)
     fun getActiveTaskCount(): Flow<Int>

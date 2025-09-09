@@ -32,6 +32,8 @@ interface TaskRepository {
 
     suspend fun deleteTaskById(taskId: String)
 
+    suspend fun deleteAllTasks()
+
     suspend fun completeTask(taskId: String)
 
     suspend fun uncompleteTask(taskId: String)

@@ -72,4 +72,8 @@ class OfflinePointsLogDataSource(
 
     override fun getAvailablePoints(): Flow<Int> =
         getCurrentPointsBalance().map { it ?: 0 }
+
+    override suspend fun resetPointsLog() {
+        pointsDao.resetAllPointsLog()
+    }
 }

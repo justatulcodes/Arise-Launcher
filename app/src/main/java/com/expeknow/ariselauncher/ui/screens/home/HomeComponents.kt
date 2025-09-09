@@ -9,13 +9,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -54,9 +57,10 @@ fun EnhancedPointsHeader(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp),
+            .padding(horizontal = 24.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    )
+    {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -74,12 +78,22 @@ fun EnhancedPointsHeader(
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "$currentPoints",
-                    style = MaterialTheme.typography.displaySmall,
-                    color = theme.accent,
-                    fontWeight = FontWeight.Medium
-                )
+                Column {
+                    Text(
+                        "$currentPoints",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = theme.accent,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 48.sp,
+                    )
+                    Text(
+                        "CURRENT POINTS",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = theme.textSecondary,
+                        fontSize = 10.sp
+                    )
+                }
+
                 Spacer(modifier = Modifier.width(8.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -95,6 +109,7 @@ fun EnhancedPointsHeader(
                         tint = trendColor,
                         modifier = Modifier.size(16.dp)
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         if (pointsTrend == PointsTrend.INCREASING) "+$pointChange" else "-$pointChange",
                         color = trendColor,
@@ -121,12 +136,7 @@ fun EnhancedPointsHeader(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(
-            "CURRENT POINTS",
-            style = MaterialTheme.typography.labelSmall,
-            color = theme.textSecondary,
-            fontSize = 10.sp
-        )
+
     }
 }
 
@@ -175,7 +185,6 @@ fun EssentialAppsDrawer(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
                         .border(
                             width = 1.dp,
                             color = theme.border,
@@ -446,7 +455,7 @@ fun EnhancedProgressBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(8.dp)
+                .height(1.dp)
                 .background(
                     Color.White.copy(alpha = 0.2f),
                     RoundedCornerShape(4.dp)
@@ -570,7 +579,7 @@ fun FocusedTaskList(
     categories: List<FocusCategory>,
     tasks: List<Task>,
     onTaskClick: (String) -> Unit,
-    onToggleTask: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
     onEditCategory: (TaskCategory) -> Unit,
     editingCategoryId: TaskCategory?,
     editingCategoryName: String,
@@ -609,7 +618,7 @@ private fun FocusedCategorySection(
     category: FocusCategory,
     tasks: List<Task>,
     onTaskClick: (String) -> Unit,
-    onToggleTask: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
     onEditCategory: (TaskCategory) -> Unit,
     isEditing: Boolean,
     editingName: String,
@@ -743,7 +752,7 @@ private fun FocusedTaskItem(
     task: Task,
     categoryColor: Color,
     onTaskClick: (String) -> Unit,
-    onToggleTask: (String) -> Unit
+    onToggleTask: (Task) -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -753,7 +762,7 @@ private fun FocusedTaskItem(
     ) {
         Checkbox(
             checked = task.isCompleted,
-            onCheckedChange = { onToggleTask(task.id) },
+            onCheckedChange = { onToggleTask(task) },
             colors = CheckboxDefaults.colors(
                 checkedColor = categoryColor,
                 uncheckedColor = Color.White.copy(alpha = 0.4f),
@@ -864,281 +873,244 @@ fun TasksCompletedCelebration(
         Triple(Icons.Filled.CheckCircle, "2500ms", Offset(320f, 180f))
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = androidx.compose.ui.graphics.Brush.radialGradient(
-                    colors = listOf(
-                        theme.accent.copy(alpha = 0.1f),
-                        Color.Transparent
-                    ),
-                    radius = 400f
-                )
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        // Background subtle pattern
+    val scrollState = rememberScrollState()
+
+    Column(Modifier.scrollable(scrollState, Orientation.Vertical)) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
                 .background(
                     brush = androidx.compose.ui.graphics.Brush.radialGradient(
                         colors = listOf(
-                            Color.White.copy(alpha = 0.02f),
+                            theme.accent.copy(alpha = 0.1f),
                             Color.Transparent
                         ),
-                        radius = 200f
+                        radius = 320f
                     )
-                )
-        )
-
-        // Floating celebration icons
-        floatingIcons.forEachIndexed { index, (icon, delay, position) ->
-            val bounceAnimation by infiniteTransition.animateFloat(
-                initialValue = 0f,
-                targetValue = 20f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(
-                        durationMillis = 2000 + (index * 200),
-                        delayMillis = delay.removeSuffix("ms").toInt(),
-                        easing = EaseInOut
-                    ),
-                    repeatMode = RepeatMode.Reverse
                 ),
-                label = "bounce$index"
-            )
-
+            contentAlignment = Alignment.Center
+        )
+        {
+            // Background subtle pattern
             Box(
                 modifier = Modifier
-                    .offset(
-                        x = position.x.dp,
-                        y = (position.y - bounceAnimation).dp
+                    .fillMaxSize()
+                    .background(
+                        brush = androidx.compose.ui.graphics.Brush.radialGradient(
+                            colors = listOf(
+                                Color.White.copy(alpha = 0.02f),
+                                Color.Transparent
+                            ),
+                            radius = 200f
+                        )
                     )
-                    .size(24.dp)
-            ) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = theme.accent.copy(alpha = 0.6f),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
+            )
 
-        // Central celebration content
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
-        ) {
-            // Main celebration icon with pulsing ring
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-                // Pulsing ring effect
-                Box(
-                    modifier = Modifier
-                        .size((120 * pulseAnimation).dp)
-                        .background(
-                            Color.Transparent,
-                            CircleShape
-                        )
-                        .border(
-                            2.dp,
-                            theme.border.copy(alpha = 0.3f),
-                            CircleShape
-                        )
-                )
-
-                // Main icon container
-                Box(
-                    modifier = Modifier
-                        .size(96.dp)
-                        .background(
-                            theme.bg.copy(alpha = 0.8f),
-                            CircleShape
-                        )
-                        .border(
-                            2.dp,
-                            theme.border,
-                            CircleShape
+            // Floating celebration icons
+            floatingIcons.forEachIndexed { index, (icon, delay, position) ->
+                val bounceAnimation by infiniteTransition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 20f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(
+                            durationMillis = 2000 + (index * 200),
+                            delayMillis = delay.removeSuffix("ms").toInt(),
+                            easing = EaseInOut
                         ),
-                    contentAlignment = Alignment.Center
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "bounce$index"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .offset(
+                            x = position.x.dp,
+                            y = (position.y - bounceAnimation).dp
+                        )
+                        .size(24.dp)
                 ) {
                     Icon(
-                        Icons.Filled.CheckCircle,
+                        icon,
                         contentDescription = null,
-                        tint = theme.accent,
-                        modifier = Modifier.size(48.dp)
+                        tint = theme.accent.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Celebration text
-            Text(
-                "ALL TASKS COMPLETED",
-                style = MaterialTheme.typography.headlineMedium,
-                color = theme.accent,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.2.sp
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                "Outstanding discipline and focus!",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 18.sp
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Stats badges
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            // Central celebration content
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(32.dp)
             ) {
+                // Main celebration icon with pulsing ring
                 Box(
-                    modifier = Modifier
-                        .background(
-                            theme.border.copy(alpha = 0.3f),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .border(
-                            1.dp,
-                            theme.border,
-                            RoundedCornerShape(12.dp)
-                        )
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        "$completedCount Tasks Done",
-                        color = theme.accent,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .background(
-                            Color(0xFF4ADE80).copy(alpha = 0.2f),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .border(
-                            1.dp,
-                            Color(0xFF4ADE80).copy(alpha = 0.4f),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        "+$pointsEarned Points",
-                        color = Color(0xFF4ADE80),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Motivational quote with border accent
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Color.Black.copy(alpha = 0.3f),
-                        RoundedCornerShape(12.dp)
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = theme.border,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .padding(start = 4.dp)
-            ) {
-                Row {
+                    // Pulsing ring effect
                     Box(
                         modifier = Modifier
-                            .width(4.dp)
-                            .height(60.dp)
+                            .size((120 * pulseAnimation).dp)
                             .background(
-                                theme.accent,
-                                RoundedCornerShape(2.dp)
+                                Color.Transparent,
+                                CircleShape
+                            )
+                            .border(
+                                2.dp,
+                                theme.border.copy(alpha = 0.3f),
+                                CircleShape
                             )
                     )
 
-                    Text(
-                        "\"Excellence is not a skill, it's an attitude. Today you've proven yours.\"",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Achievement badges
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                val achievements = listOf(
-                    Triple(Icons.Filled.EmojiEvents, Color(0xFFFFD700), "Trophy"),
-                    Triple(Icons.Filled.WorkspacePremium, theme.accent, "Crown"),
-                    Triple(Icons.Filled.Star, Color.White, "Star")
-                )
-
-                achievements.forEach { (icon, color, desc) ->
+                    // Main icon container
                     Box(
                         modifier = Modifier
-                            .size(56.dp)
+                            .size(96.dp)
                             .background(
-                                theme.bg.copy(alpha = 0.6f),
+                                theme.bg.copy(alpha = 0.8f),
+                                CircleShape
+                            )
+                            .border(
+                                2.dp,
+                                theme.border,
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Filled.CheckCircle,
+                            contentDescription = null,
+                            tint = theme.accent,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // Celebration text
+                Text(
+                    "ALL TASKS COMPLETED",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = theme.accent,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.2.sp
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    "Outstanding discipline and focus!",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 18.sp
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Stats badges
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                theme.border.copy(alpha = 0.3f),
                                 RoundedCornerShape(12.dp)
                             )
                             .border(
                                 1.dp,
                                 theme.border,
                                 RoundedCornerShape(12.dp)
-                            ),
-                        contentAlignment = Alignment.Center
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Icon(
-                            icon,
-                            contentDescription = desc,
-                            tint = color,
-                            modifier = Modifier.size(24.dp)
+                        Text(
+                            "$completedCount Tasks Done",
+                            color = theme.accent,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                Color(0xFF4ADE80).copy(alpha = 0.2f),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .border(
+                                1.dp,
+                                Color(0xFF4ADE80).copy(alpha = 0.4f),
+                                RoundedCornerShape(12.dp)
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            "+$pointsEarned Points",
+                            color = Color(0xFF4ADE80),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-            // Next steps suggestion
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    "Ready for tomorrow's challenges?",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.5f)
-                )
-                Text(
-                    "Your consistency builds your legacy",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.White.copy(alpha = 0.4f),
-                    fontSize = 12.sp
-                )
+                // Motivational quote with border accent
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Color.Black.copy(alpha = 0.3f),
+                            RoundedCornerShape(12.dp)
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = theme.border,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(start = 4.dp)
+                ) {
+                    Row {
+                        Box(
+                            modifier = Modifier
+                                .width(4.dp)
+                                .height(60.dp)
+                                .background(
+                                    theme.accent,
+                                    RoundedCornerShape(2.dp)
+                                )
+                        )
+
+                        Text(
+                            "\"Excellence is not a skill, it's an attitude. Today you've proven yours.\"",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // Next steps suggestion
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        "Your consistency builds your legacy",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White.copy(alpha = 0.4f),
+                        fontSize = 12.sp
+                    )
+                }
             }
         }
     }
+
 }
 
 @Composable
@@ -1200,7 +1172,7 @@ fun EssentialAppsBar(
                             }
                         }
                     }
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

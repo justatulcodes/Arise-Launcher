@@ -28,6 +28,9 @@ interface PointsLogDao {
     @Delete
     suspend fun deletePointsLog(pointsLog: PointsLog)
 
+    @Query("DELETE FROM points_log")
+    suspend fun resetAllPointsLog()
+
     @Query("DELETE FROM points_log WHERE id = :logId")
     suspend fun deletePointsLogById(logId: String)
 
@@ -47,8 +50,17 @@ interface PointsLogDao {
     @Query("SELECT SUM(points) FROM points_log WHERE type = 'SPENT'")
     fun getTotalPointsSpent(): Flow<Int?>
 
-    @Query("SELECT (SELECT SUM(points) FROM points_log WHERE type = 'EARNED') - (SELECT SUM(points) FROM points_log WHERE type = 'SPENT')")
+    @Query("""
+    SELECT SUM(
+        CASE 
+            WHEN type = 'EARNED' THEN points 
+            WHEN type = 'SPENT' THEN -points 
+            ELSE 0 
+        END
+    ) FROM points_log
+    """)
     fun getCurrentPointsBalance(): Flow<Int?>
+
 
     // Count queries
     @Query("SELECT COUNT(*) FROM points_log")

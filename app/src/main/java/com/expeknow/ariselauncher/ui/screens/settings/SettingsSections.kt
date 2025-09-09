@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -228,6 +229,66 @@ fun ResourcesSection(
     }
 }
 
+@Composable
+fun DefaultLauncherSection(
+    isDefaultLauncher: Boolean,
+    onSetDefaultLauncher: (Boolean) -> Unit,
+    theme: SettingsTheme
+) {
+    SettingsCard(theme) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            SettingsToggleItem(
+                title = "DEFAULT LAUNCHER",
+                subtitle = "Set Arise Launcher as your home screen",
+                description = "Make this app the default launcher that appears when you press the home button",
+                checked = isDefaultLauncher,
+                onCheckedChange = onSetDefaultLauncher,
+                theme = theme,
+                badge = if (isDefaultLauncher) {
+                    {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, theme.border),
+                            color = Color.Transparent
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Home,
+                                    contentDescription = null,
+                                    tint = theme.accent,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    "CURRENTLY ACTIVE",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = theme.accent
+                                )
+                            }
+                        }
+                    }
+                } else null
+            )
+
+            if (!isDefaultLauncher) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Toggle will open system settings where you can select Arise as your default launcher",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+            }
+        }
+    }
+}
+
 // Add preview functions at the end of the file
 @Preview
 @Composable
@@ -302,6 +363,16 @@ fun EssentialAppsSectionPreview() {
 @Composable
 fun ResourcesSectionPreview() {
     ResourcesSection(
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun DefaultLauncherSectionPreview() {
+    DefaultLauncherSection(
+        isDefaultLauncher = true,
+        onSetDefaultLauncher = {},
         theme = SettingsTheme()
     )
 }

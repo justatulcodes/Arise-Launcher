@@ -21,4 +21,6 @@ interface TaskLinkRepository {
     suspend fun deleteTaskLink(taskLink: TaskLink)
 
     suspend fun deleteTaskLinkById(linkId: String)
+
+    suspend fun deleteAllTaskLinks()
 }

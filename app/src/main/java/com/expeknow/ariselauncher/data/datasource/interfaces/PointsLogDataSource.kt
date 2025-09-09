@@ -27,4 +27,5 @@ interface PointsLogDataSource {
     suspend fun earnPoints(amount: Int, taskId: String, taskName: String)
     suspend fun spendPoints(amount: Int, taskId: String, taskName: String)
     fun getAvailablePoints(): Flow<Int>
+    suspend fun resetPointsLog()
 }

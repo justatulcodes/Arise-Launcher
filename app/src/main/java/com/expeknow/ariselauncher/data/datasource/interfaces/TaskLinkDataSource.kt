@@ -12,5 +12,6 @@ interface TaskLinkDataSource {
     suspend fun insertTaskLinks(taskLinks: List<TaskLink>)
     suspend fun updateTaskLink(taskLink: TaskLink)
     suspend fun deleteTaskLink(taskLink: TaskLink)
+    suspend fun deleteAllTaskLinks()
     suspend fun deleteTaskLinkById(linkId: String)
 }

@@ -42,4 +42,8 @@ class TaskLinkRepositoryImpl(
         taskLinkDataSource.deleteTaskLinkById(linkId)
     }
 
+    override suspend fun deleteAllTaskLinks() {
+        taskLinkDataSource.deleteAllTaskLinks()
+    }
+
 }

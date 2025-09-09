@@ -3,6 +3,7 @@ package com.expeknow.ariselauncher.data.repository
 import com.expeknow.ariselauncher.data.datasource.interfaces.PointsLogDataSource
 import com.expeknow.ariselauncher.data.model.PointsLog
 import com.expeknow.ariselauncher.data.model.PointsLogType
+import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -22,6 +23,16 @@ class PointsLogRepositoryImpl(
         pointsLogDataSource.insertPointsLog(pointsLog)
     }
 
+    override suspend fun insertPointsLogWithTask(task: Task) {
+        val pointsLog = PointsLog(
+            type = PointsLogType.EARNED,
+            points = task.points,
+            taskId = task.id,
+            taskName = task.title
+        )
+        pointsLogDataSource.insertPointsLog(pointsLog)
+    }
+
     override suspend fun insertPointsLogs(pointsLogs: List<PointsLog>) {
         pointsLogDataSource.insertPointsLogs(pointsLogs)
     }
@@ -36,6 +47,10 @@ class PointsLogRepositoryImpl(
 
     override suspend fun deletePointsLogById(logId: String) {
         pointsLogDataSource.deletePointsLogById(logId)
+    }
+
+    override suspend fun resetAllPointsLog() {
+        pointsLogDataSource.resetPointsLog()
     }
 
     override fun getPointsLogByType(type: PointsLogType): Flow<List<PointsLog>> {

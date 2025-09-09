@@ -1,5 +1,6 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +15,12 @@ import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayEndTime
+import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayStartTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -29,13 +34,14 @@ class HomeViewModel @Inject constructor(
 
     init {
         loadInitialData()
+        observePoints()
+
     }
 
     private fun loadInitialData() {
         viewModelScope.launch {
             loadApps()
             observeTasks()
-            observePoints()
         }
     }
     fun getCategorizedApps(): Map<AppCategory, List<AppDrawerApp>> {
@@ -45,10 +51,15 @@ class HomeViewModel @Inject constructor(
     private fun observePoints() {
         viewModelScope.launch {
             pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
-                _state.value = _state.value.copy(currentPoints = points)
+                updateState { it.copy(currentPoints = points) }
             }
         }
     }
+
+    private fun updateState(update: (HomeState) -> HomeState) {
+        _state.value = update(_state.value)
+    }
+
 
     fun onEvent(event: HomeEvent) {
         when (event) {
@@ -72,12 +83,13 @@ class HomeViewModel @Inject constructor(
 
             is HomeEvent.ToggleTask -> {
                 viewModelScope.launch {
-                    val task = taskRepositoryImpl.getTaskById(event.taskId)
+                    val task = taskRepositoryImpl.getTaskById(event.task.id)
                     task?.let {
                         if (it.isCompleted) {
-                            taskRepositoryImpl.uncompleteTask(event.taskId)
+                            taskRepositoryImpl.uncompleteTask(event.task.id)
                         } else {
-                            taskRepositoryImpl.completeTask(event.taskId)
+                            taskRepositoryImpl.completeTask(event.task.id)
+                            pointsLogRepositoryImpl.insertPointsLogWithTask(event.task)
                         }
                     }
                 }
@@ -192,25 +204,40 @@ class HomeViewModel @Inject constructor(
         }
         _state.value = _state.value.copy(apps = appDrawerApps)
     }
-
     private fun observeTasks() {
         viewModelScope.launch {
-            taskRepositoryImpl.getActiveTasks().collect { tasks ->
+            taskRepositoryImpl.getAllTasks().collect { tasks ->
+                val filteredTasks = filterTasksForStats(tasks)
                 _state.value = _state.value.copy(tasks = tasks)
-                updateTaskStats(tasks)
+                updateTaskStats(filteredTasks)
             }
         }
     }
 
+    private fun filterTasksForStats(tasks: List<Task>): List<Task> {
+        val todayStart = getTodayStartTime()
+        val todayEnd = getTodayEndTime()
+
+        return tasks.filter { task ->
+            val taskTime = task.createdAt
+            val isToday = taskTime in todayStart..todayEnd
+
+            // Include if: task is from today OR task is uncompleted (regardless of date)
+            isToday || !task.isCompleted
+        }
+    }
+
+
     private fun updateTaskStats(tasks: List<Task>) {
         val completedCount = tasks.count { it.isCompleted }
         val totalCount = tasks.size
-        // Removed local points calculation since we're observing from database
+        val totalPoints = tasks.sumOf { it.points }
 
         _state.value = _state.value.copy(
             completedTasks = completedCount,
-            totalTasks = totalCount
-            // Removed currentPoints update here
+            totalTasks = totalCount,
+            earnedPoints = totalPoints
+
         )
     }
 }

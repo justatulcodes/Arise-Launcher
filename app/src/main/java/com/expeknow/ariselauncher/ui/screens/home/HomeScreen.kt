@@ -1,16 +1,19 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.data.model.TaskCategory
@@ -30,11 +33,13 @@ fun HomeScreen(
 
     val theme = HomeTheme()
 
-    // Bottom sheet state
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
     )
     var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
+
+    Log.d("PointsDebug", "homeScreen: ${state.currentPoints}")
+
 
     BackHandler {
         // do nothing as its a launcher
@@ -44,7 +49,6 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-//            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
     ) {
         // Calculated values for the entire screen
         val allTasksCompleted = state.totalTasks > 0 && state.completedTasks == state.totalTasks
@@ -85,7 +89,7 @@ fun HomeScreen(
                 theme = theme
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Task Content - Scrollable
             Box(modifier = Modifier.weight(1f)) {
@@ -95,6 +99,7 @@ fun HomeScreen(
                         pointsEarned = pointsEarned,
                         theme = theme
                     )
+                    AddTaskButton(viewModel)
                 } else {
                     when (state.mode) {
                         HomeMode.SIMPLE -> {
@@ -133,7 +138,7 @@ fun HomeScreen(
                                                     navController.navigate(Screen.TaskDetails.routeFor(task.id))
                                                 },
                                                 onToggleTask = {
-                                                    viewModel.onEvent(HomeEvent.ToggleTask(task.id))
+                                                    viewModel.onEvent(HomeEvent.ToggleTask(task))
                                                 },
                                                 theme = theme
                                             )
@@ -143,33 +148,7 @@ fun HomeScreen(
                                             Spacer(modifier = Modifier.height(56.dp))
                                         }
                                     }
-
-                                    // Add Task Button for Simple Mode
-                                    OutlinedButton(
-                                        onClick = { viewModel.onEvent(HomeEvent.ShowAddTaskDialog) },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .align(Alignment.BottomCenter)
-                                            .padding(horizontal = 24.dp)
-                                            .padding(bottom = 16.dp),
-                                        colors = ButtonDefaults.outlinedButtonColors(
-                                            contentColor = Color.White.copy(alpha = 0.8f),
-                                            containerColor = Color.Black
-                                        ),
-                                        border = ButtonDefaults.outlinedButtonBorder.copy(
-                                            brush = androidx.compose.ui.graphics.SolidColor(
-                                                Color.White.copy(alpha = 0.2f)
-                                            )
-                                        )
-                                    ) {
-                                        Icon(
-                                            androidx.compose.material.icons.Icons.Filled.Add,
-                                            contentDescription = "Add Task",
-                                            modifier = Modifier.size(20.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text("ADD TASK")
-                                    }
+                                    AddTaskButton(viewModel)
 
                                 }
 
@@ -193,8 +172,8 @@ fun HomeScreen(
                                 onTaskClick = { taskId ->
                                     navController.navigate(Screen.TaskDetails.routeFor(taskId))
                                 },
-                                onToggleTask = { taskId ->
-                                    viewModel.onEvent(HomeEvent.ToggleTask(taskId))
+                                onToggleTask = { task ->
+                                    viewModel.onEvent(HomeEvent.ToggleTask(task))
                                 },
                                 onEditCategory = { categoryId ->
                                     viewModel.onEvent(HomeEvent.StartEditingCategory(categoryId))
@@ -322,6 +301,35 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category))
             }
         )
+    }
+}
+
+@Composable
+private fun BoxScope.AddTaskButton(viewModel: HomeViewModel) {
+    OutlinedButton(
+        onClick = { viewModel.onEvent(HomeEvent.ShowAddTaskDialog) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomCenter)
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 16.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.White.copy(alpha = 0.8f),
+            containerColor = Color.Black
+        ),
+        border = ButtonDefaults.outlinedButtonBorder.copy(
+            brush = SolidColor(
+                Color.White.copy(alpha = 0.2f)
+            )
+        )
+    ) {
+        Icon(
+            Icons.Filled.Add,
+            contentDescription = "Add Task",
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text("ADD TASK")
     }
 }
 
