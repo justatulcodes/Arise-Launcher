@@ -29,6 +29,9 @@ interface TaskLinkDao {
     @Delete
     suspend fun deleteTaskLink(taskLink: TaskLink)
 
+    @Query("DELETE FROM task_links")
+    suspend fun deleteAllTaskLinks()
+
     @Query("DELETE FROM task_links WHERE id = :linkId")
     suspend fun deleteTaskLinkById(linkId: String)
 

@@ -1,17 +1,40 @@
 package com.expeknow.ariselauncher.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.TaskLinkRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor() : ViewModel() {
+class SettingsViewModel @Inject constructor(
+    private val taskRepositoryImpl: TaskRepository,
+    private val pointsLogRepositoryImpl: PointsLogRepository,
+    private val taskLinkRepositoryImpl: TaskLinkRepository,
+    private val appRepositoryImpl: AppRepository
+) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = _state.asStateFlow()
+
+    init {
+        checkLauncherStatus()
+    }
+
+    fun checkLauncherStatus() {
+        viewModelScope.launch {
+            val isDefault = appRepositoryImpl.isDefaultLauncher()
+            _state.value = _state.value.copy(isDefaultLauncher = isDefault)
+        }
+    }
 
     fun onEvent(event: SettingsEvent) {
         when (event) {
@@ -39,6 +62,11 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
                 _state.value = _state.value.copy(warningsEnabled = event.enabled)
             }
 
+            is SettingsEvent.SetDefaultLauncher -> {
+                appRepositoryImpl.openDefaultLauncherSettings()
+
+            }
+
             is SettingsEvent.ToggleAppEssential -> {
                 val updatedApps = _state.value.apps.map { app ->
                     if (app.id == event.appId) {
@@ -51,13 +79,19 @@ class SettingsViewModel @Inject constructor() : ViewModel() {
             }
 
             is SettingsEvent.ResetAllPoints -> {
-                // Handle reset points logic
-                // This would typically involve calling a repository method
+                viewModelScope.launch {
+                    pointsLogRepositoryImpl.resetAllPointsLog()
+                }
             }
 
             is SettingsEvent.FactoryReset -> {
-                // Handle factory reset logic
-                _state.value = SettingsState()
+
+                viewModelScope.launch {
+                    taskRepositoryImpl.deleteAllTasks()
+                    pointsLogRepositoryImpl.resetAllPointsLog()
+                    taskLinkRepositoryImpl.deleteAllTaskLinks()
+                    _state.value = SettingsState()
+                }
             }
         }
     }

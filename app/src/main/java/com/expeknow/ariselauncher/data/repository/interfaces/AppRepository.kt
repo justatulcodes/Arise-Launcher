@@ -7,4 +7,8 @@ interface AppRepository {
 
     fun getInstalledApps(): List<AppInfo>
     fun launchApp(packageName: String)
+
+    fun isDefaultLauncher(): Boolean
+
+    fun openDefaultLauncherSettings()
 }

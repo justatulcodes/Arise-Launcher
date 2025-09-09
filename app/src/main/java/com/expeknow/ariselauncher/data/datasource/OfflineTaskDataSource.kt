@@ -21,6 +21,9 @@ class OfflineTaskDataSource(
     override suspend fun updateTask(task: Task) = taskDao.updateTask(task)
     override suspend fun deleteTask(task: Task) = taskDao.deleteTask(task)
     override suspend fun deleteTaskById(taskId: String) = taskDao.deleteTaskById(taskId)
+    override suspend fun deleteAllTasks() {
+        taskDao.deleteAllTasks()
+    }
 
     override suspend fun markTaskAsCompleted(taskId: String, completedAt: Long) =
         taskDao.markTaskAsCompleted(taskId, completedAt)

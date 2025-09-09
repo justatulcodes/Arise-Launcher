@@ -38,6 +38,7 @@ import com.expeknow.ariselauncher.ui.screens.home.HomeViewModel
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsState
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsViewModel
 import com.expeknow.ariselauncher.ui.screens.points.PointsViewModel
+import com.expeknow.ariselauncher.ui.screens.settings.SettingsViewModel
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -87,10 +88,13 @@ fun AppNavigation(navController: NavHostController) {
                 AppDrawerScreen(navController, {}, appDrawerViewModel)
             }
             composable(Screen.Ctrl.route) {
-                SettingsScreen(navController)
+                val viewModel = it.sharedViewModel<SettingsViewModel>(navController = navController)
+                SettingsScreen(navController, viewModel)
             }
             composable(Screen.Settings.route) {
-                SettingsScreen(navController)
+
+                val viewModel = it.sharedViewModel<SettingsViewModel>(navController = navController)
+                SettingsScreen(navController, viewModel)
             }
             composable("taskdetails/{id}") { backStackEntry ->
                 val taskDetailsViewModel = backStackEntry.sharedViewModel<TaskDetailsViewModel>(navController)

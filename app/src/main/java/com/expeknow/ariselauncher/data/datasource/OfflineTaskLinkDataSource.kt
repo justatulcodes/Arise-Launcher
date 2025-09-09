@@ -29,6 +29,10 @@ class OfflineTaskLinkDataSource(
     override suspend fun deleteTaskLink(taskLink: TaskLink) =
         taskLinkDao.deleteTaskLink(taskLink)
 
+    override suspend fun deleteAllTaskLinks() {
+        taskLinkDao.deleteAllTaskLinks()
+    }
+
     override suspend fun deleteTaskLinkById(linkId: String) =
         taskLinkDao.deleteTaskLinkById(linkId)
 }

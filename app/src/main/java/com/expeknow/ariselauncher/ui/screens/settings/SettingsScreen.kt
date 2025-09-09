@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onFirstVisible
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,7 +25,7 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun SettingsScreen(
     navController: NavController,
-    viewModel: SettingsViewModel = viewModel()
+    viewModel: SettingsViewModel
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = SettingsTheme()
@@ -34,6 +35,7 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(Color.Black)
             .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+            .onFirstVisible( callback = {viewModel.checkLauncherStatus()})
     ) {
         // Header
         SettingsHeader(
@@ -49,6 +51,15 @@ fun SettingsScreen(
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Default Launcher Setting
+            DefaultLauncherSection(
+                isDefaultLauncher = state.isDefaultLauncher,
+                onSetDefaultLauncher = { isDefault: Boolean ->
+                    viewModel.onEvent(SettingsEvent.SetDefaultLauncher(isDefault))
+                },
+                theme = theme
+            )
+
             // Task Completion Behavior
             TaskCompletionSection(
                 hideCompletedTasks = state.hideCompletedTasks,

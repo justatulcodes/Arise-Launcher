@@ -4,6 +4,7 @@ import com.expeknow.ariselauncher.data.model.PointActivity
 import com.expeknow.ariselauncher.data.model.PointsHistory
 import com.expeknow.ariselauncher.data.model.PointsLog
 import com.expeknow.ariselauncher.data.model.PointsLogType
+import com.expeknow.ariselauncher.data.model.Task
 import kotlinx.coroutines.flow.Flow
 
 interface PointsLogRepository {
@@ -17,11 +18,15 @@ interface PointsLogRepository {
 
     suspend fun insertPointsLogs(pointsLogs: List<PointsLog>)
 
+    suspend fun insertPointsLogWithTask(task: Task)
+
     suspend fun updatePointsLog(pointsLog: PointsLog)
 
     suspend fun deletePointsLog(pointsLog: PointsLog)
 
     suspend fun deletePointsLogById(logId: String)
+
+    suspend fun resetAllPointsLog()
 
     // Query operations
     fun getPointsLogByType(type: PointsLogType): Flow<List<PointsLog>>

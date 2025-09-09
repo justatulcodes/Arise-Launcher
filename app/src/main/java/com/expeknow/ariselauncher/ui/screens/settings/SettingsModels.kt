@@ -33,6 +33,7 @@ data class SettingsState(
     val distractionAppsDelay: Float = 30f,
     val pointThreshold: Float = 50f,
     val warningsEnabled: Boolean = true,
+    val isDefaultLauncher: Boolean = false,
     val apps: List<SettingsAppInfo> = getDefaultApps()
 )
 
@@ -52,5 +53,6 @@ sealed class SettingsEvent {
     data class ToggleWarnings(val enabled: Boolean) : SettingsEvent()
     data class ToggleAppEssential(val appId: String) : SettingsEvent()
     data object ResetAllPoints : SettingsEvent()
+    data class SetDefaultLauncher(val isDefault: Boolean) : SettingsEvent()
     data object FactoryReset : SettingsEvent()
 }

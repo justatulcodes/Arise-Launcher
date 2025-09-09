@@ -2,6 +2,7 @@ package com.expeknow.ariselauncher.ui.screens.home
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.model.Task
@@ -12,9 +13,9 @@ data class FocusCategory(
     val id: TaskCategory,
     val name: String,
     val icon: ImageVector,
-    val color: androidx.compose.ui.graphics.Color,
-    val bgColor: androidx.compose.ui.graphics.Color,
-    val borderColor: androidx.compose.ui.graphics.Color
+    val color: Color,
+    val bgColor: Color,
+    val borderColor: Color
 )
 
 enum class HomeMode {
@@ -35,6 +36,7 @@ data class HomeState(
     val pointsTrend: PointsTrend = PointsTrend.STABLE,
     val completedTasks: Int = 0,
     val totalTasks: Int = 0,
+    val earnedPoints: Int = 0,
     val apps: List<AppDrawerApp> =emptyList(),
     val tasks: List<Task> = emptyList(),
     val showAddTaskDialog: Boolean = false,
@@ -52,7 +54,7 @@ sealed class HomeEvent {
     data object LoadApps : HomeEvent()
     data object LoadTasks : HomeEvent()
     data class CompleteTask(val taskId: String) : HomeEvent()
-    data class ToggleTask(val taskId: String) : HomeEvent()
+    data class ToggleTask(val task: Task) : HomeEvent()
     data class AddTask(
         val title: String,
         val description: String,
@@ -75,15 +77,15 @@ sealed class HomeEvent {
 }
 
 data class HomeTheme(
-    val background: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.Black,
-    val surface: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color(0xFF1F1F1F),
-    val accent: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.White,
-    val textPrimary: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color.White,
-    val textSecondary: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color(
+    val background: Color = Color.Black,
+    val surface: Color = androidx.compose.ui.graphics.Color(0xFF1F1F1F),
+    val accent: Color = Color.White,
+    val textPrimary: Color = Color.White,
+    val textSecondary: Color = androidx.compose.ui.graphics.Color(
         0xFF9CA3AF
     ),
-    val border: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color(0xFF374151),
-    val bg: androidx.compose.ui.graphics.Color = androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+    val border: Color = androidx.compose.ui.graphics.Color(0xFF374151),
+    val bg: Color = androidx.compose.ui.graphics.Color(0xFF1F1F1F)
 )
 
 private fun getDefaultFocusCategories(): List<FocusCategory> = listOf(
