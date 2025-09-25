@@ -26,6 +26,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import com.google.accompanist.drawablepainter.DrawablePainter
 
 @Composable
 fun AppListScreen(navController: NavController) {
@@ -64,7 +66,7 @@ fun AppListScreen(navController: NavController) {
         } else {
             AppsList(
                 apps = state.apps,
-                onAppClick = { app: AppInfo ->
+                onAppClick = { app: AppDrawerApp ->
                     viewModel.onEvent(AppListEvent.LaunchApp(app))
                 },
                 theme = theme
@@ -115,8 +117,8 @@ private fun AppListHeaderPreview() {
 
 @Composable
 private fun AppsList(
-    apps: List<AppInfo>,
-    onAppClick: (AppInfo) -> Unit,
+    apps: List<AppDrawerApp>,
+    onAppClick: (AppDrawerApp) -> Unit,
     theme: AppListTheme
 ) {
     LazyColumn(
@@ -136,7 +138,7 @@ private fun AppsList(
 
 @Composable
 private fun AppListItem(
-    app: AppInfo,
+    app: AppDrawerApp,
     onClick: () -> Unit,
     theme: AppListTheme
 ) {
@@ -148,7 +150,7 @@ private fun AppListItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
-            painter = BitmapPainter(app.icon.toBitmap().asImageBitmap()),
+            painter = DrawablePainter(app.icon!!),
             contentDescription = app.name,
             modifier = Modifier.size(48.dp),
             contentScale = ContentScale.Fit
@@ -162,27 +164,6 @@ private fun AppListItem(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun AppListItemPreview() {
-    // Create a sample AppInfo with a mock drawable icon
-    val context = LocalContext.current
-    val mockDrawable = androidx.core.content.ContextCompat.getDrawable(
-        context, android.R.drawable.ic_menu_gallery
-    ) ?: context.getDrawable(android.R.drawable.ic_menu_camera)!!
-
-    val sampleApp = AppInfo(
-        name = "Sample App",
-        packageName = "com.example.sampleapp",
-        icon = mockDrawable
-    )
-
-    AppListItem(
-        app = sampleApp,
-        onClick = {},
-        theme = AppListTheme()
-    )
-}
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable

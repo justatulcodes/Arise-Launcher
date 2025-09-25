@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -52,7 +53,7 @@ class AppListViewModel @Inject constructor(
         }
     }
 
-    private fun launchApp(app: AppInfo) {
+    private fun launchApp(app: AppDrawerApp) {
 //        val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
 //        intent?.let {
 //            context.startActivity(it)

@@ -133,7 +133,6 @@ fun CountdownScreen(
 
 @Composable
 fun AppDrawerHeader(
-    onClose: () -> Unit,
     theme: AppDrawerTheme
 ) {
     Row(
@@ -237,7 +236,7 @@ fun AppCategorySection(
             Surface(
                 color = Color.Transparent,
                 shape = RoundedCornerShape(4.dp),
-                border = androidx.compose.foundation.BorderStroke(
+                border = BorderStroke(
                     width = 1.dp,
                     color = category.color.copy(alpha = 0.3f)
                 ),
@@ -267,13 +266,10 @@ fun AppGrid(
     theme: AppDrawerTheme
 ) {
     val columns = 4
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
+    Column{
         apps.chunked(columns).forEach { rowApps ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 rowApps.forEach { app ->
@@ -538,7 +534,6 @@ private fun CountdownScreenPreview() {
 @Composable
 private fun AppDrawerHeaderPreview() {
     AppDrawerHeader(
-        onClose = {},
         theme = AppDrawerTheme()
     )
 }

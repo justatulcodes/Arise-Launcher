@@ -2,15 +2,16 @@ package com.expeknow.ariselauncher.ui.screens.applist
 
 import androidx.compose.ui.graphics.Color
 import com.expeknow.ariselauncher.data.model.AppInfo
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 
 data class AppListState(
-    val apps: List<AppInfo> = emptyList(),
+    val apps: List<AppDrawerApp> = emptyList(),
     val isLoading: Boolean = true
 )
 
 sealed class AppListEvent {
     data object LoadApps : AppListEvent()
-    data class LaunchApp(val app: AppInfo) : AppListEvent()
+    data class LaunchApp(val app: AppDrawerApp) : AppListEvent()
     data object NavigateToSettings : AppListEvent()
 }
 
