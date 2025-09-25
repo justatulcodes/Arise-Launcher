@@ -1,8 +1,6 @@
 package com.expeknow.ariselauncher.ui.screens.apps
 
-import android.content.Context
-import android.content.Intent
-import android.os.Build
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
@@ -10,9 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
-import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
-import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
@@ -31,34 +26,30 @@ class AppDrawerViewModel @Inject constructor(
 
     init {
         loadApps()
-        startCountdown()
         observePoints()
+        startCountdown()
     }
 
     private fun loadApps() {
-        val apps = appRepositoryImpl.getInstalledApps()
-
-        val appDrawerApps = apps.map { app ->
-            AppDrawerApp(
-                name = app.name,
-                packageName = app.packageName,
-                icon = app.icon,
-                id = app.packageName,
-                category = AppCategory.Utility,
-            )
+        viewModelScope.launch {
+            val apps = appRepositoryImpl.getInstalledApps()
+            _state.value = _state.value.copy(apps = apps)
         }
-        _state.value = _state.value.copy(apps = appDrawerApps)
-
     }
 
     private fun observePoints() {
         viewModelScope.launch {
             pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
                 _state.value = _state.value.copy(currentPoints = points)
+                if(points > 0) {
+                    _state.value = _state.value.copy(isUnlocked = true)
+                }else {
+                    _state.value = _state.value.copy(isUnlocked = false)
+                }
             }
         }
     }
-    private fun startCountdown() {
+    fun startCountdown() {
         viewModelScope.launch {
             while (_state.value.countdown > 0 && !_state.value.isUnlocked) {
                 delay(1000)
@@ -81,12 +72,10 @@ class AppDrawerViewModel @Inject constructor(
             }
 
             is AppDrawerEvent.SelectApp -> {
-                // Check if user has enough points
                 if (event.app.pointCost > 0 && _state.value.currentPoints < event.app.pointCost) {
                     return
                 }
 
-                // Deduct points if the app has a cost
                 if (event.app.pointCost > 0) {
                     viewModelScope.launch {
                         pointsLogRepositoryImpl.spendPoints(
@@ -123,7 +112,10 @@ class AppDrawerViewModel @Inject constructor(
             }
 
             is AppDrawerEvent.CloseDrawer -> {
-                // Handle drawer close - this would typically involve navigation
+//                _state.value = _state.value.copy(
+//                    isUnlocked = false,
+//                    countdown = 10
+//                )
             }
         }
     }

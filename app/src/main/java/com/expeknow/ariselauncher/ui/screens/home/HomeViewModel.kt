@@ -190,19 +190,14 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadApps() {
-        val apps = appRepositoryImpl.getInstalledApps().filter {
-            it.name in listOf("Phone", "Messages") || it.name.contains("App")
-        }.take(2)
+        viewModelScope.launch {
+            val apps = appRepositoryImpl.getInstalledApps().filter {
+                it.name in listOf("Phone", "Messages") || it.name.contains("App")
+            }.take(2)
 
-        val appDrawerApps = apps.map { appInfo ->
-            AppDrawerApp(
-                id = "",
-                packageName = appInfo.packageName,
-                icon = appInfo.icon,
-                name = appInfo.name,
-            )
+            _state.value = _state.value.copy(apps = apps)
         }
-        _state.value = _state.value.copy(apps = appDrawerApps)
+
     }
     private fun observeTasks() {
         viewModelScope.launch {

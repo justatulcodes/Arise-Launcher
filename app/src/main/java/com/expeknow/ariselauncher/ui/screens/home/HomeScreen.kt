@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 
@@ -113,16 +114,6 @@ fun HomeScreen(
                             }
 
                             Column {
-//                                SimpleTaskList(
-//                                    tasks = simpleTasks,
-//                                    onTaskClick = { taskId ->
-//                                        navController.navigate(Screen.TaskDetails.routeFor(taskId))
-//                                    },
-//                                    onToggleTask = { taskId ->
-//                                        viewModel.onEvent(HomeEvent.ToggleTask(taskId))
-//                                    },
-//                                    theme = theme
-//                                )
 
                                 Box {
                                     LazyColumn(
@@ -196,28 +187,6 @@ fun HomeScreen(
                 }
             }
 
-            // Mode Status Banner
-//            Box(
-//                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-//            ) {
-//                Column(
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                    modifier = Modifier.fillMaxWidth()
-//                ) {
-//                    Text(
-//                        if (state.mode == HomeMode.SIMPLE) "TUNNEL VISION MODE ACTIVE" else "FOCUSED DEVELOPMENT MODE ACTIVE",
-//                        style = MaterialTheme.typography.labelSmall,
-//                        color = theme.accent.copy(alpha = 0.8f)
-//                    )
-//                    Spacer(modifier = Modifier.height(2.dp))
-//                    Text(
-//                        if (state.mode == HomeMode.SIMPLE) "Stay focused. Complete your goals." else "Transform yourself through disciplined action.",
-//                        style = MaterialTheme.typography.labelSmall,
-//                        color = Color.White.copy(alpha = 0.6f)
-//                    )
-//                }
-//            }
-
             EssentialAppsBar(
                 appsList = state.apps,
                 onAppClick = { appName ->
@@ -263,7 +232,11 @@ fun HomeScreen(
     // App Drawer Bottom Sheet
     if (showAppDrawerBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest = { showAppDrawerBottomSheet = false },
+            onDismissRequest = {
+                showAppDrawerBottomSheet = false
+                appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
+
+                               },
             sheetState = bottomSheetState,
             containerColor = Color.Black,
             contentColor = Color.White,
