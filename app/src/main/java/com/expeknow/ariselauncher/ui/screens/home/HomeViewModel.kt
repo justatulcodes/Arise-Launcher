@@ -191,10 +191,7 @@ class HomeViewModel @Inject constructor(
 
     private fun loadApps() {
         viewModelScope.launch {
-            val apps = appRepositoryImpl.getInstalledApps().filter {
-                it.name in listOf("Phone", "Messages") || it.name.contains("App")
-            }.take(2)
-
+            val apps = appRepositoryImpl.getCallingAndMessagingApps().take(2)
             _state.value = _state.value.copy(apps = apps)
         }
 

@@ -8,8 +8,8 @@ data class AppDrawerApp(
     val name: String,
     val packageName: String,
     val icon: Drawable? = null,
-    val category: AppCategory,
-    val pointCost: Int = 10,
+    var category: AppCategory,
+    var pointCost: Int = 10,
     val description: String = ""
 )
 

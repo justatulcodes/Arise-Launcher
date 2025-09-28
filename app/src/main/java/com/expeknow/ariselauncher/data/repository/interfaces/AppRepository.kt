@@ -7,6 +7,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 interface AppRepository {
 
     suspend fun getInstalledApps(): List<AppDrawerApp>
+    suspend fun getCallingAndMessagingApps(): List<AppDrawerApp>
     fun launchApp(packageName: String)
 
     fun isDefaultLauncher(): Boolean
