@@ -18,18 +18,6 @@ object AppClassifier {
 
     private const val TAG = "AppClassifier"
 
-    suspend fun classifyAppsConcurrently(
-        context: Context,
-        packages: List<String>
-    ): Map<String, AppCategory> = coroutineScope {
-        packages.map { pkg ->
-            async(Dispatchers.IO) {
-                pkg to classifyApp(context, pkg)
-            }
-        }.awaitAll().toMap()
-    }
-
-
     suspend fun classifyApp(context: Context, packageName: String): AppCategory {
         val pm = context.packageManager
         val appInfo = try {
@@ -65,7 +53,6 @@ object AppClassifier {
 
     }
 
-
     private fun fetchPlayStoreCategory(packageName: String): String? {
         return try {
             val url = "https://play.google.com/store/apps/details?id=$packageName"
@@ -83,37 +70,27 @@ object AppClassifier {
         }
     }
 
-    /**
-     * Maps official Play Store categories into broad enums.
-     */
     private fun mapPlayStoreCategory(category: String): AppCategory {
         return when (category.lowercase()) {
-            // Productivity / Utility
             "productivity", "tools", "utilities", "business", "education",
             "books & reference", "events", "house & home", "libraries & demo",
             "parenting", "personalization" -> AppCategory.PRODUCTIVITY
 
-            // Social & Communication
             "communication", "social", "dating" -> AppCategory.SOCIAL
 
-            // Entertainment & Media
             "entertainment", "video players & editors", "music & audio", "photography",
             "news & magazines", "comics", "art & design", "lifestyle" -> AppCategory.ENTERTAINMENT
 
-            // Games (all subgenres go here)
             "action", "adventure", "arcade", "board", "card", "casino", "casual",
             "educational", "music", "puzzle", "racing", "role playing", "simulation",
             "sports", "strategy", "trivia", "word" -> AppCategory.GAMES
 
-            // Shopping & Finance
             "shopping", "food & drink" -> AppCategory.SHOPPING
             "finance" -> AppCategory.UTILITY
 
-            // Health & Travel
             "health & fitness", "medical" -> AppCategory.UTILITY
             "travel & local", "maps & navigation", "auto & vehicles" -> AppCategory.UTILITY
 
-            // Weather
             "weather" -> AppCategory.UTILITY
 
             else -> AppCategory.ESSENTIAL
