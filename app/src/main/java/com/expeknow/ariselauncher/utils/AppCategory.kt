@@ -86,12 +86,8 @@ object AppClassifier {
             "sports", "strategy", "trivia", "word" -> AppCategory.GAMES
 
             "shopping", "food & drink" -> AppCategory.SHOPPING
-            "finance" -> AppCategory.UTILITY
-
-            "health & fitness", "medical" -> AppCategory.UTILITY
-            "travel & local", "maps & navigation", "auto & vehicles" -> AppCategory.UTILITY
-
-            "weather" -> AppCategory.UTILITY
+            "health & fitness", "medical", "finance", "weather" , "travel & local",
+            "maps & navigation", "auto & vehicles"  -> AppCategory.UTILITY
 
             else -> AppCategory.ESSENTIAL
         }
@@ -101,11 +97,11 @@ object AppClassifier {
         return when (category) {
             AppCategory.ESSENTIAL -> 0
             AppCategory.ENTERTAINMENT -> 10
-            AppCategory.GAMES -> 25
+            AppCategory.GAMES -> 30
             AppCategory.SHOPPING -> 5
-            AppCategory.UTILITY -> 5
+            AppCategory.UTILITY -> 0
             AppCategory.PRODUCTIVITY -> 0
-            AppCategory.SOCIAL -> 30
+            AppCategory.SOCIAL -> 25
             AppCategory.MISCELLANEOUS -> 5
         }
     }
