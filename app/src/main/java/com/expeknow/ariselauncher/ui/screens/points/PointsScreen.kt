@@ -36,7 +36,7 @@ fun PointsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+//            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
     ) {
         // Header with tabs
         PointsHeader(

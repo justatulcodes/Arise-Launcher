@@ -30,7 +30,8 @@ data class AppDrawerState(
     val selectedApp: AppDrawerApp? = null,
     val showWarning: Boolean = false,
     val currentPoints: Int = 0,
-    val apps: List<AppDrawerApp> = emptyList()
+    val apps: List<AppDrawerApp> = emptyList(),
+    val searchQuery: String = ""
 )
 
 
@@ -42,6 +43,7 @@ sealed class AppDrawerEvent {
     data object HideWarning : AppDrawerEvent()
     data object ConfirmAppOpen : AppDrawerEvent()
     data object CloseDrawer : AppDrawerEvent()
+    data class SearchApps(val query: String) : AppDrawerEvent()
 }
 
 data class AppDrawerTheme(
