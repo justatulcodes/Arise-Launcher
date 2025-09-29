@@ -45,7 +45,7 @@ fun DriveScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
+//            .statusBarsPadding()
             .background(theme.background)
     ) {
         // Header with tabs

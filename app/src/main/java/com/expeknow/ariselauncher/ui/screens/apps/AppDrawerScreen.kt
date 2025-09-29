@@ -92,12 +92,14 @@ fun AppDrawerScreen(
                 .background(Color.Black)
                 .nestedScroll(nestedScrollConnection)
         ) {
-            // Header
-            AppDrawerHeader(
+            AppDrawerSearchBar(
+                searchQuery = state.searchQuery,
+                onSearchQueryChange = { query ->
+                    viewModel.onEvent(AppDrawerEvent.SearchApps(query))
+                },
                 theme = theme
             )
 
-            // App Categories
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -111,18 +113,33 @@ fun AppDrawerScreen(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     state = listState
                 ) {
-                    val categorizedApps = viewModel.getCategorizedApps()
-
-                    categorizedApps.forEach { (category, apps) ->
+                    if (state.searchQuery.isNotEmpty()) {
+                        // Show search results
+                        val searchResults = viewModel.getSearchResults()
                         item {
-                            AppCategorySection(
-                                category = category,
-                                apps = apps,
+                            SearchResultsSection(
+                                searchQuery = state.searchQuery,
+                                searchResults = searchResults,
                                 onAppClick = { app: AppDrawerApp ->
                                     viewModel.onEvent(AppDrawerEvent.SelectApp(app))
                                 },
                                 theme = theme
                             )
+                        }
+                    } else {
+                        // Show categorized apps
+                        val categorizedApps = viewModel.getCategorizedApps()
+                        categorizedApps.forEach { (category, apps) ->
+                            item {
+                                AppCategorySection(
+                                    category = category,
+                                    apps = apps,
+                                    onAppClick = { app: AppDrawerApp ->
+                                        viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                    },
+                                    theme = theme
+                                )
+                            }
                         }
                     }
                 }

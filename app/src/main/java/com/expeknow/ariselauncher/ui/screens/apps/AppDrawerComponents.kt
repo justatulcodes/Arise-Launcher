@@ -17,14 +17,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
@@ -172,6 +179,80 @@ fun AppDrawerHeader(
 }
 
 @Composable
+fun AppDrawerSearchBar(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    theme: AppDrawerTheme
+) {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 12.dp)
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = theme.border,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .background(theme.background, RoundedCornerShape(12.dp))
+            .height(48.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Search,
+            contentDescription = "Search",
+            tint = theme.accent.copy(alpha = 0.7f),
+            modifier = Modifier.size(36.dp).padding(start = 12.dp)
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Box(
+            modifier = Modifier.weight(1f)
+        ) {
+            if (searchQuery.isEmpty()) {
+                Text(
+                    text = "Search apps...",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.White.copy(alpha = 0.4f)
+                )
+            }
+
+            BasicTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = TextStyle(
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                ),
+                cursorBrush = SolidColor(theme.accent),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Search
+                )
+            )
+        }
+
+        if (searchQuery.isNotEmpty()) {
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(
+                onClick = { onSearchQueryChange("") },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "Clear search",
+                    tint = Color.White.copy(alpha = 0.6f),
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun WarningBanner() {
     Row(
         modifier = Modifier
@@ -269,7 +350,9 @@ fun AppGrid(
     Column{
         apps.chunked(columns).forEach { rowApps ->
             Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 rowApps.forEach { app ->
@@ -442,6 +525,89 @@ fun AppDrawerFooter(
 }
 
 @Composable
+fun SearchResultsSection(
+    searchQuery: String,
+    searchResults: List<AppDrawerApp>,
+    onAppClick: (AppDrawerApp) -> Unit,
+    theme: AppDrawerTheme
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        if (searchResults.isNotEmpty()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "SEARCH RESULTS",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = theme.accent,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Surface(
+                    color = Color.Transparent,
+                    shape = RoundedCornerShape(4.dp),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = theme.accent.copy(alpha = 0.3f)
+                    ),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "${searchResults.size} found",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = theme.accent,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
+            }
+
+            AppGrid(
+                apps = searchResults,
+                onAppClick = onAppClick,
+                theme = theme
+            )
+        } else {
+            // No results found
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.SearchOff,
+                    contentDescription = "No results",
+                    tint = Color.White.copy(alpha = 0.4f),
+                    modifier = Modifier.size(48.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "NO APPS FOUND",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White.copy(alpha = 0.6f),
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Try adjusting your search terms",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.4f),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun AppWarningDialog(
     app: AppDrawerApp?,
     onConfirm: () -> Unit,
@@ -518,6 +684,26 @@ fun AppWarningDialog(
             }
         )
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppDrawerSearchBarPreview() {
+    AppDrawerSearchBar(
+        searchQuery = "",
+        onSearchQueryChange = {},
+        theme = AppDrawerTheme()
+    )
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun AppDrawerSearchBarWithTextPreview() {
+    AppDrawerSearchBar(
+        searchQuery = "Instagram",
+        onSearchQueryChange = {},
+        theme = AppDrawerTheme()
+    )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
