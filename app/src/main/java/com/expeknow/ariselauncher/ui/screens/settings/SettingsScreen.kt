@@ -34,16 +34,10 @@ fun SettingsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-//            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
-            .onFirstVisible( callback = {viewModel.checkLauncherStatus()})
+            .onFirstVisible(callback = { viewModel.checkLauncherStatus() })
     ) {
-        // Header
-        SettingsHeader(
-            onBackClick = { navController.popBackStack() },
-            theme = theme
-        )
+        SettingsHeader()
 
-        // Content
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -51,7 +45,6 @@ fun SettingsScreen(
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Default Launcher Setting
             DefaultLauncherSection(
                 isDefaultLauncher = state.isDefaultLauncher,
                 onSetDefaultLauncher = { isDefault: Boolean ->
@@ -60,7 +53,6 @@ fun SettingsScreen(
                 theme = theme
             )
 
-            // Task Completion Behavior
             TaskCompletionSection(
                 hideCompletedTasks = state.hideCompletedTasks,
                 onToggle = { hide: Boolean ->
@@ -69,7 +61,6 @@ fun SettingsScreen(
                 theme = theme
             )
 
-            // Tunnel Vision Mode
             TunnelVisionSection(
                 tunnelVisionMode = state.tunnelVisionMode,
                 onToggle = { enabled: Boolean ->
@@ -78,7 +69,6 @@ fun SettingsScreen(
                 theme = theme
             )
 
-            // Access Delays
             AccessDelaysSection(
                 appDrawerDelay = state.appDrawerDelay,
                 distractionAppsDelay = state.distractionAppsDelay,
@@ -104,46 +94,57 @@ fun SettingsScreen(
                 theme = theme
             )
 
-            // Essential Apps
-            EssentialAppsSection(
-                apps = state.apps,
-                onAppToggle = { appId: String ->
-                    viewModel.onEvent(SettingsEvent.ToggleAppEssential(appId))
-                },
-                theme = theme
-            )
+//            EssentialAppsSection(
+//                apps = state.apps,
+//                onAppToggle = { appId: String ->
+//                    viewModel.onEvent(SettingsEvent.ToggleAppEssential(appId))
+//                },
+//                theme = theme
+//            )
 
             // Danger Zone
             DangerZoneCard(
-                onResetPoints = { viewModel.onEvent(SettingsEvent.ResetAllPoints) },
-                onFactoryReset = { viewModel.onEvent(SettingsEvent.FactoryReset) }
+                onShowResetPointsDialog = { viewModel.onEvent(SettingsEvent.ShowResetPointsDialog) },
+                onShowFactoryResetDialog = { viewModel.onEvent(SettingsEvent.ShowFactoryResetDialog) }
             )
 
             // Footer
             SettingsFooter(theme = theme)
         }
     }
+
+    // Confirmation Dialogs
+    if (state.showResetPointsDialog) {
+        ConfirmationDialog(
+            title = "RESET ALL POINTS",
+            message = "This action will permanently reset all points for all apps. This cannot be undone.",
+            onConfirm = { viewModel.onEvent(SettingsEvent.ResetAllPoints) },
+            onDismiss = { viewModel.onEvent(SettingsEvent.HideResetPointsDialog) },
+            theme = theme,
+            isDestructive = true
+        )
+    }
+
+    if (state.showFactoryResetDialog) {
+        ConfirmationDialog(
+            title = "FACTORY RESET",
+            message = "This will delete all tasks, reset all points, and restore settings to default values. This action cannot be undone.",
+            onConfirm = { viewModel.onEvent(SettingsEvent.FactoryReset) },
+            onDismiss = { viewModel.onEvent(SettingsEvent.HideFactoryResetDialog) },
+            theme = theme,
+            isDestructive = true
+        )
+    }
 }
 
 @Composable
-private fun SettingsHeader(
-    onBackClick: () -> Unit,
-    theme: SettingsTheme
-) {
+private fun SettingsHeader() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = onBackClick) {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
-        }
 
         Column(modifier = Modifier.padding(start = 8.dp)) {
             Text(
