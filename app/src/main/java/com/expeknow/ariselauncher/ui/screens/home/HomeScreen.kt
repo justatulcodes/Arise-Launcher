@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.data.model.TaskCategory
@@ -22,6 +23,7 @@ import com.expeknow.ariselauncher.ui.navigation.Screen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
+import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,9 +40,7 @@ fun HomeScreen(
         skipPartiallyExpanded = true,
     )
     var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
-
-    Log.d("PointsDebug", "homeScreen: ${state.currentPoints}")
-
+    val context = LocalContext.current
 
     BackHandler {
         // do nothing as its a launcher
@@ -131,7 +131,12 @@ fun HomeScreen(
                                                 onToggleTask = {
                                                     viewModel.onEvent(HomeEvent.ToggleTask(task))
                                                 },
-                                                theme = theme
+                                                theme = theme,
+                                                onTaskLinkClick = { taskLink ->
+                                                    openLink(context = context,
+                                                        url = taskLink.url,
+                                                        linkType = taskLink.type)
+                                                }
                                             )
                                         }
 

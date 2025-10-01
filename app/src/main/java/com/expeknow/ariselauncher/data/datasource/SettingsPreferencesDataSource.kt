@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import androidx.core.content.edit
 
 @Singleton
 class SettingsPreferencesDataSource @Inject constructor(
@@ -26,28 +27,28 @@ class SettingsPreferencesDataSource @Inject constructor(
 
     fun getHideCompletedTasks(): Boolean = prefs.getBoolean(KEY_HIDE_COMPLETED_TASKS, true)
     fun setHideCompletedTasks(hide: Boolean) =
-        prefs.edit().putBoolean(KEY_HIDE_COMPLETED_TASKS, hide).apply()
+        prefs.edit { putBoolean(KEY_HIDE_COMPLETED_TASKS, hide) }
 
     fun getTunnelVisionMode(): Boolean = prefs.getBoolean(KEY_TUNNEL_VISION_MODE, true)
     fun setTunnelVisionMode(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_TUNNEL_VISION_MODE, enabled).apply()
+        prefs.edit { putBoolean(KEY_TUNNEL_VISION_MODE, enabled) }
 
     fun getAppDrawerDelay(): Float = prefs.getFloat(KEY_APP_DRAWER_DELAY, 60f)
-    fun setAppDrawerDelay(delay: Float) = prefs.edit().putFloat(KEY_APP_DRAWER_DELAY, delay).apply()
+    fun setAppDrawerDelay(delay: Float) = prefs.edit { putFloat(KEY_APP_DRAWER_DELAY, delay) }
 
     fun getDistractionAppsDelay(): Float = prefs.getFloat(KEY_DISTRACTION_APPS_DELAY, 30f)
     fun setDistractionAppsDelay(delay: Float) =
-        prefs.edit().putFloat(KEY_DISTRACTION_APPS_DELAY, delay).apply()
+        prefs.edit { putFloat(KEY_DISTRACTION_APPS_DELAY, delay) }
 
     fun getPointThreshold(): Float = prefs.getFloat(KEY_POINT_THRESHOLD, 50f)
     fun setPointThreshold(threshold: Float) =
-        prefs.edit().putFloat(KEY_POINT_THRESHOLD, threshold).apply()
+        prefs.edit { putFloat(KEY_POINT_THRESHOLD, threshold) }
 
     fun getWarningsEnabled(): Boolean = prefs.getBoolean(KEY_WARNINGS_ENABLED, true)
     fun setWarningsEnabled(enabled: Boolean) =
-        prefs.edit().putBoolean(KEY_WARNINGS_ENABLED, enabled).apply()
+        prefs.edit { putBoolean(KEY_WARNINGS_ENABLED, enabled) }
 
     fun resetAllSettings() {
-        prefs.edit().clear().apply()
+        prefs.edit { clear() }
     }
 }
