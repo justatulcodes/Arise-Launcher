@@ -9,7 +9,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
@@ -519,13 +521,21 @@ fun SimpleTaskItem(
     ) {
         Checkbox(
             checked = task.isCompleted,
-            onCheckedChange = { onToggleTask(task.id) },
+            onCheckedChange = null,
             colors = CheckboxDefaults.colors(
                 checkedColor = theme.accent,
                 uncheckedColor = Color.White.copy(alpha = 0.4f),
                 checkmarkColor = Color.Black
             ),
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier
+                .size(20.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            onToggleTask(task.id)
+                        }
+                    )
+                }
         )
 
         Spacer(modifier = Modifier.width(12.dp))
