@@ -76,7 +76,7 @@ fun SettingsToggleItem(
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
-                    checkedTrackColor = theme.accent,
+                    checkedTrackColor = Color.White.copy(alpha = 0.2f),
                     uncheckedThumbColor = Color.White,
                     uncheckedTrackColor = Color.White.copy(alpha = 0.2f)
                 )
@@ -226,7 +226,7 @@ fun AppListItem(
                     onCheckedChange = { onEssentialToggle(app.id) },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = theme.accent,
+                        checkedTrackColor = Color.White.copy(alpha = 0.2f),
                         uncheckedThumbColor = Color.White,
                         uncheckedTrackColor = Color.White.copy(alpha = 0.2f)
                     )
@@ -273,8 +273,8 @@ fun SettingsSectionTitle(
 
 @Composable
 fun DangerZoneCard(
-    onResetPoints: () -> Unit,
-    onFactoryReset: () -> Unit,
+    onShowResetPointsDialog: () -> Unit,
+    onShowFactoryResetDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -311,7 +311,7 @@ fun DangerZoneCard(
             }
 
             Button(
-                onClick = onResetPoints,
+                onClick = onShowResetPointsDialog,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 border = androidx.compose.foundation.BorderStroke(
                     width = 1.dp,
@@ -327,7 +327,7 @@ fun DangerZoneCard(
             }
 
             Button(
-                onClick = onFactoryReset,
+                onClick = onShowFactoryResetDialog,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 border = androidx.compose.foundation.BorderStroke(
                     width = 1.dp,
@@ -343,6 +343,78 @@ fun DangerZoneCard(
             }
         }
     }
+}
+
+@Composable
+fun ConfirmationDialog(
+    title: String,
+    message: String,
+    confirmText: String = "CONFIRM",
+    cancelText: String = "CANCEL",
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    theme: SettingsTheme,
+    isDestructive: Boolean = true
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = if (isDestructive) Color(0xFFE57373) else theme.accent
+            )
+        },
+        text = {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.8f)
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onConfirm()
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isDestructive) Color(0xFFE57373).copy(alpha = 0.2f) else theme.accent.copy(
+                        alpha = 0.2f
+                    )
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = if (isDestructive) Color(0xFFE57373) else theme.accent
+                )
+            ) {
+                Text(
+                    text = confirmText,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (isDestructive) Color(0xFFE57373) else theme.accent
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = Color.White.copy(alpha = 0.4f)
+                )
+            ) {
+                Text(
+                    text = cancelText,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+            }
+        },
+        containerColor = Color(0xFF1A1A1A),
+        titleContentColor = if (isDestructive) Color(0xFFE57373) else theme.accent,
+        textContentColor = Color.White.copy(alpha = 0.8f)
+    )
 }
 
 @Preview
@@ -409,7 +481,19 @@ fun PreviewSettingsSectionTitle() {
 @Composable
 fun PreviewDangerZoneCard() {
     DangerZoneCard(
-        onResetPoints = {},
-        onFactoryReset = {}
+        onShowResetPointsDialog = {},
+        onShowFactoryResetDialog = {}
+    )
+}
+
+@Preview
+@Composable
+fun PreviewConfirmationDialog() {
+    ConfirmationDialog(
+        title = "RESET ALL POINTS",
+        message = "This action will permanently reset all points for all apps. This cannot be undone.",
+        onConfirm = {},
+        onDismiss = {},
+        theme = SettingsTheme()
     )
 }

@@ -34,7 +34,9 @@ data class SettingsState(
     val pointThreshold: Float = 50f,
     val warningsEnabled: Boolean = true,
     val isDefaultLauncher: Boolean = false,
-    val apps: List<SettingsAppInfo> = getDefaultApps()
+    val apps: List<SettingsAppInfo> = getDefaultApps(),
+    val showResetPointsDialog: Boolean = false,
+    val showFactoryResetDialog: Boolean = false
 )
 
 private fun getDefaultApps(): List<SettingsAppInfo> = listOf(
@@ -52,6 +54,10 @@ sealed class SettingsEvent {
     data class UpdatePointThreshold(val threshold: Float) : SettingsEvent()
     data class ToggleWarnings(val enabled: Boolean) : SettingsEvent()
     data class ToggleAppEssential(val appId: String) : SettingsEvent()
+    data object ShowResetPointsDialog : SettingsEvent()
+    data object HideResetPointsDialog : SettingsEvent()
+    data object ShowFactoryResetDialog : SettingsEvent()
+    data object HideFactoryResetDialog : SettingsEvent()
     data object ResetAllPoints : SettingsEvent()
     data class SetDefaultLauncher(val isDefault: Boolean) : SettingsEvent()
     data object FactoryReset : SettingsEvent()
