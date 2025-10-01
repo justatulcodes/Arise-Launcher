@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -481,6 +482,7 @@ fun SimpleTaskList(
     tasks: List<Task>,
     onTaskClick: (String) -> Unit,
     onToggleTask: (String) -> Unit,
+    onTaskLinkClick : (TaskLink) -> Unit,
     theme: HomeTheme
 ) {
     LazyColumn(
@@ -494,7 +496,8 @@ fun SimpleTaskList(
                 task = task,
                 onTaskClick = onTaskClick,
                 onToggleTask = onToggleTask,
-                theme = theme
+                theme = theme,
+                onTaskLinkClick = onTaskLinkClick
             )
         }
     }
@@ -505,6 +508,7 @@ fun SimpleTaskItem(
     task: Task,
     onTaskClick: (String) -> Unit,
     onToggleTask: (String) -> Unit,
+    onTaskLinkClick : (TaskLink) -> Unit,
     theme: HomeTheme
 ) {
     Row(
@@ -551,7 +555,10 @@ fun SimpleTaskItem(
                 Spacer(modifier = Modifier.height(8.dp))
                 Row {
                     task.relatedLinks.take(2).forEach { link ->
-                        TaskLinkChip(link = link, theme = theme)
+                        TaskLinkChip(link = link, theme = theme,
+                            onTaskLinkChipClick = {
+                                onTaskLinkClick(it)
+                            })
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                     if (task.relatedLinks.size > 2) {
@@ -807,7 +814,8 @@ private fun FocusedTaskItem(
 @Composable
 private fun TaskLinkChip(
     link: TaskLink,
-    theme: HomeTheme
+    theme: HomeTheme,
+    onTaskLinkChipClick : (TaskLink) -> Unit = {}
 ) {
     val linkIcon = when (link.type) {
         TaskLinkType.VIDEO -> "📹"
@@ -817,6 +825,7 @@ private fun TaskLinkChip(
 
     Box(
         modifier = Modifier
+            .clickable { onTaskLinkChipClick(link) }
             .background(
                 theme.bg,
                 RoundedCornerShape(8.dp)
