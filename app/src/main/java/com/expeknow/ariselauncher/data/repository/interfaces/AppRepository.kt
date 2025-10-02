@@ -13,4 +13,12 @@ interface AppRepository {
     fun isDefaultLauncher(): Boolean
 
     fun openDefaultLauncherSettings()
+
+    fun getAppInfo(packageName: String): AppInfo
+
+    fun addAppInfo(packageName: String, category: String, installTime : Long)
+
+    fun deleteAppInfo(packageName: String)
+
+    fun getAppSortedByInstallTime() :  List<AppInfo>
 }

@@ -5,13 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.model.PointsLog
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskConverters
 import com.expeknow.ariselauncher.data.model.TaskLink
 
 @Database(
-    entities = [Task::class, TaskLink::class, PointsLog::class],
+    entities = [Task::class, TaskLink::class, PointsLog::class, AppInfo::class],
     version = 1,
     exportSchema = false
 )
@@ -21,6 +22,8 @@ abstract class AriseLauncherDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun taskLinkDao(): TaskLinkDao
     abstract fun pointsLogDao(): PointsLogDao
+
+    abstract fun appInfoDao(): AppInfoDao
 
     companion object {
         @Volatile
@@ -33,7 +36,7 @@ abstract class AriseLauncherDatabase : RoomDatabase() {
                     AriseLauncherDatabase::class.java,
                     "arise_launcher_database"
                 )
-                    .fallbackToDestructiveMigration(true) // For development - remove in production
+                    .fallbackToDestructiveMigration(true) // TODO For development - remove in production
                     .build()
                 INSTANCE = instance
                 instance

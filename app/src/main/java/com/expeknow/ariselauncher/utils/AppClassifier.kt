@@ -3,14 +3,9 @@ package com.expeknow.ariselauncher.utils
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
-import androidx.compose.ui.graphics.Color
 import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import java.net.URL
 

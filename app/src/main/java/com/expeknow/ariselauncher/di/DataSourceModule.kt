@@ -1,9 +1,11 @@
 package com.expeknow.ariselauncher.di
 
 import android.content.Context
+import com.expeknow.ariselauncher.data.database.AppInfoDao
 import com.expeknow.ariselauncher.data.database.PointsLogDao
 import com.expeknow.ariselauncher.data.database.TaskDao
 import com.expeknow.ariselauncher.data.database.TaskLinkDao
+import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflinePointsLogDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflineTaskDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflineTaskLinkDataSource
@@ -41,4 +43,10 @@ object DataSourceModule {
     fun provideSettingsPreferencesDataSource(@ApplicationContext context : Context): SettingsPreferencesDataSource {
         return SettingsPreferencesDataSource(context)
     }
+
+    @Provides
+    fun provideAppInfoDataSource(appInfoDao: AppInfoDao): AppInfoDataSource {
+        return AppInfoDataSource(appInfoDao)
+    }
 }
+

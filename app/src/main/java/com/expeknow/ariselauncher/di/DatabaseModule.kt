@@ -1,6 +1,7 @@
 package com.expeknow.ariselauncher.di
 
 import android.content.Context
+import com.expeknow.ariselauncher.data.database.AppInfoDao
 import com.expeknow.ariselauncher.data.database.AriseLauncherDatabase
 import com.expeknow.ariselauncher.data.database.PointsLogDao
 import com.expeknow.ariselauncher.data.database.TaskDao
@@ -38,6 +39,11 @@ object DatabaseModule {
     @Provides
     fun providePointsLogDao(database: AriseLauncherDatabase) : PointsLogDao {
         return database.pointsLogDao()
+    }
+
+    @Provides
+    fun provideAppInfoDao(database: AriseLauncherDatabase) : AppInfoDao {
+        return database.appInfoDao()
     }
 
 }

@@ -6,16 +6,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.Settings
 
-/**
- * Utility class for launcher-related operations
- */
 object LauncherUtils {
 
-    /**
-     * Check if this app is the default launcher
-     * @param context Application context
-     * @return true if this app is the default launcher, false otherwise
-     */
     fun isDefaultLauncher(context: Context): Boolean {
         val intent = Intent(Intent.ACTION_MAIN).apply {
             addCategory(Intent.CATEGORY_HOME)
@@ -25,10 +17,6 @@ object LauncherUtils {
         return context.packageName == currentHomePackage
     }
 
-    /**
-     * Open the system's default home app selection dialog
-     * @param context Application context
-     */
     fun openDefaultLauncherSettings(context: Context) {
         val intent = Intent(Settings.ACTION_HOME_SETTINGS).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
