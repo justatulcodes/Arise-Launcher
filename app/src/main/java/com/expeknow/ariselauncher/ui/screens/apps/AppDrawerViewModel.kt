@@ -73,6 +73,7 @@ class AppDrawerViewModel @Inject constructor(
 
             is AppDrawerEvent.SelectApp -> {
                 if (event.app.pointCost > 0 && _state.value.currentPoints < event.app.pointCost) {
+                    appRepositoryImpl.launchApp(event.app.packageName)
                     return
                 }
 
