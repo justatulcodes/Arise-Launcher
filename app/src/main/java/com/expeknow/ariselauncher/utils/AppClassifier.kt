@@ -27,7 +27,7 @@ object AppClassifier {
 
         if (playCategory != null) {
             Log.i(TAG, "Play Store category for ${appInfo.loadLabel(pm)}: $playCategory")
-            return mapPlayStoreCategory(playCategory)
+            return mapCategoryToAppCategory(playCategory)
         }
 
         // Fallback for system / sideloaded apps using ApplicationInfo.category
@@ -65,7 +65,7 @@ object AppClassifier {
         }
     }
 
-    private fun mapPlayStoreCategory(category: String): AppCategory {
+    fun mapCategoryToAppCategory(category: String): AppCategory {
         return when (category.lowercase()) {
             "productivity", "tools", "utilities", "business", "education",
             "books & reference", "events", "house & home", "libraries & demo",
@@ -87,6 +87,32 @@ object AppClassifier {
             else -> AppCategory.ESSENTIAL
         }
     }
+
+    fun getDefaultCategoryString(appInfoCategory: Int): String {
+        return when (appInfoCategory) {
+            ApplicationInfo.CATEGORY_PRODUCTIVITY ->
+                "productivity"
+            ApplicationInfo.CATEGORY_SOCIAL ->
+                "social"
+            ApplicationInfo.CATEGORY_GAME ->
+                "action"
+            ApplicationInfo.CATEGORY_VIDEO,
+            ApplicationInfo.CATEGORY_AUDIO,
+            ApplicationInfo.CATEGORY_IMAGE ->
+                "entertainment"
+            ApplicationInfo.CATEGORY_NEWS ->
+                "news & magazines"
+            ApplicationInfo.CATEGORY_MAPS ->
+                "maps & navigation"
+            ApplicationInfo.CATEGORY_ACCESSIBILITY ->
+                "utilities"
+            ApplicationInfo.CATEGORY_UNDEFINED ->
+                "miscellaneous"
+            else ->
+                "miscellaneous"
+        }
+    }
+
 
     fun getAppPointCost(category: AppCategory): Int {
         return when (category) {

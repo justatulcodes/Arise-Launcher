@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
+import com.expeknow.ariselauncher.utils.AppClassifier.mapCategoryToAppCategory
 import com.expeknow.ariselauncher.utils.InstalledAppObject
 
 class AppRepositoryImpl(
@@ -41,6 +42,7 @@ class AppRepositoryImpl(
 
             val name = resolveInfo.loadLabel(packageManager).toString()
             val icon = resolveInfo.loadIcon(packageManager)
+            val appInstallTime = packageManager.getPackageInfo(packageName, 0).firstInstallTime
 
             AppDrawerApp(
                 name = name,
@@ -48,17 +50,30 @@ class AppRepositoryImpl(
                 icon = icon,
                 id = packageName,
                 category = AppCategory.MISCELLANEOUS,
-                pointCost = AppClassifier.getAppPointCost(AppCategory.MISCELLANEOUS)
+                pointCost = AppClassifier.getAppPointCost(AppCategory.MISCELLANEOUS),
+                appInstallTime = appInstallTime
             )
         }.sortedBy { it.name }
 
         appDrawerApps.forEach { app ->
             CoroutineScope(Dispatchers.IO).launch {
-                app.category = AppClassifier.classifyApp(context, app.packageName)
-                app.pointCost = AppClassifier.getAppPointCost(app.category)
-            }
-        }
+                val cachedCategory = appInfoDataSource.getAppInfo(packageName = app.packageName)
+                if(cachedCategory != null) {
+                    app.category = mapCategoryToAppCategory(cachedCategory.category)
+                    app.pointCost = AppClassifier.getAppPointCost(app.category)
+                }else{
+                    val foundCategory = AppClassifier.classifyApp(context, app.packageName)
+                    app.category = foundCategory
+                    app.pointCost = AppClassifier.getAppPointCost(app.category)
+                    appInfoDataSource.addAppInfo(
+                        packageName = app.packageName,
+                        category = AppClassifier.getDefaultCategoryString(foundCategory.ordinal),
+                        installTime = app.appInstallTime)
 
+                }
+            }
+
+        }
         InstalledAppObject.installedAppList = appDrawerApps as MutableList<AppDrawerApp>
         return appDrawerApps
 
@@ -70,6 +85,7 @@ class AppRepositoryImpl(
 
         val callIntent = Intent(Intent.ACTION_DIAL)
         val callApps = packageManager.queryIntentActivities(callIntent, 0)
+        val callAppInstallTime = packageManager.getPackageInfo(callApps[0].activityInfo.packageName, 0).firstInstallTime
 
         callApps.forEach { resolveInfo ->
             val packageName = resolveInfo.activityInfo.packageName
@@ -81,7 +97,8 @@ class AppRepositoryImpl(
                         icon = resolveInfo.loadIcon(packageManager),
                         id = packageName,
                         category = AppCategory.ESSENTIAL,
-                        pointCost = AppClassifier.getAppPointCost(AppCategory.ESSENTIAL)
+                        pointCost = AppClassifier.getAppPointCost(AppCategory.ESSENTIAL),
+                        appInstallTime = callAppInstallTime
                     )
                 )
             }
@@ -89,6 +106,7 @@ class AppRepositoryImpl(
 
         val smsIntent = Intent(Intent.ACTION_SENDTO, "smsto:".toUri())
         val smsApps = packageManager.queryIntentActivities(smsIntent, 0)
+        val SMSappInstallTime = packageManager.getPackageInfo(smsApps[0].activityInfo.packageName, 0).firstInstallTime
 
         smsApps.forEach { resolveInfo ->
             val packageName = resolveInfo.activityInfo.packageName
@@ -101,7 +119,8 @@ class AppRepositoryImpl(
                         icon = resolveInfo.loadIcon(packageManager),
                         id = packageName,
                         category = AppCategory.ESSENTIAL,
-                        pointCost = AppClassifier.getAppPointCost(AppCategory.ESSENTIAL)
+                        pointCost = AppClassifier.getAppPointCost(AppCategory.ESSENTIAL),
+                        appInstallTime = SMSappInstallTime
                     )
                 )
             }
@@ -109,9 +128,6 @@ class AppRepositoryImpl(
 
         return result.sortedBy { it.name }
     }
-
-
-
 
     override fun launchApp(packageName: String) {
         val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
@@ -127,29 +143,5 @@ class AppRepositoryImpl(
 
     override fun openDefaultLauncherSettings() {
         LauncherUtils.openDefaultLauncherSettings(context)
-    }
-
-    override fun getAppInfo(packageName: String): AppInfo {
-        return appInfoDataSource.getAppInfo(packageName)
-    }
-
-    override fun addAppInfo(
-        packageName: String,
-        category: String,
-        installTime: Long
-    ) {
-        return appInfoDataSource.addAppInfo(
-            packageName = packageName,
-            category = category,
-            installTime = installTime
-        )
-    }
-
-    override fun deleteAppInfo(packageName: String) {
-        return appInfoDataSource.deleteAppInfo(packageName)
-    }
-
-    override fun getAppSortedByInstallTime() :  List<AppInfo> {
-        return appInfoDataSource.getAppSortedByInstallTime()
     }
 }
