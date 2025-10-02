@@ -16,9 +16,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.utils.InstalledAppObject
 
-class AppRepositoryImpl(private val context: Context) : AppRepository {
+class AppRepositoryImpl(
+    private val context: Context,
+    private val appInfoDataSource: AppInfoDataSource
+    ) : AppRepository {
 
     override suspend fun getInstalledApps(): List<AppDrawerApp> {
         if(InstalledAppObject.installedAppList.isNotEmpty()){
@@ -29,6 +33,7 @@ class AppRepositoryImpl(private val context: Context) : AppRepository {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
         val apps = packageManager.queryIntentActivities(mainIntent, 0)
+        
 
         val appDrawerApps = apps.mapNotNull { resolveInfo ->
             val packageName = resolveInfo.activityInfo.packageName
@@ -122,5 +127,29 @@ class AppRepositoryImpl(private val context: Context) : AppRepository {
 
     override fun openDefaultLauncherSettings() {
         LauncherUtils.openDefaultLauncherSettings(context)
+    }
+
+    override fun getAppInfo(packageName: String): AppInfo {
+        return appInfoDataSource.getAppInfo(packageName)
+    }
+
+    override fun addAppInfo(
+        packageName: String,
+        category: String,
+        installTime: Long
+    ) {
+        return appInfoDataSource.addAppInfo(
+            packageName = packageName,
+            category = category,
+            installTime = installTime
+        )
+    }
+
+    override fun deleteAppInfo(packageName: String) {
+        return appInfoDataSource.deleteAppInfo(packageName)
+    }
+
+    override fun getAppSortedByInstallTime() :  List<AppInfo> {
+        return appInfoDataSource.getAppSortedByInstallTime()
     }
 }

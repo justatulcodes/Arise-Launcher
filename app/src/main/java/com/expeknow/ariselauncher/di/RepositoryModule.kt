@@ -1,6 +1,8 @@
 package com.expeknow.ariselauncher.di
 
 import android.content.Context
+import com.expeknow.ariselauncher.data.database.AppInfoDao
+import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.data.datasource.SettingsPreferencesDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.PointsLogDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
@@ -29,8 +31,9 @@ object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideAppRepository(@ApplicationContext context : Context) : AppRepository {
-        return AppRepositoryImpl(context)
+    fun provideAppRepository(@ApplicationContext context : Context,
+                             appInfoDataSource: AppInfoDataSource) : AppRepository {
+        return AppRepositoryImpl(context, appInfoDataSource)
     }
 
     @Singleton
