@@ -10,7 +10,8 @@ data class AppDrawerApp(
     val icon: Drawable? = null,
     var category: AppCategory,
     var pointCost: Int = 10,
-    val description: String = ""
+    val description: String = "",
+    val appInstallTime : Long
 )
 
 enum class AppCategory(val displayName: String, val color: Color) {
