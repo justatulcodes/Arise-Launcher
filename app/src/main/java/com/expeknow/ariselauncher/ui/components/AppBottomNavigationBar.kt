@@ -83,18 +83,18 @@ fun AppBottomNavigationBar(navController: NavController) {
                     }
                 }
             )
-            NavBarItem(
-                icon = Icons.Filled.GridView,
-                label = "APPS",
-                isSelected = currentRoute == Screen.Apps.route,
-                showNotificationDot = true,
-                onClick = {
-                    navController.navigate(Screen.Apps.route) {
-                        popUpTo(Screen.Focus.route)
-                        launchSingleTop = true
-                    }
-                }
-            )
+//            NavBarItem(
+//                icon = Icons.Filled.GridView,
+//                label = "APPS",
+//                isSelected = currentRoute == Screen.Apps.route,
+//                showNotificationDot = true,
+//                onClick = {
+//                    navController.navigate(Screen.Apps.route) {
+//                        popUpTo(Screen.Focus.route)
+//                        launchSingleTop = true
+//                    }
+//                }
+//            )
             NavBarItem(
                 icon = Icons.Filled.ControlPoint,
                 label = "CTRL",

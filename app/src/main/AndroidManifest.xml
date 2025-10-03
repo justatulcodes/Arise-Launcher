@@ -32,7 +32,6 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:stateNotNeeded="true"
             android:theme="@style/Theme.AriseLauncher">
             <intent-filter>
@@ -43,15 +42,6 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".utils.PackageChangeReceiver"
-            android:exported="true">
-
-            <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_ADDED" />
-                <data android:scheme="package" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

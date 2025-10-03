@@ -49,7 +49,7 @@ fun AppNavigation(navController: NavHostController) {
         Screen.Focus.route,
         Screen.Points.route,
         Screen.Drive.route,
-        Screen.Apps.route,
+//        Screen.Apps.route,
         Screen.Ctrl.route
     )
 
@@ -82,11 +82,11 @@ fun AppNavigation(navController: NavHostController) {
             composable(Screen.Drive.route) {
                 DriveScreen(navController)
             }
-            composable(Screen.Apps.route) {
-
-                val appDrawerViewModel = it.sharedViewModel<AppDrawerViewModel>(navController)
-                AppDrawerScreen(navController, {}, appDrawerViewModel)
-            }
+//            composable(Screen.Apps.route) {
+//
+//                val appDrawerViewModel = it.sharedViewModel<AppDrawerViewModel>(navController)
+//                AppDrawerScreen(navController, {}, appDrawerViewModel)
+//            }
             composable(Screen.Ctrl.route) {
                 val viewModel = it.sharedViewModel<SettingsViewModel>(navController = navController)
                 SettingsScreen(navController, viewModel)
