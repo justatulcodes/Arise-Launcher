@@ -32,7 +32,6 @@ data class AppDrawerState(
     val showWarning: Boolean = false,
     val currentPoints: Int = 0,
     val apps: List<AppDrawerApp> = emptyList(),
-    val searchQuery: String = ""
 )
 
 

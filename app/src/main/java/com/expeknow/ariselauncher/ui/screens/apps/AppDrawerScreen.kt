@@ -29,6 +29,7 @@ fun AppDrawerScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = AppDrawerTheme()
     val listState = rememberLazyListState()
+    var searchQuery by remember { mutableStateOf("") }
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -93,9 +94,9 @@ fun AppDrawerScreen(
                 .nestedScroll(nestedScrollConnection)
         ) {
             AppDrawerSearchBar(
-                searchQuery = state.searchQuery,
+                searchQuery = searchQuery,
                 onSearchQueryChange = { query ->
-                    viewModel.onEvent(AppDrawerEvent.SearchApps(query))
+                    searchQuery = query
                 },
                 theme = theme
             )
@@ -113,12 +114,12 @@ fun AppDrawerScreen(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     state = listState
                 ) {
-                    if (state.searchQuery.isNotEmpty()) {
+                    if (searchQuery.isNotEmpty()) {
                         // Show search results
-                        val searchResults = viewModel.getSearchResults()
+                        val searchResults = viewModel.getSearchResults(searchQuery)
                         item {
                             SearchResultsSection(
-                                searchQuery = state.searchQuery,
+                                searchQuery = searchQuery,
                                 searchResults = searchResults,
                                 onAppClick = { app: AppDrawerApp ->
                                     viewModel.onEvent(AppDrawerEvent.SelectApp(app))

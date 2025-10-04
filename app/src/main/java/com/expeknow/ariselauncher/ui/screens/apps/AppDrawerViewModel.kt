@@ -120,26 +120,17 @@ class AppDrawerViewModel @Inject constructor(
             }
 
             is AppDrawerEvent.SearchApps -> {
-                _state.value = _state.value.copy(searchQuery = event.query)
+
             }
         }
     }
 
     fun getCategorizedApps(): Map<AppCategory, List<AppDrawerApp>> {
-        val query = _state.value.searchQuery
-        val filteredApps = if (query.isBlank()) {
-            _state.value.apps
-        } else {
-            _state.value.apps.filter { app ->
-                app.name.contains(query, ignoreCase = true) ||
-                        app.category.displayName.contains(query, ignoreCase = true)
-            }
-        }
-        return filteredApps.groupBy { it.category }
+        return _state.value.apps.groupBy { it.category }
     }
 
-    fun getSearchResults(): List<AppDrawerApp> {
-        val query = _state.value.searchQuery
+    fun getSearchResults(searchQuery: String): List<AppDrawerApp> {
+        val query = searchQuery
         return if (query.isBlank()) {
             emptyList()
         } else {
