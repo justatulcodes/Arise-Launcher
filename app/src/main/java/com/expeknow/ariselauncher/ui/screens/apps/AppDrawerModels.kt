@@ -14,17 +14,21 @@ data class AppDrawerApp(
     val appInstallTime : Long
 )
 
+
 enum class AppCategory(val displayName: String, val color: Color) {
     ESSENTIAL("Essential", Color(0xFF81C784)),
     PRODUCTIVITY("Productivity", Color(0xFF64B5F6)),
-    SOCIAL("Social", Color(0xFFE57373)),
+    COMMUNICATION("Communication", Color(0xFF42A5F5)),
+    SOCIAL_MEDIA("Social Media", Color(0xFFE57373)),
+    STREAMING("Streaming", Color(0xFFFF7043)),
     ENTERTAINMENT("Entertainment", Color(0xFFFFD54F)),
     GAMES("Games", Color(0xFFBA68C8)),
     SHOPPING("Shopping", Color(0xFFFFB74D)),
+    HEALTH("Health & Fitness", Color(0xFF66BB6A)),
+    FINANCE("Finance", Color(0xFF26A69A)),
     UTILITY("Utility", Color(0xFF9575CD)),
     MISCELLANEOUS("Miscellaneous", Color(0xFFA1887F))
 }
-
 data class AppDrawerState(
     val countdown: Int = 10,
     val isUnlocked: Boolean = false,
