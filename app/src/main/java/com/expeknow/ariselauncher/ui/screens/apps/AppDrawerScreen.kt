@@ -31,35 +31,13 @@ fun AppDrawerScreen(
     val listState = rememberLazyListState()
     var searchQuery by remember { mutableStateOf("") }
 
+    // Create a nested scroll connection that prevents bottom sheet from closing
+    // when the list is not at the top
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-
-                // Check if we can scroll in the direction of the gesture
-                val canScrollUp = listState.canScrollBackward
-                val canScrollDown = listState.canScrollForward
-
-                // If scrolling up (negative delta) and list can scroll up,
-                // consume the scroll to prevent bottom sheet from intercepting
-                if (delta < 0 && canScrollDown) {
-                    // Let the LazyColumn handle it by not consuming here
-                    return Offset.Zero
-                }
-
-                // If scrolling down (positive delta) and list can scroll up,
-                // consume the scroll to prevent bottom sheet from closing
-                if (delta > 0 && canScrollUp) {
-                    // Let the LazyColumn handle it by not consuming here
-                    return Offset.Zero
-                }
-
-                // Only when at the very top and scrolling down further,
-                // let the bottom sheet handle it (for dismiss gesture)
-                if (delta > 0 && !canScrollUp) {
-                    return Offset.Zero // Let bottom sheet handle the dismiss
-                }
-
+                // We don't consume anything in onPreScroll - let the LazyColumn handle it first
+                // This allows the LazyColumn to scroll normally
                 return Offset.Zero
             }
 
@@ -68,14 +46,34 @@ fun AppDrawerScreen(
                 available: Offset,
                 source: NestedScrollSource
             ): Offset {
-                // If there's remaining scroll after LazyColumn consumed what it could,
-                // and we're at the top of the list scrolling down, let bottom sheet handle it
-                if (available.y > 0 && !listState.canScrollBackward) {
-                    return Offset.Zero // Let bottom sheet consume the remaining
+                // This is called after LazyColumn has consumed what it can
+                // 'consumed' = what LazyColumn used
+                // 'available' = what's left over
+
+                val leftoverDelta = available.y
+
+                // If we're scrolling down (positive) and there's leftover scroll
+                if (leftoverDelta > 0) {
+                    // Check if we're at the top of the list
+                    if (!listState.canScrollBackward) {
+                        // We're at the top, let the bottom sheet handle the leftover
+                        // (this allows dismiss gesture)
+                        return Offset.Zero
+                    } else {
+                        // We're not at the top, consume the leftover to prevent
+                        // the bottom sheet from moving
+                        return available
+                    }
                 }
 
-                // Otherwise consume any remaining to prevent bottom sheet from moving
-                return available
+                // For upward scrolling (negative), if there's leftover it means
+                // we've hit the bottom of the list - consume it to prevent
+                // bottom sheet from moving
+                if (leftoverDelta < 0) {
+                    return available
+                }
+
+                return Offset.Zero
             }
         }
     }
@@ -146,13 +144,13 @@ fun AppDrawerScreen(
                 }
             }
 
-            // Footer Stats
-            AppDrawerFooter(
-                currentPoints = state.currentPoints,
-                totalFreeApps = state.apps.count { it.pointCost == 0 },
-                totalPremiumApps = state.apps.count { it.pointCost > 0 },
-                theme = theme
-            )
+//            // Footer Stats
+//            AppDrawerFooter(
+//                currentPoints = state.currentPoints,
+//                totalFreeApps = state.apps.count { it.pointCost == 0 },
+//                totalPremiumApps = state.apps.count { it.pointCost > 0 },
+//                theme = theme
+//            )
         }
     }
 
