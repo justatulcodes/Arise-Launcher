@@ -1179,6 +1179,21 @@ fun EssentialAppsBar(
     theme: HomeTheme,
     appsList: List<AppDrawerApp>
 ) {
+
+    val infiniteTransition = rememberInfiniteTransition(label = "swipe_animation")
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1000,
+                easing = FastOutLinearInEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "offset_animation"
+    )
+
     Column {
         Box(contentAlignment = Alignment.Center) {
             Row(
@@ -1211,21 +1226,6 @@ fun EssentialAppsBar(
                     )
                 }
             }
-
-            val infiniteTransition = rememberInfiniteTransition(label = "swipe_animation")
-
-            val offsetY by infiniteTransition.animateFloat(
-                initialValue = 0f,
-                targetValue = -8f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(
-                        durationMillis = 1000,
-                        easing = FastOutLinearInEasing
-                    ),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "offset_animation"
-            )
 
             Column(
                 modifier = Modifier.offset(y = offsetY.dp),
