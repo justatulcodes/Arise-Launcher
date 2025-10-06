@@ -11,6 +11,8 @@ import com.expeknow.ariselauncher.data.repository.interfaces.TaskLinkRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -140,8 +142,8 @@ class SettingsViewModel @Inject constructor(
                 _state.value = _state.value.copy(showAppRefreshDialog = false)
             }
             SettingsEvent.RefreshApps -> {
-                viewModelScope.launch {
-                  appInfoDataSource.deleteAllAppInfo()
+                CoroutineScope(Dispatchers.IO).launch {
+                    appInfoDataSource.deleteAllAppInfo()
                 }
                 _state.value = _state.value.copy(showAppRefreshDialog = false)
             }

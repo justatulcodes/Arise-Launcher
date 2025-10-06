@@ -96,9 +96,9 @@ fun SettingsScreen(
 
             // Danger Zone
             DangerZoneCard(
+                onShowRefreshAppDrawerDialog = { viewModel.onEvent(SettingsEvent.ShowAppRefreshDialog) },
                 onShowResetPointsDialog = { viewModel.onEvent(SettingsEvent.ShowResetPointsDialog) },
                 onShowFactoryResetDialog = { viewModel.onEvent(SettingsEvent.ShowFactoryResetDialog) },
-                onShowRefreshAppDrawerDialog = { viewModel.onEvent(SettingsEvent.ShowAppRefreshDialog) },
             )
 
             // Footer
@@ -131,12 +131,13 @@ fun SettingsScreen(
 
     if(state.showAppRefreshDialog) {
         ConfirmationDialog(
-            title = "REFRESH APP DATA",
-            message = "This will refresh all app data, including app names and icons. This action cannot be undone.",
+            title = "REFRESH APP DRAWER",
+            message = "This will refresh the app drawer to reflect any changes made to your device's installed apps." +
+                    " This action is safe and can be done at any time.",
             onConfirm = { viewModel.onEvent(SettingsEvent.RefreshApps) },
             onDismiss = { viewModel.onEvent(SettingsEvent.HideAppRefreshDialog) },
             theme = theme,
-            isDestructive = true
+            isDestructive = false
         )
     }
 }
