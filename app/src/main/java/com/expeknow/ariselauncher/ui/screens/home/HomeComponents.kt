@@ -1181,6 +1181,8 @@ fun EssentialAppsBar(
 ) {
 
     val infiniteTransition = rememberInfiniteTransition(label = "swipe_animation")
+    var totalDrag by remember { mutableStateOf(0f) }
+    var hasTriggered by remember { mutableStateOf(false) }
     val offsetY by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -8f,
@@ -1200,12 +1202,27 @@ fun EssentialAppsBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .pointerInput(Unit) {
-                        detectVerticalDragGestures() { change, dragAmount ->
-                            if (dragAmount < -50f) {
-                                onOpenFullApps()
+                        detectVerticalDragGestures(
+                            onDragStart = {
+                                totalDrag = 0f
+                                hasTriggered = false
+                            },
+                            onVerticalDrag = { change, dragAmount ->
+                                change.consume()
+
+                                totalDrag += dragAmount
+                                if (totalDrag < -50f && !hasTriggered) {
+                                    hasTriggered = true
+                                    onOpenFullApps()
+                                }
+                            },
+                            onDragEnd = {
+                                totalDrag = 0f
+                                hasTriggered = false
                             }
-                        }
+                        )
                     }
+
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -1216,11 +1233,7 @@ fun EssentialAppsBar(
                         icon = app.icon,
                         label = app.name,
                         onClick = {
-                            if(app.name == "Apps") {
-                                onOpenFullApps()
-                            } else {
-                                onAppClick(app)
-                            }
+                            onAppClick(app)
                         },
                         theme = theme
                     )

@@ -94,18 +94,11 @@ fun SettingsScreen(
                 theme = theme
             )
 
-//            EssentialAppsSection(
-//                apps = state.apps,
-//                onAppToggle = { appId: String ->
-//                    viewModel.onEvent(SettingsEvent.ToggleAppEssential(appId))
-//                },
-//                theme = theme
-//            )
-
             // Danger Zone
             DangerZoneCard(
                 onShowResetPointsDialog = { viewModel.onEvent(SettingsEvent.ShowResetPointsDialog) },
-                onShowFactoryResetDialog = { viewModel.onEvent(SettingsEvent.ShowFactoryResetDialog) }
+                onShowFactoryResetDialog = { viewModel.onEvent(SettingsEvent.ShowFactoryResetDialog) },
+                onShowRefreshAppDrawerDialog = { viewModel.onEvent(SettingsEvent.ShowAppRefreshDialog) },
             )
 
             // Footer
@@ -131,6 +124,17 @@ fun SettingsScreen(
             message = "This will delete all tasks, reset all points, and restore settings to default values. This action cannot be undone.",
             onConfirm = { viewModel.onEvent(SettingsEvent.FactoryReset) },
             onDismiss = { viewModel.onEvent(SettingsEvent.HideFactoryResetDialog) },
+            theme = theme,
+            isDestructive = true
+        )
+    }
+
+    if(state.showAppRefreshDialog) {
+        ConfirmationDialog(
+            title = "REFRESH APP DATA",
+            message = "This will refresh all app data, including app names and icons. This action cannot be undone.",
+            onConfirm = { viewModel.onEvent(SettingsEvent.RefreshApps) },
+            onDismiss = { viewModel.onEvent(SettingsEvent.HideAppRefreshDialog) },
             theme = theme,
             isDestructive = true
         )

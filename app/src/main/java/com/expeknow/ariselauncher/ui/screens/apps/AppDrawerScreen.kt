@@ -11,18 +11,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.expeknow.ariselauncher.ui.screens.home.HomeViewModel
-import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 
 @Composable
 fun AppDrawerScreen(
-    navController: NavController,
     onClose: () -> Unit = {},
     viewModel: AppDrawerViewModel = viewModel()
 ) {
@@ -81,6 +76,7 @@ fun AppDrawerScreen(
     if (!state.isUnlocked) {
         CountdownScreen(
             countdown = state.countdown,
+            appDrawerDelay = viewModel.getAppDrawerDelay(),
             theme = theme,
             onReturnToTasks = onClose
         )
@@ -144,13 +140,6 @@ fun AppDrawerScreen(
                 }
             }
 
-//            // Footer Stats
-//            AppDrawerFooter(
-//                currentPoints = state.currentPoints,
-//                totalFreeApps = state.apps.count { it.pointCost == 0 },
-//                totalPremiumApps = state.apps.count { it.pointCost > 0 },
-//                theme = theme
-//            )
         }
     }
 
@@ -160,7 +149,6 @@ fun AppDrawerScreen(
 @Composable
 private fun AppDrawerScreenPreview() {
     AppDrawerScreen(
-        navController = androidx.navigation.compose.rememberNavController(),
         onClose = {},
         viewModel = viewModel()
     )

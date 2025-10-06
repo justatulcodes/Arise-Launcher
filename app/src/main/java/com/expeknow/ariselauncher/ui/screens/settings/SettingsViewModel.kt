@@ -3,6 +3,7 @@ package com.expeknow.ariselauncher.ui.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
@@ -21,7 +22,8 @@ class SettingsViewModel @Inject constructor(
     private val pointsLogRepositoryImpl: PointsLogRepository,
     private val taskLinkRepositoryImpl: TaskLinkRepository,
     private val appRepositoryImpl: AppRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val appInfoDataSource: AppInfoDataSource
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState())
@@ -123,9 +125,9 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.FactoryReset -> {
                 viewModelScope.launch {
                     taskRepositoryImpl.deleteAllTasks()
-                    pointsLogRepositoryImpl.resetAllPointsLog()
-                    taskLinkRepositoryImpl.deleteAllTaskLinks()
-                    settingsRepository.resetAllSettings()
+//                    pointsLogRepositoryImpl.resetAllPointsLog()
+//                    taskLinkRepositoryImpl.deleteAllTaskLinks()
+//                    settingsRepository.resetAllSettings()
                     loadSettings() // Reload default settings
                 }
                 _state.value = _state.value.copy(
@@ -133,6 +135,20 @@ class SettingsViewModel @Inject constructor(
                     apps = _state.value.apps // Keep app list as is
                 )
             }
+
+            SettingsEvent.HideAppRefreshDialog -> {
+                _state.value = _state.value.copy(showAppRefreshDialog = false)
+            }
+            SettingsEvent.RefreshApps -> {
+                viewModelScope.launch {
+                  appInfoDataSource.deleteAllAppInfo()
+                }
+                _state.value = _state.value.copy(showAppRefreshDialog = false)
+            }
+            SettingsEvent.ShowAppRefreshDialog -> {
+                _state.value = _state.value.copy(showAppRefreshDialog = true)
+            }
+
         }
     }
 }
