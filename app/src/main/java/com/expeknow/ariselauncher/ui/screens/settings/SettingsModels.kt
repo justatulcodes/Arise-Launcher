@@ -29,14 +29,15 @@ data class SettingsTheme(
 data class SettingsState(
     val hideCompletedTasks: Boolean = true,
     val tunnelVisionMode: Boolean = true,
-    val appDrawerDelay: Float = 60f,
+    val appDrawerDelay: Float = 0f,
     val distractionAppsDelay: Float = 30f,
     val pointThreshold: Float = 50f,
     val warningsEnabled: Boolean = true,
     val isDefaultLauncher: Boolean = false,
     val apps: List<SettingsAppInfo> = getDefaultApps(),
     val showResetPointsDialog: Boolean = false,
-    val showFactoryResetDialog: Boolean = false
+    val showFactoryResetDialog: Boolean = false,
+    val showAppRefreshDialog: Boolean = false,
 )
 
 private fun getDefaultApps(): List<SettingsAppInfo> = listOf(
@@ -57,8 +58,11 @@ sealed class SettingsEvent {
     data object ShowResetPointsDialog : SettingsEvent()
     data object HideResetPointsDialog : SettingsEvent()
     data object ShowFactoryResetDialog : SettingsEvent()
+    data object ShowAppRefreshDialog : SettingsEvent()
+    data object HideAppRefreshDialog : SettingsEvent()
     data object HideFactoryResetDialog : SettingsEvent()
     data object ResetAllPoints : SettingsEvent()
+    data object RefreshApps : SettingsEvent()
     data class SetDefaultLauncher(val isDefault: Boolean) : SettingsEvent()
     data object FactoryReset : SettingsEvent()
 }

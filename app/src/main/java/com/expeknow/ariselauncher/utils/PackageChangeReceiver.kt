@@ -45,7 +45,7 @@ class PackageChangeReceiver : BroadcastReceiver() {
 
                             appInfoDataSource.addAppInfo(
                                 packageName = packageName,
-                                category = AppClassifier.getDefaultCategoryString(category.ordinal),
+                                category = AppClassifier.getDefaultCategoryString(category),
                                 installTime = installTime
                             )
                         } catch (e: Exception) {

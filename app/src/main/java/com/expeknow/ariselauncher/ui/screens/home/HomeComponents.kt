@@ -1179,18 +1179,50 @@ fun EssentialAppsBar(
     theme: HomeTheme,
     appsList: List<AppDrawerApp>
 ) {
+
+    val infiniteTransition = rememberInfiniteTransition(label = "swipe_animation")
+    var totalDrag by remember { mutableStateOf(0f) }
+    var hasTriggered by remember { mutableStateOf(false) }
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1000,
+                easing = FastOutLinearInEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "offset_animation"
+    )
+
     Column {
         Box(contentAlignment = Alignment.Center) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .pointerInput(Unit) {
-                        detectVerticalDragGestures() { change, dragAmount ->
-                            if (dragAmount < -50f) {
-                                onOpenFullApps()
+                        detectVerticalDragGestures(
+                            onDragStart = {
+                                totalDrag = 0f
+                                hasTriggered = false
+                            },
+                            onVerticalDrag = { change, dragAmount ->
+                                change.consume()
+
+                                totalDrag += dragAmount
+                                if (totalDrag < -50f && !hasTriggered) {
+                                    hasTriggered = true
+                                    onOpenFullApps()
+                                }
+                            },
+                            onDragEnd = {
+                                totalDrag = 0f
+                                hasTriggered = false
                             }
-                        }
+                        )
                     }
+
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -1201,31 +1233,12 @@ fun EssentialAppsBar(
                         icon = app.icon,
                         label = app.name,
                         onClick = {
-                            if(app.name == "Apps") {
-                                onOpenFullApps()
-                            } else {
-                                onAppClick(app)
-                            }
+                            onAppClick(app)
                         },
                         theme = theme
                     )
                 }
             }
-
-            val infiniteTransition = rememberInfiniteTransition(label = "swipe_animation")
-
-            val offsetY by infiniteTransition.animateFloat(
-                initialValue = 0f,
-                targetValue = -8f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(
-                        durationMillis = 1000,
-                        easing = FastOutLinearInEasing
-                    ),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "offset_animation"
-            )
 
             Column(
                 modifier = Modifier.offset(y = offsetY.dp),

@@ -6,8 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -18,28 +16,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.drawable.toBitmap
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 @Composable
 fun CountdownScreen(
     countdown: Int,
     theme: AppDrawerTheme,
-    onReturnToTasks: () -> Unit
+    onReturnToTasks: () -> Unit,
+    appDrawerDelay: Float
 ) {
     Column(
         modifier = Modifier
@@ -102,7 +96,7 @@ fun CountdownScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 LinearProgressIndicator(
-                    progress = (60 - countdown) / 60f,
+                    progress = (appDrawerDelay - countdown) / appDrawerDelay,
                     modifier = Modifier
                         .height(4.dp)
                         .width(200.dp),
@@ -712,7 +706,8 @@ private fun CountdownScreenPreview() {
     CountdownScreen(
         countdown = 30,
         theme = AppDrawerTheme(),
-        onReturnToTasks = {}
+        onReturnToTasks = {},
+        appDrawerDelay = 10f
     )
 }
 
@@ -730,39 +725,6 @@ private fun WarningBannerPreview() {
     WarningBanner()
 }
 
-//@Preview(showBackground = true, backgroundColor = 0xFF000000)
-//@Composable
-//private fun AppCategorySectionPreview() {
-//    val sampleApps = listOf(
-//        AppDrawerApp(
-//            id = "1",
-//            name = "Phone",
-//            icon = Icons.Default.Phone,
-//            category = AppCategory.ESSENTIAL,
-//            pointCost = 0,
-//            description = "Make calls",
-//            packageName = "com.android.phone"
-//        ),
-//        AppDrawerApp(
-//            id = "2",
-//            name = "Instagram",
-//            icon = Icons.Default.CameraAlt,
-//            category = AppCategory.SOCIAL,
-//            pointCost = 25,
-//            description = "Social media",
-//            packageName = "com.android.phone"
-//
-//        )
-//    )
-//
-//    AppCategorySection(
-//        category = AppCategory.ESSENTIAL,
-//        apps = sampleApps,
-//        onAppClick = {},
-//        theme = AppDrawerTheme()
-//    )
-//}
-
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun AppDrawerFooterPreview() {
@@ -773,24 +735,3 @@ private fun AppDrawerFooterPreview() {
         theme = AppDrawerTheme()
     )
 }
-
-//@Preview(showBackground = true, backgroundColor = 0xFF000000)
-//@Composable
-//private fun AppWarningDialogPreview() {
-//    val sampleApp = AppDrawerApp(
-//        id = "1",
-//        name = "Instagram",
-//        icon = Icons.Default.CameraAlt,
-//        category = AppCategory.SOCIAL,
-//        pointCost = 25,
-//        description = "Social media platform",
-//        packageName = "com.android.phone"
-//
-//    )
-//
-//    AppWarningDialog(
-//        app = sampleApp,
-//        onConfirm = {},
-//        onDismiss = {}
-//    )
-//}

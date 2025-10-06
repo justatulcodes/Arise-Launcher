@@ -23,4 +23,6 @@ class AppInfoDataSource(
 
     fun getAppSortedByInstallTime() = appInfoDao.getAppsSortedByInstallTime()
 
+    fun deleteAllAppInfo() = appInfoDao.deleteAllAppInfo()
+
 }
