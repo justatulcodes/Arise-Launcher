@@ -15,19 +15,23 @@ data class AppDrawerApp(
 )
 
 
-enum class AppCategory(val displayName: String, val color: Color) {
-    ESSENTIAL("Essential", Color(0xFF81C784)),
-    PRODUCTIVITY("Productivity", Color(0xFF64B5F6)),
-    COMMUNICATION("Communication", Color(0xFF42A5F5)),
-    SOCIAL_MEDIA("Social Media", Color(0xFFE57373)),
-    STREAMING("Streaming", Color(0xFFFF7043)),
-    ENTERTAINMENT("Entertainment", Color(0xFFFFD54F)),
-    GAMES("Games", Color(0xFFBA68C8)),
-    SHOPPING("Shopping", Color(0xFFFFB74D)),
-    HEALTH("Health & Fitness", Color(0xFF66BB6A)),
-    FINANCE("Finance", Color(0xFF26A69A)),
-    UTILITY("Utility", Color(0xFF9575CD)),
-    MISCELLANEOUS("Miscellaneous", Color(0xFFA1887F))
+enum class AppCategory(
+    val displayName: String,
+    val color: Color,
+    val priority: Int // Lower number = higher priority
+) {
+    ESSENTIAL("Essential", Color(0xFF81C784), 4),
+    PRODUCTIVITY("Productivity", Color(0xFF64B5F6), 1),
+    HEALTH("Health & Fitness", Color(0xFF66BB6A), 3),
+    FINANCE("Finance", Color(0xFF26A69A), 2),
+    UTILITY("Utility", Color(0xFF9575CD), 5),
+    COMMUNICATION("Communication", Color(0xFF42A5F5), 6),
+    SHOPPING("Shopping", Color(0xFFFFB74D), 7),
+    ENTERTAINMENT("Entertainment", Color(0xFFFFD54F), 8),
+    STREAMING("Streaming", Color(0xFFFF7043), 9),
+    SOCIAL_MEDIA("Social Media", Color(0xFFE57373), 10),
+    GAMES("Games", Color(0xFFBA68C8), 11),
+    MISCELLANEOUS("Miscellaneous", Color(0xFFA1887F), 12)
 }
 data class AppDrawerState(
     val countdown: Int = 0,

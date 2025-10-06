@@ -150,7 +150,9 @@ class AppDrawerViewModel @Inject constructor(
     }
 
     fun getCategorizedApps(): Map<AppCategory, List<AppDrawerApp>> {
-        return _state.value.apps.groupBy { it.category }
+        return _state.value.apps
+            .groupBy { it.category }
+            .toSortedMap(compareBy { it.priority })
     }
 
     fun getSearchResults(searchQuery: String): List<AppDrawerApp> {
