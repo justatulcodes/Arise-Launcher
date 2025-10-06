@@ -127,10 +127,10 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.FactoryReset -> {
                 viewModelScope.launch {
                     taskRepositoryImpl.deleteAllTasks()
-//                    pointsLogRepositoryImpl.resetAllPointsLog()
-//                    taskLinkRepositoryImpl.deleteAllTaskLinks()
-//                    settingsRepository.resetAllSettings()
-                    loadSettings() // Reload default settings
+                    pointsLogRepositoryImpl.resetAllPointsLog()
+                    taskLinkRepositoryImpl.deleteAllTaskLinks()
+                    settingsRepository.resetAllSettings()
+                    loadSettings()
                 }
                 _state.value = _state.value.copy(
                     showFactoryResetDialog = false,
