@@ -18,6 +18,7 @@ object AppClassifier {
         val appInfo = try {
             pm.getApplicationInfo(packageName, 0)
         } catch (e: PackageManager.NameNotFoundException) {
+            //if package name by any chance not found
             return AppCategory.UTILITY
         }
 
@@ -31,21 +32,24 @@ object AppClassifier {
         }
 
         // Fallback for system / sideloaded apps using ApplicationInfo.category
-        when (appInfo.category) {
-            ApplicationInfo.CATEGORY_PRODUCTIVITY -> return AppCategory.PRODUCTIVITY
-            ApplicationInfo.CATEGORY_SOCIAL -> return AppCategory.SOCIAL
-            ApplicationInfo.CATEGORY_GAME -> return AppCategory.GAMES
-            ApplicationInfo.CATEGORY_VIDEO -> return AppCategory.ENTERTAINMENT
-            ApplicationInfo.CATEGORY_AUDIO -> return AppCategory.ENTERTAINMENT
-            ApplicationInfo.CATEGORY_IMAGE -> return AppCategory.ENTERTAINMENT
-            ApplicationInfo.CATEGORY_NEWS -> return AppCategory.PRODUCTIVITY
-            ApplicationInfo.CATEGORY_MAPS -> return AppCategory.UTILITY
-            ApplicationInfo.CATEGORY_UNDEFINED -> return AppCategory.MISCELLANEOUS
-            ApplicationInfo.CATEGORY_ACCESSIBILITY -> return AppCategory.UTILITY
+        return getFallbackCategory(appInfo)
+
+    }
+
+    fun getFallbackCategory(appInfo: ApplicationInfo): AppCategory {
+        return when (appInfo.category) {
+            ApplicationInfo.CATEGORY_PRODUCTIVITY -> AppCategory.PRODUCTIVITY
+            ApplicationInfo.CATEGORY_SOCIAL -> AppCategory.SOCIAL_MEDIA
+            ApplicationInfo.CATEGORY_GAME -> AppCategory.GAMES
+            ApplicationInfo.CATEGORY_VIDEO -> AppCategory.STREAMING
+            ApplicationInfo.CATEGORY_AUDIO -> AppCategory.STREAMING
+            ApplicationInfo.CATEGORY_IMAGE -> AppCategory.ENTERTAINMENT
+            ApplicationInfo.CATEGORY_NEWS -> AppCategory.ENTERTAINMENT
+            ApplicationInfo.CATEGORY_MAPS -> AppCategory.UTILITY
+            ApplicationInfo.CATEGORY_ACCESSIBILITY -> AppCategory.UTILITY
+            ApplicationInfo.CATEGORY_UNDEFINED -> AppCategory.MISCELLANEOUS
+            else -> AppCategory.MISCELLANEOUS
         }
-
-        return AppCategory.MISCELLANEOUS
-
     }
 
     private fun fetchPlayStoreCategory(packageName: String): String? {
@@ -67,62 +71,66 @@ object AppClassifier {
 
     fun mapCategoryToAppCategory(category: String): AppCategory {
         return when (category.lowercase()) {
-            "productivity", "tools", "utilities", "business", "education",
-            "books & reference", "events", "house & home", "libraries & demo",
-            "parenting", "personalization" -> AppCategory.PRODUCTIVITY
+            "productivity", "tools", "business", "education",
+            "books & reference", "libraries & demo" -> AppCategory.PRODUCTIVITY
 
-            "communication", "social", "dating" -> AppCategory.SOCIAL
+            "communication" -> AppCategory.COMMUNICATION
 
-            "entertainment", "video players & editors", "music & audio", "photography",
-            "news & magazines", "comics", "art & design", "lifestyle" -> AppCategory.ENTERTAINMENT
+            "social", "dating" -> AppCategory.SOCIAL_MEDIA
+
+            "video players & editors", "music & audio" -> AppCategory.STREAMING
+
+            "entertainment", "photography", "news & magazines", "comics",
+            "art & design", "lifestyle" -> AppCategory.ENTERTAINMENT
 
             "action", "adventure", "arcade", "board", "card", "casino", "casual",
             "educational", "music", "puzzle", "racing", "role playing", "simulation",
             "sports", "strategy", "trivia", "word" -> AppCategory.GAMES
 
             "shopping", "food & drink" -> AppCategory.SHOPPING
-            "health & fitness", "medical", "finance", "weather" , "travel & local",
-            "maps & navigation", "auto & vehicles"  -> AppCategory.UTILITY
+
+            "health & fitness", "medical" -> AppCategory.HEALTH
+
+            "finance" -> AppCategory.FINANCE
+
+            "utilities", "weather", "travel & local", "maps & navigation",
+            "auto & vehicles", "events", "house & home", "parenting",
+            "personalization" -> AppCategory.UTILITY
 
             else -> AppCategory.ESSENTIAL
         }
     }
 
-    fun getDefaultCategoryString(appInfoCategory: Int): String {
+    fun getDefaultCategoryString(appInfoCategory: AppCategory): String {
         return when (appInfoCategory) {
-            ApplicationInfo.CATEGORY_PRODUCTIVITY ->
-                "productivity"
-            ApplicationInfo.CATEGORY_SOCIAL ->
-                "social"
-            ApplicationInfo.CATEGORY_GAME ->
-                "action"
-            ApplicationInfo.CATEGORY_VIDEO,
-            ApplicationInfo.CATEGORY_AUDIO,
-            ApplicationInfo.CATEGORY_IMAGE ->
-                "entertainment"
-            ApplicationInfo.CATEGORY_NEWS ->
-                "news & magazines"
-            ApplicationInfo.CATEGORY_MAPS ->
-                "maps & navigation"
-            ApplicationInfo.CATEGORY_ACCESSIBILITY ->
-                "utilities"
-            ApplicationInfo.CATEGORY_UNDEFINED ->
-                "miscellaneous"
-            else ->
-                "miscellaneous"
+            AppCategory.PRODUCTIVITY -> "productivity"
+            AppCategory.COMMUNICATION -> "communication"
+            AppCategory.SOCIAL_MEDIA -> "social"
+            AppCategory.STREAMING -> "video players & editors"
+            AppCategory.GAMES -> "action"
+            AppCategory.ENTERTAINMENT -> "entertainment"
+            AppCategory.HEALTH -> "health & fitness"
+            AppCategory.FINANCE -> "finance"
+            AppCategory.UTILITY -> "maps & navigation"
+            AppCategory.MISCELLANEOUS -> "miscellaneous"
+            AppCategory.ESSENTIAL -> "essential"
+            AppCategory.SHOPPING -> "shopping"
         }
     }
-
 
     fun getAppPointCost(category: AppCategory): Int {
         return when (category) {
             AppCategory.ESSENTIAL -> 0
-            AppCategory.ENTERTAINMENT -> 10
-            AppCategory.GAMES -> 30
-            AppCategory.SHOPPING -> 5
-            AppCategory.UTILITY -> 0
             AppCategory.PRODUCTIVITY -> 0
-            AppCategory.SOCIAL -> 25
+            AppCategory.UTILITY -> 0
+            AppCategory.HEALTH -> 5
+            AppCategory.FINANCE -> 5
+            AppCategory.SHOPPING -> 10
+            AppCategory.COMMUNICATION -> 15
+            AppCategory.ENTERTAINMENT -> 20
+            AppCategory.STREAMING -> 25
+            AppCategory.SOCIAL_MEDIA -> 30
+            AppCategory.GAMES -> 35
             AppCategory.MISCELLANEOUS -> 5
         }
     }

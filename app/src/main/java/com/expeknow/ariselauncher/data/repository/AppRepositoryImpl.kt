@@ -2,11 +2,6 @@ package com.expeknow.ariselauncher.data.repository
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.util.Log
-import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
@@ -26,15 +21,11 @@ class AppRepositoryImpl(
     ) : AppRepository {
 
     override suspend fun getInstalledApps(): List<AppDrawerApp> {
-        if(InstalledAppObject.installedAppList.isNotEmpty()){
-            return InstalledAppObject.installedAppList
-        }
         val packageManager = context.packageManager
         val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
         val apps = packageManager.queryIntentActivities(mainIntent, 0)
-        
 
         val appDrawerApps = apps.mapNotNull { resolveInfo ->
             val packageName = resolveInfo.activityInfo.packageName
@@ -54,7 +45,6 @@ class AppRepositoryImpl(
                 appInstallTime = appInstallTime
             )
         }.sortedBy { it.name }
-
         appDrawerApps.forEach { app ->
             CoroutineScope(Dispatchers.IO).launch {
                 val cachedCategory = appInfoDataSource.getAppInfo(packageName = app.packageName)
@@ -67,7 +57,7 @@ class AppRepositoryImpl(
                     app.pointCost = AppClassifier.getAppPointCost(app.category)
                     appInfoDataSource.addAppInfo(
                         packageName = app.packageName,
-                        category = AppClassifier.getDefaultCategoryString(foundCategory.ordinal),
+                        category = AppClassifier.getDefaultCategoryString(foundCategory),
                         installTime = app.appInstallTime)
 
                 }

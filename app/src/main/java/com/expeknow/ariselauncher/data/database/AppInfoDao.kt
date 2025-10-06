@@ -21,5 +21,6 @@ interface AppInfoDao {
     @Query("SELECT * FROM app_info ORDER BY installTime ASC")
     fun getAppsSortedByInstallTime() : List<AppInfo>
 
-
+    @Query("DELETE FROM app_info")
+    fun deleteAllAppInfo()
 }

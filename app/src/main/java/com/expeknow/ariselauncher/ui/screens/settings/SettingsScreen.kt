@@ -94,18 +94,11 @@ fun SettingsScreen(
                 theme = theme
             )
 
-//            EssentialAppsSection(
-//                apps = state.apps,
-//                onAppToggle = { appId: String ->
-//                    viewModel.onEvent(SettingsEvent.ToggleAppEssential(appId))
-//                },
-//                theme = theme
-//            )
-
             // Danger Zone
             DangerZoneCard(
+                onShowRefreshAppDrawerDialog = { viewModel.onEvent(SettingsEvent.ShowAppRefreshDialog) },
                 onShowResetPointsDialog = { viewModel.onEvent(SettingsEvent.ShowResetPointsDialog) },
-                onShowFactoryResetDialog = { viewModel.onEvent(SettingsEvent.ShowFactoryResetDialog) }
+                onShowFactoryResetDialog = { viewModel.onEvent(SettingsEvent.ShowFactoryResetDialog) },
             )
 
             // Footer
@@ -133,6 +126,18 @@ fun SettingsScreen(
             onDismiss = { viewModel.onEvent(SettingsEvent.HideFactoryResetDialog) },
             theme = theme,
             isDestructive = true
+        )
+    }
+
+    if(state.showAppRefreshDialog) {
+        ConfirmationDialog(
+            title = "REFRESH APP DRAWER",
+            message = "This will refresh the app drawer to reflect any changes made to your device's installed apps." +
+                    " This action is safe and can be done at any time.",
+            onConfirm = { viewModel.onEvent(SettingsEvent.RefreshApps) },
+            onDismiss = { viewModel.onEvent(SettingsEvent.HideAppRefreshDialog) },
+            theme = theme,
+            isDestructive = false
         )
     }
 }

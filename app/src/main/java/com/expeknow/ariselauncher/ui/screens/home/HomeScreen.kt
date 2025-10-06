@@ -20,6 +20,7 @@ import androidx.navigation.NavController
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
@@ -198,6 +199,7 @@ fun HomeScreen(
                     viewModel.onEvent(HomeEvent.LaunchApp(appName))
                 },
                 onOpenFullApps = {
+                    appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
                     showAppDrawerBottomSheet = true
                 },
                 theme = theme
@@ -240,7 +242,6 @@ fun HomeScreen(
             onDismissRequest = {
                 showAppDrawerBottomSheet = false
                 appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
-
                                },
             sheetState = bottomSheetState,
             containerColor = Color.Black,
@@ -260,7 +261,6 @@ fun HomeScreen(
             modifier = Modifier.statusBarsPadding(),
         ) {
             AppDrawerScreen(
-                navController = navController,
                 onClose = { showAppDrawerBottomSheet = false },
                 viewModel = appDrawerViewModel
             )
