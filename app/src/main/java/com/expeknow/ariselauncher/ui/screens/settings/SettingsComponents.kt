@@ -312,7 +312,7 @@ fun DangerZoneCard(
             }
 
             Button(
-                onClick = onShowFactoryResetDialog,
+                onClick = onShowRefreshAppDrawerDialog,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                 border = androidx.compose.foundation.BorderStroke(
                     width = 1.dp,
