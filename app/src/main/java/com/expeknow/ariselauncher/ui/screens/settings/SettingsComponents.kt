@@ -274,6 +274,7 @@ fun SettingsSectionTitle(
 @Composable
 fun DangerZoneCard(
     onShowResetPointsDialog: () -> Unit,
+    onShowRefreshAppDrawerDialog: () -> Unit,
     onShowFactoryResetDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -306,6 +307,22 @@ fun DangerZoneCard(
                 Text(
                     "DANGER ZONE",
                     style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFFE57373)
+                )
+            }
+
+            Button(
+                onClick = onShowFactoryResetDialog,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = Color(0xFFE57373).copy(alpha = 0.4f)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    "REFRESH APP DRAWER",
+                    style = MaterialTheme.typography.labelLarge,
                     color = Color(0xFFE57373)
                 )
             }
@@ -482,7 +499,8 @@ fun PreviewSettingsSectionTitle() {
 fun PreviewDangerZoneCard() {
     DangerZoneCard(
         onShowResetPointsDialog = {},
-        onShowFactoryResetDialog = {}
+        onShowFactoryResetDialog = {},
+        onShowRefreshAppDrawerDialog = {}
     )
 }
 

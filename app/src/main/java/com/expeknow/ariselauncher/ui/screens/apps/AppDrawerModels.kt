@@ -30,7 +30,7 @@ enum class AppCategory(val displayName: String, val color: Color) {
     MISCELLANEOUS("Miscellaneous", Color(0xFFA1887F))
 }
 data class AppDrawerState(
-    val countdown: Int = 10,
+    val countdown: Int = 0,
     val isUnlocked: Boolean = false,
     val selectedApp: AppDrawerApp? = null,
     val showWarning: Boolean = false,
@@ -47,6 +47,7 @@ sealed class AppDrawerEvent {
     data object HideWarning : AppDrawerEvent()
     data object ConfirmAppOpen : AppDrawerEvent()
     data object CloseDrawer : AppDrawerEvent()
+    data object OpenDrawer : AppDrawerEvent()
     data class SearchApps(val query: String) : AppDrawerEvent()
 }
 
