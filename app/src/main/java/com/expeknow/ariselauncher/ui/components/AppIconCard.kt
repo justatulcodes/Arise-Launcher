@@ -21,7 +21,7 @@ fun AppIconCard(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     iconColor: Color = Color.White,
-    bgColor: Color = Color.Transparent, // set to surface if you need
+    bgColor: Color = Color.Transparent,
     outlineColor: Color = NavIconOutline,
     showNotificationDot: Boolean = false
 ) {
