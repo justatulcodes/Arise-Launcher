@@ -162,13 +162,6 @@ fun AppDrawerHeader(
             )
         }
 
-//        IconButton(onClick = onClose) {
-//            Icon(
-//                imageVector = Icons.Default.Close,
-//                contentDescription = "Close",
-//                tint = Color.White.copy(alpha = 0.6f)
-//            )
-//        }
     }
 }
 
