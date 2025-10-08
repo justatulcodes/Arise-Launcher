@@ -33,7 +33,6 @@ fun PointsHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(currentRank.colors.background)
-            .border(1.dp, currentRank.colors.border)
             .padding(24.dp)
     ) {
         Text(
@@ -52,22 +51,22 @@ fun PointsHeader(
                 .fillMaxWidth()
                 .background(
                     currentRank.colors.background,
-                    RoundedCornerShape(8.dp)
+                    RoundedCornerShape(12.dp)
                 )
                 .border(
                     1.dp,
                     currentRank.colors.border,
-                    RoundedCornerShape(8.dp)
+                    RoundedCornerShape(12.dp)
                 )
                 .padding(4.dp)
         ) {
-            TabType.values().forEach { tab ->
+            TabType.entries.forEach { tab ->
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .background(
                             if (selectedTabIndex == tab.index) Color.White else Color.Transparent,
-                            RoundedCornerShape(4.dp)
+                            RoundedCornerShape(8.dp)
                         )
                         .clickable { onTabSelect(tab.index) }
                         .padding(vertical = 8.dp),
@@ -396,7 +395,7 @@ private fun StatCard(
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(

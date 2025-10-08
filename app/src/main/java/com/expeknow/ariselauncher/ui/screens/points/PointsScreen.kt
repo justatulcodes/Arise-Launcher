@@ -107,7 +107,6 @@ private fun OverviewTabContent(
     activities: List<PointActivity>
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        // Current Status Card
         CurrentStatusCard(
             currentPoints = currentPoints,
             currentRank = currentRank,
@@ -115,23 +114,19 @@ private fun OverviewTabContent(
             progressToNext = progressToNext
         )
 
-        // Points Growth Chart
         PointsGrowthChart(
             pointsHistory = pointsHistory,
             currentRank = currentRank
         )
 
-        // Stats Grid
         StatsGrid(
             totalEarned = totalEarned,
             totalBurned = totalBurned,
             currentRank = currentRank
         )
 
-        // Point Rules
         PointSystemCard(currentRank = currentRank)
 
-        // Recent Activity
         RecentActivityCard(
             activities = activities,
             currentRank = currentRank
