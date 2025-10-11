@@ -102,7 +102,8 @@ fun TasksContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .clickable {onNavigateToTaskHistory()},
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -142,15 +143,17 @@ fun TasksContent(
                     }
                 }
 
-                Button(
-                    onClick = onNavigateToTaskHistory,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = currentRank.colors.accent
-                    )
-                ) {
-                    Text("View All")
-                }
+                Text("View All")
+
+//                Button(
+//                    onClick = onNavigateToTaskHistory,
+//                    colors = ButtonDefaults.buttonColors(
+//                        containerColor = Color.Transparent,
+//                        contentColor = currentRank.colors.accent
+//                    )
+//                ) {
+//                    Text("View All")
+//                }
             }
         }
 
