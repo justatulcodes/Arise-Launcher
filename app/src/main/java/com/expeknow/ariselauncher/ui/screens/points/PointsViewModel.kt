@@ -9,11 +9,15 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.model.TaskStats
+import com.expeknow.ariselauncher.data.model.ranks
 import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
+import com.expeknow.ariselauncher.ui.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import androidx.navigation.NavController
+import kotlinx.coroutines.flow.collectLatest
 
 @HiltViewModel
 class PointsViewModel @Inject constructor(
@@ -24,10 +28,25 @@ class PointsViewModel @Inject constructor(
     private val _state = MutableStateFlow(PointsState())
     val state: StateFlow<PointsState> = _state.asStateFlow()
 
+    private var navController: NavController? = null
+
+    fun setNavController(navController: NavController) {
+        this.navController = navController
+    }
+
     init {
         observePointsData()
         observeTaskStats()
         loadPointActivities()
+        loadCompletedTasks()
+    }
+
+    private fun loadCompletedTasks() {
+        viewModelScope.launch {
+            taskRepositoryImpl.getCompletedTasks().collectLatest { tasks ->
+                _state.value = _state.value.copy(completedTasks = tasks)
+            }
+        }
     }
 
     private fun observePointsData() {
@@ -39,10 +58,16 @@ class PointsViewModel @Inject constructor(
                 val earned = earnedPoints ?: 0
                 val spent = earned - availablePoints
                 
+                // Calculate current rank based on points
+                val currentRank = ranks.find { rank ->
+                    availablePoints >= rank.minPoints && availablePoints <= rank.maxPoints
+                } ?: ranks[0]
+
                 _state.value = _state.value.copy(
                     currentPoints = availablePoints,
                     totalEarned = earned,
-                    totalBurned = spent
+                    totalBurned = spent,
+                    currentRank = currentRank
                 )
             }.collect { }
         }
@@ -75,7 +100,10 @@ class PointsViewModel @Inject constructor(
                     weeklyAverage = completedCount / 7f // Simple weekly average
                 )
 
-                _state.value = _state.value.copy(taskStats = taskStats)
+                _state.value = _state.value.copy(
+                    taskStats = taskStats,
+                    completedTasks = completedTasks
+                )
             }.collect { }
         }
     }
@@ -94,6 +122,7 @@ class PointsViewModel @Inject constructor(
     // Public method to refresh data
     fun refreshData() {
         loadPointActivities()
+        loadCompletedTasks()
     }
 
     fun onEvent(event: PointsEvent) {
@@ -107,7 +136,7 @@ class PointsViewModel @Inject constructor(
             }
 
             is PointsEvent.NavigateToTaskHistory -> {
-                // Handle navigation - this would typically involve a navigation callback
+                navController?.navigate(Screen.TaskHistory.route)
             }
         }
     }

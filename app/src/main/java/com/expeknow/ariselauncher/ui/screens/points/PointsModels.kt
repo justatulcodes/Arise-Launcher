@@ -11,7 +11,7 @@ data class PointsState(
     val totalEarned: Int = 0,
     val totalBurned: Int = 0,
     val selectedTabIndex: Int = 0,
-    val debugCurrentRank: Rank? = null,
+    val debugCurrentRank: Rank? = ranks[8],
     val pointsHistory: List<PointsHistory> = emptyList(),
     val taskStats: TaskStats = TaskStats(
         totalTasks = 0,
@@ -23,7 +23,9 @@ data class PointsState(
         todayCompleted = 0,
         weeklyAverage = 0f
     ),
-    val activities: List<PointActivity> = emptyList()
+    val activities: List<PointActivity> = emptyList(),
+    val completedTasks: List<Task> = emptyList(),
+    val currentRank: Rank = ranks[8]
 )
 
 sealed class PointsEvent {
@@ -35,5 +37,5 @@ sealed class PointsEvent {
 enum class TabType(val index: Int, val title: String) {
     OVERVIEW(0, "OVERVIEW"),
     TASKS(1, "TASKS"),
-    RANKS(2, "RANKS")
+//    RANKS(2, "RANKS") //removing it from alpha version
 }
