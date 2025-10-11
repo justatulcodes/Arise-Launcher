@@ -99,8 +99,9 @@ fun CurrentStatusCard(
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.padding(24.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             // Points display
             Row(
@@ -111,7 +112,7 @@ fun CurrentStatusCard(
                     imageVector = currentRank.icon,
                     contentDescription = null,
                     tint = currentRank.colors.accent,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(36.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -132,63 +133,63 @@ fun CurrentStatusCard(
                 color = Color(0xFF9CA3AF)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+//            Spacer(modifier = Modifier.height(16.dp))
 
             // Rank Progress
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "CURRENT RANK",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF9CA3AF)
-                    )
-                    Text(
-                        text = currentRank.name,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = currentRank.colors.accent
-                    )
-                }
-
-                if (nextRank != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "NEXT: ${nextRank.name}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF6B7280)
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-                    CustomProgressBar(
-                        progress = progressToNext / 100f,
-                        color = currentRank.colors.accent,
-                        backgroundColor = currentRank.colors.background
-                    )
-
-                    Text(
-                        text = "${progressToNext.toInt()}% TO NEXT RANK",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF6B7280),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentWidth(Alignment.CenterHorizontally)
-                            .padding(top = 4.dp)
-                    )
-                } else {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "MAXIMUM RANK ACHIEVED",
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Medium
-                        ),
-                        color = currentRank.colors.accent,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
+//            Column {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    Text(
+//                        text = "CURRENT RANK",
+//                        style = MaterialTheme.typography.labelSmall,
+//                        color = Color(0xFF9CA3AF)
+//                    )
+//                    Text(
+//                        text = currentRank.name,
+//                        style = MaterialTheme.typography.labelSmall,
+//                        color = currentRank.colors.accent
+//                    )
+//                }
+//
+//                if (nextRank != null) {
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Text(
+//                        text = "NEXT: ${nextRank.name}",
+//                        style = MaterialTheme.typography.labelSmall,
+//                        color = Color(0xFF6B7280)
+//                    )
+//
+//                    Spacer(modifier = Modifier.height(12.dp))
+//                    CustomProgressBar(
+//                        progress = progressToNext / 100f,
+//                        color = currentRank.colors.accent,
+//                        backgroundColor = currentRank.colors.background
+//                    )
+//
+//                    Text(
+//                        text = "${progressToNext.toInt()}% TO NEXT RANK",
+//                        style = MaterialTheme.typography.labelSmall,
+//                        color = Color(0xFF6B7280),
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .wrapContentWidth(Alignment.CenterHorizontally)
+//                            .padding(top = 4.dp)
+//                    )
+//                } else {
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Text(
+//                        text = "MAXIMUM RANK ACHIEVED",
+//                        style = MaterialTheme.typography.labelSmall.copy(
+//                            fontWeight = FontWeight.Medium
+//                        ),
+//                        color = currentRank.colors.accent,
+//                        modifier = Modifier.fillMaxWidth(),
+//                        textAlign = TextAlign.Center
+//                    )
+//                }
+//            }
         }
     }
 }

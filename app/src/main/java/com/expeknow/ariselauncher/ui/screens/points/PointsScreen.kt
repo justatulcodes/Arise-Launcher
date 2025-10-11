@@ -21,7 +21,6 @@ fun PointsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // Set the NavController in the ViewModel to enable navigation
     LaunchedEffect(navController) {
         viewModel.setNavController(navController)
     }
