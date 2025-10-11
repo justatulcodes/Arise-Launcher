@@ -45,7 +45,6 @@ fun PointsHeader(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Custom Tab Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()

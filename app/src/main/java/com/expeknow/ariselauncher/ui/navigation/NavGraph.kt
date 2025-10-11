@@ -14,6 +14,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.expeknow.ariselauncher.ui.screens.home.HomeScreen
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsScreen
 import com.expeknow.ariselauncher.ui.screens.points.PointsScreen
+import com.expeknow.ariselauncher.ui.screens.points.TaskHistoryScreen
 import com.expeknow.ariselauncher.ui.screens.settings.SettingsScreen
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -95,6 +96,16 @@ fun AppNavigation(navController: NavHostController) {
                 val state by taskDetailsViewModel.state.collectAsStateWithLifecycle()
                 val id = backStackEntry.arguments?.getString("id") ?: ""
                 TaskDetailsScreen(navController, id, taskDetailsViewModel, state)
+            }
+            composable(Screen.TaskHistory.route) { backStackEntry ->
+                val pointsViewModel = backStackEntry.sharedViewModel<PointsViewModel>(navController)
+                val state by pointsViewModel.state.collectAsStateWithLifecycle()
+                // Pass the completed tasks from the PointsViewModel state
+                TaskHistoryScreen(
+                    navController = navController,
+                    completedTasks = state.completedTasks,
+                    currentRank = state.debugCurrentRank ?: state.currentRank
+                )
             }
         }
     }

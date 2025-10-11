@@ -21,6 +21,11 @@ fun PointsScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    // Set the NavController in the ViewModel to enable navigation
+    LaunchedEffect(navController) {
+        viewModel.setNavController(navController)
+    }
+
     // Calculate current rank
     val currentRank = state.debugCurrentRank ?: ranks.find { rank ->
         state.currentPoints >= rank.minPoints && state.currentPoints <= rank.maxPoints
@@ -36,16 +41,13 @@ fun PointsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-//            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
     ) {
-        // Header with tabs
         PointsHeader(
             selectedTabIndex = state.selectedTabIndex,
             onTabSelect = { index: Int -> viewModel.onEvent(PointsEvent.SelectTab(index)) },
             currentRank = currentRank
         )
 
-        // Tab Content
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -80,16 +82,16 @@ fun PointsScreen(
                     }
                 }
 
-                TabType.RANKS.index -> {
-                    item {
-                        RanksContent(
-                            currentRank = currentRank,
-                            onRankClick = { rank: Rank ->
-                                viewModel.onEvent(PointsEvent.SetDebugRank(rank))
-                            }
-                        )
-                    }
-                }
+//                TabType.RANKS.index -> {
+//                    item {
+//                        RanksContent(
+//                            currentRank = currentRank,
+//                            onRankClick = { rank: Rank ->
+//                                viewModel.onEvent(PointsEvent.SetDebugRank(rank))
+//                            }
+//                        )
+//                    }
+//                }
             }
         }
     }
