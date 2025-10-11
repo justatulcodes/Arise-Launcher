@@ -1,5 +1,13 @@
 package com.expeknow.ariselauncher.ui.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -57,7 +65,17 @@ fun AppNavigation(navController: NavHostController) {
 
     Scaffold(
         bottomBar = {
-            if (showBottomNav) {
+            AnimatedVisibility(
+                visible = showBottomNav,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing)
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(durationMillis = 300, easing = FastOutLinearInEasing)
+                ) + fadeOut(animationSpec = tween(300))
+            ) {
                 AppBottomNavigationBar(navController = navController)
             }
         }
