@@ -41,61 +41,68 @@ fun PointsScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
+        /*
         PointsHeader(
             selectedTabIndex = state.selectedTabIndex,
             onTabSelect = { index: Int -> viewModel.onEvent(PointsEvent.SelectTab(index)) },
             currentRank = currentRank
         )
+        */
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(horizontal = 24.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            when (state.selectedTabIndex) {
-                TabType.OVERVIEW.index -> {
-                    item {
-                        OverviewTabContent(
-                            currentPoints = state.currentPoints,
-                            currentRank = currentRank,
-                            nextRank = nextRank,
-                            progressToNext = progressToNext,
-                            pointsHistory = state.pointsHistory,
-                            totalEarned = state.totalEarned,
-                            totalBurned = state.totalBurned,
-                            activities = state.activities
-                        )
-                    }
-                }
+            item { Spacer(Modifier.height(16.dp)) }
 
-                TabType.TASKS.index -> {
-                    item {
-                        TasksContent(
-                            currentRank = currentRank,
-                            taskStats = state.taskStats,
-                            onNavigateToTaskHistory = {
-                                viewModel.onEvent(PointsEvent.NavigateToTaskHistory)
-                            }
-                        )
+            item {
+                TasksContent(
+                    currentRank = currentRank,
+                    taskStats = state.taskStats,
+                    onNavigateToTaskHistory = {
+                        viewModel.onEvent(PointsEvent.NavigateToTaskHistory)
                     }
-                }
-
-//                TabType.RANKS.index -> {
-//                    item {
-//                        RanksContent(
-//                            currentRank = currentRank,
-//                            onRankClick = { rank: Rank ->
-//                                viewModel.onEvent(PointsEvent.SetDebugRank(rank))
-//                            }
-//                        )
-//                    }
-//                }
+                )
             }
+
+
+            item {
+                StatsGrid(
+                    totalEarned = state.totalEarned,
+                    totalBurned = state.totalBurned,
+                    currentRank = currentRank
+                )
+            }
+
+//            item {
+//                RecentActivityCard(
+//                    activities = state.activities,
+//                    currentRank = currentRank
+//                )
+//            }
+//
+//
+//
+//            item {
+//                PointsGrowthChart(
+//                    pointsHistory = state.pointsHistory,
+//                    currentRank = currentRank
+//                )
+//            }
+
+//            item {
+//                PointSystemCard(currentRank = currentRank)
+//            }
+
+            item { Spacer(Modifier.height(24.dp)) }
         }
     }
 }
 
+// Keep the original OverviewTabContent commented out for reference
+/*
 @Composable
 private fun OverviewTabContent(
     currentPoints: Int,
@@ -134,6 +141,7 @@ private fun OverviewTabContent(
         )
     }
 }
+*/
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
