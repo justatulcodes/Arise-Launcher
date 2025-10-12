@@ -1,5 +1,13 @@
 package com.expeknow.ariselauncher.ui.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,6 +22,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.expeknow.ariselauncher.ui.screens.home.HomeScreen
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsScreen
 import com.expeknow.ariselauncher.ui.screens.points.PointsScreen
+import com.expeknow.ariselauncher.ui.screens.points.TaskHistoryScreen
 import com.expeknow.ariselauncher.ui.screens.settings.SettingsScreen
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
@@ -56,7 +65,17 @@ fun AppNavigation(navController: NavHostController) {
 
     Scaffold(
         bottomBar = {
-            if (showBottomNav) {
+            AnimatedVisibility(
+                visible = showBottomNav,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(durationMillis = 300, easing = LinearOutSlowInEasing)
+                ) + fadeIn(animationSpec = tween(300)),
+                exit = slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(durationMillis = 300, easing = FastOutLinearInEasing)
+                ) + fadeOut(animationSpec = tween(300))
+            ) {
                 AppBottomNavigationBar(navController = navController)
             }
         }
@@ -95,6 +114,16 @@ fun AppNavigation(navController: NavHostController) {
                 val state by taskDetailsViewModel.state.collectAsStateWithLifecycle()
                 val id = backStackEntry.arguments?.getString("id") ?: ""
                 TaskDetailsScreen(navController, id, taskDetailsViewModel, state)
+            }
+            composable(Screen.TaskHistory.route) { backStackEntry ->
+                val pointsViewModel = backStackEntry.sharedViewModel<PointsViewModel>(navController)
+                val state by pointsViewModel.state.collectAsStateWithLifecycle()
+                // Pass the completed tasks from the PointsViewModel state
+                TaskHistoryScreen(
+                    navController = navController,
+                    completedTasks = state.completedTasks,
+                    currentRank = state.debugCurrentRank ?: state.currentRank
+                )
             }
         }
     }
