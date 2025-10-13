@@ -75,14 +75,8 @@ fun HomeScreen(
                 theme = theme
             )
 
-            // Mode Toggle
-//            ModeToggle(
-//                mode = state.mode,
-//                onModeToggle = { viewModel.onEvent(HomeEvent.ToggleMode) },
-//                theme = theme
-//            )
 
-//            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Progress Bar
             EnhancedProgressBar(
@@ -273,11 +267,14 @@ fun HomeScreen(
             onDismiss = {
                 viewModel.onEvent(HomeEvent.HideAddTaskDialog)
             },
-            onTaskAdded = { title: String, desc: String, pts: Int ->
-                val category =
-                    if (state.mode == HomeMode.FOCUSED) TaskCategory.INTELLIGENCE else TaskCategory.PERSONAL
+            onTaskAdded = { title: String, desc: String, pts: Int, category: TaskCategory ->
                 viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category))
-            }
+            },
+            showCategorySelector = state.mode == HomeMode.FOCUSED,
+            initialCategory = if (state.mode == HomeMode.FOCUSED) TaskCategory.INTELLIGENCE else TaskCategory.PERSONAL,
+            availableCategories = if (state.mode == HomeMode.FOCUSED)
+                listOf(TaskCategory.INTELLIGENCE, TaskCategory.PHYSICAL, TaskCategory.WEALTH)
+                else listOf(TaskCategory.PERSONAL, TaskCategory.WORK, TaskCategory.URGENT, TaskCategory.IMPORTANT)
         )
     }
 }
