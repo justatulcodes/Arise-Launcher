@@ -12,6 +12,7 @@ import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
@@ -26,7 +27,8 @@ import kotlinx.coroutines.flow.stateIn
 class HomeViewModel @Inject constructor(
     private val appRepositoryImpl: AppRepository,
     private val taskRepositoryImpl: TaskRepository,
-    private val pointsLogRepositoryImpl: PointsLogRepository
+    private val pointsLogRepositoryImpl: PointsLogRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -35,7 +37,14 @@ class HomeViewModel @Inject constructor(
     init {
         loadInitialData()
         observePoints()
+        updateModeFromSettings()
+    }
 
+    private fun updateModeFromSettings() {
+        val tunnelVisionEnabled = settingsRepository.getTunnelVisionMode()
+        _state.value = _state.value.copy(
+            mode = if (tunnelVisionEnabled) HomeMode.FOCUSED else HomeMode.SIMPLE
+        )
     }
 
     private fun loadInitialData() {
@@ -124,9 +133,11 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.ToggleMode -> {
-                val newMode =
-                    if (_state.value.mode == HomeMode.SIMPLE) HomeMode.FOCUSED else HomeMode.SIMPLE
-                _state.value = _state.value.copy(mode = newMode)
+                // This is no longer needed as mode is controlled by settings
+                // But we'll keep it for backward compatibility
+                val tunnelVisionEnabled = !settingsRepository.getTunnelVisionMode()
+                settingsRepository.setTunnelVisionMode(tunnelVisionEnabled)
+                updateModeFromSettings()
             }
 
             is HomeEvent.ToggleHideCompletedTasks -> {

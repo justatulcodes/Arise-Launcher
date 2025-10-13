@@ -36,15 +36,33 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import com.expeknow.ariselauncher.data.model.TaskCategory
 
 @Composable
 fun TaskDialog(
     onDismiss: () -> Unit,
-    onTaskAdded: (title: String, description: String, points: Int) -> Unit
+    onTaskAdded: (title: String, description: String, points: Int, category: TaskCategory) -> Unit,
+    showCategorySelector: Boolean = false,
+    initialCategory: TaskCategory = TaskCategory.PERSONAL,
+    availableCategories: List<TaskCategory> = TaskCategory.values().toList()
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var pointsValue by remember { mutableStateOf(10f) }
+    var selectedCategory by remember { mutableStateOf(initialCategory) }
+    var showCategoryDropdown by remember { mutableStateOf(false) }
+
     val points = pointsValue.roundToInt()
     val windowInfo = LocalWindowInfo.current
     val focusRequester = remember { FocusRequester() }
@@ -86,6 +104,55 @@ fun TaskDialog(
                     maxLines = 3,
                 )
 
+                if (showCategorySelector) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Category", color = BannerTextGray)
+
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showCategoryDropdown = true }
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.White.copy(alpha = 0.3f),
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = getCategoryName(selectedCategory),
+                                color = Color.White,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Icon(
+                                Icons.Default.ArrowDropDown,
+                                contentDescription = "Select Category",
+                                tint = Color.White
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = showCategoryDropdown,
+                            onDismissRequest = { showCategoryDropdown = false },
+                            modifier = Modifier
+                                .background(Color(0xFF1A1A1A))
+                                .width(300.dp)
+                        ) {
+                            availableCategories.forEach { category ->
+                                DropdownMenuItem(
+                                    text = { Text(getCategoryName(category), color = Color.White) },
+                                    onClick = {
+                                        selectedCategory = category
+                                        showCategoryDropdown = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
@@ -100,62 +167,59 @@ fun TaskDialog(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
                 Slider(
                     value = pointsValue,
                     onValueChange = { pointsValue = it },
-                    valueRange = 0f..50f,
-                    steps = 49,
-                    modifier = Modifier.fillMaxWidth(),
+                    valueRange = 1f..50f,
+                    steps = 48,
                     colors = SliderDefaults.colors(
                         thumbColor = AccentGreen,
-                        activeTrackColor = AccentGreen,
-                        inactiveTrackColor = DividerGray
-                    )
+                        activeTrackColor = AccentGreen
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        "0",
-                        color = BannerTextGray,
-                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        "50",
-                        color = BannerTextGray,
-                        style = androidx.compose.material3.MaterialTheme.typography.bodySmall
-                    )
-                }
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (title.isNotBlank()) {
-                        onTaskAdded(title, description, points)
-                        onDismiss()
+                    if (title.isNotEmpty()) {
+                        onTaskAdded(title, description, points, selectedCategory)
                     }
                 },
-                modifier = Modifier.background(Color.White)
+                enabled = title.isNotEmpty()
             ) {
-                Text("Add Task", color = Color.Black)
+                Text("ADD", color = if (title.isNotEmpty()) AccentGreen else Color.Gray)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss, modifier = Modifier.background(SurfaceCard)) {
-                Text("Cancel", color = Color.White)
+            TextButton(onClick = onDismiss) {
+                Text("CANCEL", color = Color.Gray)
             }
         },
-        containerColor = SurfaceCard
+        containerColor = Color.Black,
+        textContentColor = Color.White,
     )
+}
+
+private fun getCategoryName(category: TaskCategory): String {
+    return when (category) {
+        TaskCategory.PERSONAL -> "Personal"
+        TaskCategory.WORK -> "Work"
+        TaskCategory.URGENT -> "Urgent"
+        TaskCategory.IMPORTANT -> "Important"
+        TaskCategory.INTELLIGENCE -> "Intelligence"
+        TaskCategory.PHYSICAL -> "Physical"
+        TaskCategory.WEALTH -> "Wealth"
+        TaskCategory.BECOMING_INTELLIGENT -> "Becoming Intelligent"
+        TaskCategory.BECOMING_MUSCULAR -> "Becoming Muscular"
+        TaskCategory.BECOMING_RICH -> "Becoming Rich"
+        TaskCategory.MISCELLANEOUS -> "Miscellaneous"
+    }
 }
 
 @Preview
 @Composable
 fun AddTaskDialogPreview() {
-    TaskDialog(onDismiss = {}, onTaskAdded = { _, _, _ -> })
+    TaskDialog(onDismiss = {}, onTaskAdded = { _, _, _, _ -> })
 }

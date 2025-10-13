@@ -684,11 +684,14 @@ private fun FocusedCategorySection(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.White.copy(alpha = 0.2f),
                             unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-                            cursorColor = Color.White
+                            cursorColor = Color.White,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent
                         ),
+                        singleLine = true,
                         modifier = Modifier
                             .weight(1f)
-                            .height(40.dp)
+                            .height(56.dp) // Increased height from 40dp to 56dp
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = onSaveEdit) {
