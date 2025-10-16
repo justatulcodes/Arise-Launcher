@@ -34,7 +34,7 @@ fun TaskDetailsHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp),
+            .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
