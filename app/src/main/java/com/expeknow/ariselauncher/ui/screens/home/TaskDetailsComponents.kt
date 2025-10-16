@@ -28,6 +28,7 @@ import com.expeknow.ariselauncher.data.model.*
 @Composable
 fun TaskDetailsHeader(
     onBackClick: () -> Unit,
+    onDeleteTask : () -> Unit,
     theme: TaskDetailsTheme
 ) {
     Row(
@@ -61,6 +62,24 @@ fun TaskDetailsHeader(
             fontWeight = FontWeight.Medium,
             letterSpacing = 1.2.sp
         )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            onClick = onDeleteTask,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.White.copy(alpha = 0.6f)
+            ),
+            contentPadding = PaddingValues(8.dp),
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                Icons.Filled.Delete,
+                contentDescription = "Delete Task",
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
 
@@ -848,7 +867,8 @@ fun AddLinkDialog(
 private fun TaskDetailsHeaderPreview() {
     TaskDetailsHeader(
         onBackClick = {},
-        theme = TaskDetailsTheme()
+        theme = TaskDetailsTheme(),
+        onDeleteTask = {}
     )
 }
 

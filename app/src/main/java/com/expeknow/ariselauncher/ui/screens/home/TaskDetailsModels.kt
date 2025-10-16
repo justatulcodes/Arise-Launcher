@@ -24,6 +24,8 @@ sealed class TaskDetailsEvent {
     data class LoadTask(val taskId: String) : TaskDetailsEvent()
     data class CompleteTask(val taskId: String) : TaskDetailsEvent()
     data class ToggleTask(val taskId: String) : TaskDetailsEvent()
+
+    data class DeleteTask(val taskId: String) : TaskDetailsEvent()
     data class ExpandLink(val linkId: String?) : TaskDetailsEvent()
     data class OpenLink(val url: String) : TaskDetailsEvent()
     data object NavigateBack : TaskDetailsEvent()
