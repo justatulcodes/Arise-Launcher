@@ -609,7 +609,7 @@ fun FocusedTaskList(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(categories) { category ->
             val categoryTasks = tasks.filter { it.category == category.id }
@@ -626,6 +626,9 @@ fun FocusedTaskList(
                 onEditingNameChange = onEditingNameChange,
                 theme = theme
             )
+        }
+        item {
+            Spacer(Modifier.height(6.dp))
         }
     }
 }

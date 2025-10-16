@@ -75,9 +75,6 @@ fun HomeScreen(
                 theme = theme
             )
 
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Progress Bar
             EnhancedProgressBar(
                 completed = state.completedTasks,
@@ -206,7 +203,7 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 24.dp, bottom = 140.dp)
+                    .padding(end = 24.dp, bottom = 100.dp)
             ) {
                 FloatingAddButton(
                     onClick = { viewModel.onEvent(HomeEvent.ShowAddTaskDialog) },
