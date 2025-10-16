@@ -34,6 +34,12 @@ class TaskDetailsViewModel @Inject constructor(
                 }
             }
 
+            is TaskDetailsEvent.DeleteTask -> {
+                viewModelScope.launch {
+                    taskRepositoryImpl.deleteTaskById(event.taskId)
+                }
+            }
+
             is TaskDetailsEvent.ToggleTask -> {
                 _state.value.task?.let { currentTask ->
                     val updatedTask = currentTask.copy(isCompleted = !currentTask.isCompleted)
