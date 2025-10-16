@@ -782,13 +782,21 @@ private fun FocusedTaskItem(
     ) {
         Checkbox(
             checked = task.isCompleted,
-            onCheckedChange = { onToggleTask(task) },
             colors = CheckboxDefaults.colors(
                 checkedColor = categoryColor,
                 uncheckedColor = Color.White.copy(alpha = 0.4f),
                 checkmarkColor = Color.Black
             ),
+            onCheckedChange = null,
             modifier = Modifier.size(16.dp)
+                    .size(20.dp)
+                    .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            onToggleTask(task)
+                        }
+                    )
+                }
         )
 
         Spacer(modifier = Modifier.width(12.dp))
