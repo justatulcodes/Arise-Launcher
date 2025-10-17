@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
@@ -264,7 +265,7 @@ fun HomeScreen(
             onDismiss = {
                 viewModel.onEvent(HomeEvent.HideAddTaskDialog)
             },
-            onTaskAdded = { title: String, desc: String, pts: Int, category: TaskCategory ->
+            onTaskAdded = { title: String, desc: String, pts: Int, category: TaskCategory, isRepeatable : Boolean, daysOfWeek : List<DaysOfWeek> ->
                 viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category))
             },
             showCategorySelector = state.mode == HomeMode.FOCUSED,
