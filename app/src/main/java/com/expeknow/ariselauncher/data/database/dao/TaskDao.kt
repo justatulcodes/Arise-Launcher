@@ -1,4 +1,4 @@
-package com.expeknow.ariselauncher.data.database
+package com.expeknow.ariselauncher.data.database.dao
 
 import androidx.room.*
 import com.expeknow.ariselauncher.data.model.Task

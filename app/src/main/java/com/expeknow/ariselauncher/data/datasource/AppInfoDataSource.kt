@@ -1,6 +1,6 @@
 package com.expeknow.ariselauncher.data.datasource
 
-import com.expeknow.ariselauncher.data.database.AppInfoDao
+import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
 import com.expeknow.ariselauncher.data.model.AppInfo
 
 class AppInfoDataSource(
