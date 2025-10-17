@@ -2,6 +2,7 @@ package com.expeknow.ariselauncher.data.repository.interfaces
 
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
+import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {
@@ -21,7 +22,9 @@ interface TaskRepository {
         description: String = "",
         points: Int = 0,
         category: TaskCategory = TaskCategory.MISCELLANEOUS,
-        priority: Int = 1
+        priority: Int = 1,
+        isRepeated: Boolean = false,
+        repeatDays: List<DaysOfWeek> = emptyList()
     ): Task
 
     suspend fun insertTask(task: Task)

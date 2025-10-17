@@ -110,7 +110,9 @@ class HomeViewModel @Inject constructor(
                         title = event.title,
                         description = event.description,
                         points = event.points,
-                        category = event.category
+                        category = event.category,
+                        isRepeated = event.isRepeated,
+                        repeatDays = event.repeatDays
                     )
                     _state.value = _state.value.copy(showAddTaskDialog = false)
                 }

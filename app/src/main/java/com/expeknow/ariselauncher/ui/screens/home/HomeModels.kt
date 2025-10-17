@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.expeknow.ariselauncher.data.model.AppInfo
+import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
@@ -59,7 +60,9 @@ sealed class HomeEvent {
         val title: String,
         val description: String,
         val points: Int,
-        val category: TaskCategory = TaskCategory.PERSONAL
+        val category: TaskCategory = TaskCategory.PERSONAL,
+        val isRepeated: Boolean = false,
+        val repeatDays: List<DaysOfWeek> = emptyList()
     ) : HomeEvent()
     data object ShowAddTaskDialog : HomeEvent()
     data object HideAddTaskDialog : HomeEvent()
