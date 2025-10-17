@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
+    id("androidx.room") version "2.7.2"
     alias(libs.plugins.compose.compiler)
 }
 
@@ -52,6 +53,12 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+
+
 }
 
 dependencies {

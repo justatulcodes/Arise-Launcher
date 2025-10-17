@@ -1,13 +1,11 @@
 package com.expeknow.ariselauncher.di
 
 import android.content.Context
-import com.expeknow.ariselauncher.data.database.AppInfoDao
+import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
 import com.expeknow.ariselauncher.data.database.AriseLauncherDatabase
-import com.expeknow.ariselauncher.data.database.PointsLogDao
-import com.expeknow.ariselauncher.data.database.TaskDao
-import com.expeknow.ariselauncher.data.database.TaskDao_Impl
-import com.expeknow.ariselauncher.data.database.TaskLinkDao
-import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
+import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
+import com.expeknow.ariselauncher.data.database.dao.TaskDao
+import com.expeknow.ariselauncher.data.database.dao.TaskLinkDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
