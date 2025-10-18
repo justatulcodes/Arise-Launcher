@@ -116,6 +116,32 @@ fun TaskDetailsScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // Recurring Task Section
+                    RecurringTaskSection(
+                        task = task,
+                        isEditingRecurrence = state.isEditingRecurrence,
+                        editingIsRepeated = state.editingIsRepeated,
+                        editingRepeatDays = state.editingRepeatDays,
+                        onStartEditing = {
+                            viewModel.onEvent(TaskDetailsEvent.StartEditingRecurrence)
+                        },
+                        onToggleIsRepeated = { isRepeated ->
+                            viewModel.onEvent(TaskDetailsEvent.UpdateIsRepeated(isRepeated))
+                        },
+                        onToggleDay = { day ->
+                            viewModel.onEvent(TaskDetailsEvent.ToggleRepeatDay(day))
+                        },
+                        onSave = {
+                            viewModel.onEvent(TaskDetailsEvent.SaveRecurrence)
+                        },
+                        onCancel = {
+                            viewModel.onEvent(TaskDetailsEvent.CancelEditing)
+                        },
+                        theme = theme
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
                     // Resources & Links Section
                     ResourcesLinksSection(
                         links = task.relatedLinks,
