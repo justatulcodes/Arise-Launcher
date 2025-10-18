@@ -1,6 +1,6 @@
 package com.expeknow.ariselauncher.data.datasource
 
-import com.expeknow.ariselauncher.data.database.PointsLogDao
+import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
 import com.expeknow.ariselauncher.data.datasource.interfaces.PointsLogDataSource
 import com.expeknow.ariselauncher.data.model.PointsLog
 import com.expeknow.ariselauncher.data.model.PointsLogType

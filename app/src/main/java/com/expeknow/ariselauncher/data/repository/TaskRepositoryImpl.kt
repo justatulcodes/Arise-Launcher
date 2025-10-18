@@ -1,6 +1,7 @@
 package com.expeknow.ariselauncher.data.repository
 
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
+import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
@@ -12,6 +13,7 @@ class TaskRepositoryImpl(
 {
 
     override fun getAllTasks(): Flow<List<Task>> = taskRepositoryDataSource.getAllTasks()
+    override suspend fun getAllRecurringTasks(): Flow<List<Task>> = taskRepositoryDataSource.getAllRecurringTasks()
 
     override fun getActiveTasks(): Flow<List<Task>> = taskRepositoryDataSource.getActiveTasks()
 
@@ -27,14 +29,18 @@ class TaskRepositoryImpl(
         description: String,
         points: Int,
         category: TaskCategory,
-        priority: Int
+        priority: Int,
+        isRepeated: Boolean,
+        repeatDays: List<DaysOfWeek>
     ): Task {
         val task = Task(
             title = title,
             description = description,
             points = points,
             category = category,
-            priority = priority
+            priority = priority,
+            isRepeated = isRepeated,
+            repeatDays = repeatDays
         )
         taskRepositoryDataSource.insertTask(task)
         return task

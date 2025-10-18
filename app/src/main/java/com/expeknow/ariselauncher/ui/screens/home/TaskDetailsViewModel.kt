@@ -34,6 +34,12 @@ class TaskDetailsViewModel @Inject constructor(
                 }
             }
 
+            is TaskDetailsEvent.DeleteTask -> {
+                viewModelScope.launch {
+                    taskRepositoryImpl.deleteTaskById(event.taskId)
+                }
+            }
+
             is TaskDetailsEvent.ToggleTask -> {
                 _state.value.task?.let { currentTask ->
                     val updatedTask = currentTask.copy(isCompleted = !currentTask.isCompleted)
@@ -100,6 +106,7 @@ class TaskDetailsViewModel @Inject constructor(
                     isEditingTitle = false,
                     isEditingDescription = false,
                     isAddingLink = false,
+                    isEditingRecurrence = false,
                     editingTitleText = "",
                     editingDescriptionText = "",
                     newLinkTitle = "",
@@ -198,6 +205,48 @@ class TaskDetailsViewModel @Inject constructor(
                         relatedLinks = task.relatedLinks.filter { it.id != event.linkId }
                     )
                     _state.value = _state.value.copy(task = updatedTask)
+
+                    viewModelScope.launch {
+                        taskRepositoryImpl.updateTask(updatedTask)
+                    }
+                }
+            }
+
+            // Recurrence management events
+            is TaskDetailsEvent.StartEditingRecurrence -> {
+                _state.value.task?.let { task ->
+                    _state.value = _state.value.copy(
+                        isEditingRecurrence = true,
+                        editingIsRepeated = task.isRepeated,
+                        editingRepeatDays = task.repeatDays
+                    )
+                }
+            }
+
+            is TaskDetailsEvent.UpdateIsRepeated -> {
+                _state.value = _state.value.copy(editingIsRepeated = event.isRepeated)
+            }
+
+            is TaskDetailsEvent.ToggleRepeatDay -> {
+                val currentDays = _state.value.editingRepeatDays
+                val updatedDays = if (currentDays.contains(event.day)) {
+                    currentDays.filter { it != event.day }
+                } else {
+                    currentDays + event.day
+                }
+                _state.value = _state.value.copy(editingRepeatDays = updatedDays)
+            }
+
+            is TaskDetailsEvent.SaveRecurrence -> {
+                _state.value.task?.let { task ->
+                    val updatedTask = task.copy(
+                        isRepeated = _state.value.editingIsRepeated,
+                        repeatDays = _state.value.editingRepeatDays
+                    )
+                    _state.value = _state.value.copy(
+                        task = updatedTask,
+                        isEditingRecurrence = false
+                    )
 
                     viewModelScope.launch {
                         taskRepositoryImpl.updateTask(updatedTask)

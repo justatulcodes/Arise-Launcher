@@ -1,6 +1,5 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,10 +16,10 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
-import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
@@ -44,7 +43,7 @@ fun HomeScreen(
     val context = LocalContext.current
 
     BackHandler {
-        // do nothing as its a launcher
+        // do nothing to disable back navigation
     }
 
     Box(
@@ -55,11 +54,11 @@ fun HomeScreen(
         // Calculated values for the entire screen
         val allTasksCompleted = state.totalTasks > 0 && state.completedTasks == state.totalTasks
         val filteredTasks = if (state.hideCompletedTasks) {
-            state.tasks.filter { !it.isCompleted }
+            state.allTasks.filter { !it.isCompleted }
         } else {
-            state.tasks
+            state.allTasks
         }
-        val pointsEarned = state.tasks.filter { it.isCompleted }.sumOf { it.points }
+        val pointsEarned = state.allTasks.filter { it.isCompleted }.sumOf { it.points }
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -74,15 +73,6 @@ fun HomeScreen(
                 onPointsClick = { /* Navigate to points page */ },
                 theme = theme
             )
-
-            // Mode Toggle
-//            ModeToggle(
-//                mode = state.mode,
-//                onModeToggle = { viewModel.onEvent(HomeEvent.ToggleMode) },
-//                theme = theme
-//            )
-
-//            Spacer(modifier = Modifier.height(16.dp))
 
             // Progress Bar
             EnhancedProgressBar(
@@ -155,17 +145,9 @@ fun HomeScreen(
                         }
 
                         HomeMode.FOCUSED -> {
-                            val focusedTasks = filteredTasks.filter { task ->
-                                task.category in listOf(
-                                    TaskCategory.INTELLIGENCE,
-                                    TaskCategory.PHYSICAL,
-                                    TaskCategory.WEALTH
-                                )
-                            }
-
                             FocusedTaskList(
                                 categories = state.focusCategories,
-                                tasks = focusedTasks,
+                                tasks = state.recurringTasks,
                                 onTaskClick = { taskId ->
                                     navController.navigate(Screen.TaskDetails.routeFor(taskId))
                                 },
@@ -212,7 +194,7 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 24.dp, bottom = 140.dp)
+                    .padding(end = 24.dp, bottom = 100.dp)
             ) {
                 FloatingAddButton(
                     onClick = { viewModel.onEvent(HomeEvent.ShowAddTaskDialog) },
@@ -273,11 +255,14 @@ fun HomeScreen(
             onDismiss = {
                 viewModel.onEvent(HomeEvent.HideAddTaskDialog)
             },
-            onTaskAdded = { title: String, desc: String, pts: Int ->
-                val category =
-                    if (state.mode == HomeMode.FOCUSED) TaskCategory.INTELLIGENCE else TaskCategory.PERSONAL
-                viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category))
-            }
+            onTaskAdded = { title: String, desc: String, pts: Int, category: TaskCategory, isRepeatable : Boolean, daysOfWeek : List<DaysOfWeek> ->
+                viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category, isRepeatable, daysOfWeek))
+            },
+            showCategorySelector = state.mode == HomeMode.FOCUSED,
+            initialCategory = if (state.mode == HomeMode.FOCUSED) TaskCategory.INTELLIGENCE else TaskCategory.PERSONAL,
+            availableCategories = if (state.mode == HomeMode.FOCUSED)
+                listOf(TaskCategory.INTELLIGENCE, TaskCategory.PHYSICAL, TaskCategory.WEALTH)
+                else listOf(TaskCategory.PERSONAL, TaskCategory.WORK, TaskCategory.URGENT, TaskCategory.IMPORTANT)
         )
     }
 }
@@ -310,10 +295,3 @@ private fun BoxScope.AddTaskButton(viewModel: HomeViewModel) {
         Text("ADD TASK")
     }
 }
-
-//@Preview(showBackground = true, backgroundColor = 0xFF000000)
-//@Composable
-//private fun HomeScreenPreview() {
-//    // Create a mock navigation controller (null for preview)
-//    HomeScreen(navController = androidx.navigation.compose.rememberNavController())
-//}

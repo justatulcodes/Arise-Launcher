@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.ui.tooling.preview.Preview
+import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskLink
 import com.expeknow.ariselauncher.data.model.TaskLinkType
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
@@ -63,7 +64,11 @@ fun TaskDetailsScreen(
                             viewModel.onEvent(TaskDetailsEvent.NavigateBack)
                             navController.popBackStack()
                         },
-                        theme = theme
+                        theme = theme,
+                        onDeleteTask = {
+                            viewModel.onEvent(TaskDetailsEvent.DeleteTask(task.id))
+                            navController.popBackStack()
+                        }
                     )
 
 
@@ -107,6 +112,32 @@ fun TaskDetailsScreen(
                         onCancelEditing = {
                             viewModel.onEvent(TaskDetailsEvent.CancelEditing)
                         }
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Recurring Task Section
+                    RecurringTaskSection(
+                        task = task,
+                        isEditingRecurrence = state.isEditingRecurrence,
+                        editingIsRepeated = state.editingIsRepeated,
+                        editingRepeatDays = state.editingRepeatDays,
+                        onStartEditing = {
+                            viewModel.onEvent(TaskDetailsEvent.StartEditingRecurrence)
+                        },
+                        onToggleIsRepeated = { isRepeated ->
+                            viewModel.onEvent(TaskDetailsEvent.UpdateIsRepeated(isRepeated))
+                        },
+                        onToggleDay = { day ->
+                            viewModel.onEvent(TaskDetailsEvent.ToggleRepeatDay(day))
+                        },
+                        onSave = {
+                            viewModel.onEvent(TaskDetailsEvent.SaveRecurrence)
+                        },
+                        onCancel = {
+                            viewModel.onEvent(TaskDetailsEvent.CancelEditing)
+                        },
+                        theme = theme
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))

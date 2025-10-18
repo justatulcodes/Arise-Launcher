@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,16 +25,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.*
+import com.expeknow.ariselauncher.ui.components.DayChip
+import java.util.Locale
 
 @Composable
 fun TaskDetailsHeader(
     onBackClick: () -> Unit,
+    onDeleteTask : () -> Unit,
     theme: TaskDetailsTheme
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp),
+            .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(
@@ -61,6 +65,24 @@ fun TaskDetailsHeader(
             fontWeight = FontWeight.Medium,
             letterSpacing = 1.2.sp
         )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Button(
+            onClick = onDeleteTask,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.White.copy(alpha = 0.6f)
+            ),
+            contentPadding = PaddingValues(8.dp),
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                Icons.Filled.Delete,
+                contentDescription = "Delete Task",
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
 
@@ -342,9 +364,9 @@ fun EnhancedTaskDetailsCard(
                     verticalAlignment = Alignment.Top
                 ) {
                     Text(
-                        task.description,
+                        if (task.description.isBlank()) "No description added yet..." else task.description,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = Color(0xFFD1D5DB),
+                        color = if (task.description.isBlank()) Color(0xFF6B7280) else Color(0xFFD1D5DB),
                         lineHeight = 24.sp,
                         modifier = Modifier.weight(1f)
                     )
@@ -848,7 +870,8 @@ fun AddLinkDialog(
 private fun TaskDetailsHeaderPreview() {
     TaskDetailsHeader(
         onBackClick = {},
-        theme = TaskDetailsTheme()
+        theme = TaskDetailsTheme(),
+        onDeleteTask = {}
     )
 }
 
@@ -879,4 +902,243 @@ private fun CompletionStatusBannerCompletedPreview() {
         onToggleComplete = {},
         theme = TaskDetailsTheme()
     )
+}
+
+@Composable
+fun RecurringTaskSection(
+    task: Task,
+    isEditingRecurrence: Boolean,
+    editingIsRepeated: Boolean,
+    editingRepeatDays: List<DaysOfWeek>,
+    onStartEditing: () -> Unit,
+    onToggleIsRepeated: (Boolean) -> Unit,
+    onToggleDay: (DaysOfWeek) -> Unit,
+    onSave: () -> Unit,
+    onCancel: () -> Unit,
+    theme: TaskDetailsTheme
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .background(
+                theme.surface,
+                RoundedCornerShape(12.dp)
+            )
+            .border(
+                1.dp,
+                theme.border,
+                RoundedCornerShape(12.dp)
+            )
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    Icons.Filled.Repeat,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "RECURRENCE",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold,
+                    letterSpacing = 1.sp
+                )
+            }
+
+            if (!isEditingRecurrence) {
+                IconButton(
+                    onClick = onStartEditing,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Edit,
+                        contentDescription = "Edit Recurrence",
+                        tint = Color.White.copy(alpha = 0.6f),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        if (isEditingRecurrence) {
+            // Editing Mode
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        "Repeating Task",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
+                    Switch(
+                        checked = editingIsRepeated,
+                        onCheckedChange = onToggleIsRepeated,
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = theme.completedGreen,
+                            uncheckedThumbColor = Color.White.copy(alpha = 0.6f),
+                            uncheckedTrackColor = Color.White.copy(alpha = 0.2f)
+                        )
+                    )
+                }
+
+                if (editingIsRepeated) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        "Repeat on:",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = theme.textSecondary,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Days of week selector
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        DaysOfWeek.entries.forEach { day ->
+                            val isSelected = editingRepeatDays.contains(day)
+                            DayChip(
+                                day = day,
+                                isSelected = isSelected,
+                                onClick = { onToggleDay(day) },
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(
+                        onClick = onCancel,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = Color.White.copy(alpha = 0.8f)
+                        )
+                    ) {
+                        Text("Cancel")
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    TextButton(
+                        onClick = onSave,
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = theme.completedGreen
+                        )
+                    ) {
+                        Text("Save", fontWeight = FontWeight.SemiBold)
+                    }
+                }
+            }
+        } else {
+            // Display Mode
+            if (task.isRepeated) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Filled.CheckCircle,
+                        contentDescription = null,
+                        tint = theme.completedGreen,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "This is a repeating task",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
+                }
+
+                if (task.repeatDays.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        "Repeats on:",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = theme.textSecondary,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        task.repeatDays.forEach { day ->
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        theme.completedGreen.copy(alpha = 0.2f),
+                                        RoundedCornerShape(8.dp)
+                                    )
+                                    .border(
+                                        1.dp,
+                                        theme.completedGreen.copy(alpha = 0.4f),
+                                        RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text(
+                                    day.name.lowercase().capitalize(Locale.getDefault()),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = theme.completedGreen,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "No specific days selected",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = theme.textSecondary.copy(alpha = 0.7f)
+                    )
+                }
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Filled.Cancel,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.4f),
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "This is a one-time task",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.7f)
+                    )
+                }
+            }
+        }
+    }
 }
