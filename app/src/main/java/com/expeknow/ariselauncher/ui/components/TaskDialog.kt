@@ -288,45 +288,12 @@ private fun DaySelectionChips(
             val isSelected = selectedDays.contains(day)
             DayChip(
                 day = day,
-                label = label,
                 isSelected = isSelected,
-                onSelected = onDaySelected
+                onClick = { onDaySelected(day, !isSelected) },
+                selectedColor = AccentGreen,
+                size = 30.dp
             )
         }
-    }
-}
-
-@Composable
-private fun DayChip(
-    day: DaysOfWeek,
-    label: String,
-    isSelected: Boolean,
-    onSelected: (DaysOfWeek, Boolean) -> Unit
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(30.dp)
-            .background(
-                color = if (isSelected) AccentGreen else Color.Transparent,
-                shape = CircleShape
-            )
-            .border(
-                width = 1.dp,
-                brush = SolidColor(if (isSelected) AccentGreen else Color.White.copy(alpha = 0.3f)),
-                shape = CircleShape
-            )
-            .clickable { onSelected(day, !isSelected) }
-    ) {
-        Text(
-            text = label,
-            color = if (isSelected) Color.Black else Color.White,
-            textAlign = TextAlign.Center,
-            style = TextStyle(
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
-            )
-        )
     }
 }
 
