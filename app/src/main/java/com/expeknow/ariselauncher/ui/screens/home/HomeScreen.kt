@@ -295,10 +295,3 @@ private fun BoxScope.AddTaskButton(viewModel: HomeViewModel) {
         Text("ADD TASK")
     }
 }
-
-//@Preview(showBackground = true, backgroundColor = 0xFF000000)
-//@Composable
-//private fun HomeScreenPreview() {
-//    // Create a mock navigation controller (null for preview)
-//    HomeScreen(navController = androidx.navigation.compose.rememberNavController())
-//}

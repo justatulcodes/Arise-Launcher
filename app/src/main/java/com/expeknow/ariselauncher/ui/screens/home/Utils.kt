@@ -10,6 +10,7 @@ import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.graphics.createBitmap
+import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.TaskLinkType
 import java.util.Calendar
 
@@ -48,6 +49,21 @@ object Utils {
         calendar.set(Calendar.SECOND, 59)
         calendar.set(Calendar.MILLISECOND, 999)
         return calendar.timeInMillis
+    }
+
+    fun getTodaysDayOfWeek(): DaysOfWeek {
+        val calendar = Calendar.getInstance()
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        return when(dayOfWeek) {
+            Calendar.SUNDAY -> DaysOfWeek.SUNDAY
+            Calendar.MONDAY -> DaysOfWeek.MONDAY
+            Calendar.TUESDAY -> DaysOfWeek.TUESDAY
+            Calendar.WEDNESDAY -> DaysOfWeek.WEDNESDAY
+            Calendar.THURSDAY -> DaysOfWeek.THURSDAY
+            Calendar.FRIDAY -> DaysOfWeek.FRIDAY
+            Calendar.SATURDAY -> DaysOfWeek.SATURDAY
+            else -> DaysOfWeek.SUNDAY
+        }
     }
 
     fun extractYouTubeVideoId(url: String): String? {
