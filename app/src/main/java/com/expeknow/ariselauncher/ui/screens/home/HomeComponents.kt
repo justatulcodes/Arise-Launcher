@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextDecoration.Companion.LineThrough
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -813,7 +814,7 @@ private fun FocusedTaskItem(
                 task.title,
                 color = if (task.isCompleted) Color.White.copy(alpha = 0.5f) else Color.White,
                 style = MaterialTheme.typography.bodySmall,
-                textDecoration = if (task.isCompleted) androidx.compose.ui.text.style.TextDecoration.LineThrough else null,
+                textDecoration = if (task.isCompleted) LineThrough else null,
                 modifier = Modifier.weight(1f)
             )
             Text(

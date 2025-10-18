@@ -4,7 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
@@ -39,7 +38,8 @@ data class HomeState(
     val totalTasks: Int = 0,
     val earnedPoints: Int = 0,
     val apps: List<AppDrawerApp> =emptyList(),
-    val tasks: List<Task> = emptyList(),
+    val allTasks: List<Task> = emptyList(),
+    val recurringTasks : List<Task> = emptyList(),
     val showAddTaskDialog: Boolean = false,
     val showEssentialAppsSheet: Boolean = false,
     val tunnelVisionMode: Boolean = true,
@@ -71,7 +71,6 @@ sealed class HomeEvent {
     data class NavigateToTaskDetails(val taskId: String) : HomeEvent()
     data class LaunchApp(val app: AppDrawerApp) : HomeEvent()
     data object ToggleMode : HomeEvent()
-    data object ToggleHideCompletedTasks : HomeEvent()
     data class StartEditingCategory(val categoryId: TaskCategory) : HomeEvent()
     data class SaveEditingCategory(val name: String) : HomeEvent()
     data object CancelEditingCategory : HomeEvent()

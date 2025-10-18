@@ -120,7 +120,8 @@ fun TaskItemPreview() {
             title = "Task 1",
             description = "Description 1",
             isCompleted = false,
-            points = 10
+            points = 10,
+            isRepeated = false
         ),
         onTaskCompleted = {}
     )

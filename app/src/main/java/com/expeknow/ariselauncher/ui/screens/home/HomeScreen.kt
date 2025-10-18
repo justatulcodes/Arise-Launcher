@@ -1,6 +1,5 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -21,7 +20,6 @@ import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
-import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
@@ -45,7 +43,7 @@ fun HomeScreen(
     val context = LocalContext.current
 
     BackHandler {
-        // do nothing as its a launcher
+        // do nothing to disable back navigation
     }
 
     Box(
@@ -56,11 +54,11 @@ fun HomeScreen(
         // Calculated values for the entire screen
         val allTasksCompleted = state.totalTasks > 0 && state.completedTasks == state.totalTasks
         val filteredTasks = if (state.hideCompletedTasks) {
-            state.tasks.filter { !it.isCompleted }
+            state.allTasks.filter { !it.isCompleted }
         } else {
-            state.tasks
+            state.allTasks
         }
-        val pointsEarned = state.tasks.filter { it.isCompleted }.sumOf { it.points }
+        val pointsEarned = state.allTasks.filter { it.isCompleted }.sumOf { it.points }
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -147,17 +145,9 @@ fun HomeScreen(
                         }
 
                         HomeMode.FOCUSED -> {
-                            val focusedTasks = filteredTasks.filter { task ->
-                                task.category in listOf(
-                                    TaskCategory.INTELLIGENCE,
-                                    TaskCategory.PHYSICAL,
-                                    TaskCategory.WEALTH
-                                )
-                            }
-
                             FocusedTaskList(
                                 categories = state.focusCategories,
-                                tasks = focusedTasks,
+                                tasks = state.recurringTasks,
                                 onTaskClick = { taskId ->
                                     navController.navigate(Screen.TaskDetails.routeFor(taskId))
                                 },
@@ -266,7 +256,7 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.HideAddTaskDialog)
             },
             onTaskAdded = { title: String, desc: String, pts: Int, category: TaskCategory, isRepeatable : Boolean, daysOfWeek : List<DaysOfWeek> ->
-                viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category))
+                viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category, isRepeatable, daysOfWeek))
             },
             showCategorySelector = state.mode == HomeMode.FOCUSED,
             initialCategory = if (state.mode == HomeMode.FOCUSED) TaskCategory.INTELLIGENCE else TaskCategory.PERSONAL,

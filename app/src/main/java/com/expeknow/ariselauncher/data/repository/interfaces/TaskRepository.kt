@@ -9,6 +9,8 @@ interface TaskRepository {
 
     fun getAllTasks(): Flow<List<Task>>
 
+    suspend fun getAllRecurringTasks(): Flow<List<Task>>
+
     fun getActiveTasks(): Flow<List<Task>>
 
     fun getCompletedTasks(): Flow<List<Task>>
