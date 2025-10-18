@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.*
+import com.expeknow.ariselauncher.ui.components.DayChip
 import java.util.Locale
 
 @Composable
@@ -1020,7 +1021,6 @@ fun RecurringTaskSection(
                                 day = day,
                                 isSelected = isSelected,
                                 onClick = { onToggleDay(day) },
-                                theme = theme
                             )
                         }
                     }
@@ -1140,49 +1140,5 @@ fun RecurringTaskSection(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun DayChip(
-    day: DaysOfWeek,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    theme: TaskDetailsTheme
-) {
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .background(
-                if (isSelected) theme.completedGreen else Color.White.copy(alpha = 0.1f),
-                RoundedCornerShape(20.dp)
-            )
-            .border(
-                1.dp,
-                if (isSelected) theme.completedGreen else Color.White.copy(alpha = 0.2f),
-                RoundedCornerShape(20.dp)
-            )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            getDayAbbreviation(day),
-            style = MaterialTheme.typography.labelSmall,
-            color = if (isSelected) Color.Black else Color.White.copy(alpha = 0.7f),
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            fontSize = 11.sp
-        )
-    }
-}
-
-private fun getDayAbbreviation(day: DaysOfWeek): String {
-    return when (day) {
-        DaysOfWeek.MONDAY -> "M"
-        DaysOfWeek.TUESDAY -> "T"
-        DaysOfWeek.WEDNESDAY -> "W"
-        DaysOfWeek.THURSDAY -> "T"
-        DaysOfWeek.FRIDAY -> "F"
-        DaysOfWeek.SATURDAY -> "S"
-        DaysOfWeek.SUNDAY -> "S"
     }
 }
