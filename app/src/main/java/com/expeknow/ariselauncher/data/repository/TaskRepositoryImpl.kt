@@ -13,6 +13,7 @@ class TaskRepositoryImpl(
 {
 
     override fun getAllTasks(): Flow<List<Task>> = taskRepositoryDataSource.getAllTasks()
+    override suspend fun getAllRecurringTasks(): Flow<List<Task>> = taskRepositoryDataSource.getAllRecurringTasks()
 
     override fun getActiveTasks(): Flow<List<Task>> = taskRepositoryDataSource.getActiveTasks()
 

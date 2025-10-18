@@ -33,4 +33,5 @@ class OfflineTaskDataSource(
 
     override fun getActiveTaskCount(): Flow<Int> = taskDao.getActiveTaskCount()
     override fun getCompletedTaskCount(): Flow<Int> = taskDao.getCompletedTaskCount()
+    override suspend fun getAllRecurringTasks(): Flow<List<Task>> = taskDao.getAllRecurringTasks()
 }

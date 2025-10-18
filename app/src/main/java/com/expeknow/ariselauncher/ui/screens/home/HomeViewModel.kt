@@ -7,8 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
-import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
@@ -20,8 +18,6 @@ import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayEndTime
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayStartTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -42,9 +38,12 @@ class HomeViewModel @Inject constructor(
 
     private fun updateModeFromSettings() {
         val tunnelVisionEnabled = settingsRepository.getTunnelVisionMode()
+        val shouldHideCompletedTasks = settingsRepository.getHideCompletedTasks()
         _state.value = _state.value.copy(
-            mode = if (tunnelVisionEnabled) HomeMode.FOCUSED else HomeMode.SIMPLE
+            mode = if (tunnelVisionEnabled) HomeMode.FOCUSED else HomeMode.SIMPLE,
+            hideCompletedTasks = shouldHideCompletedTasks
         )
+
     }
 
     private fun loadInitialData() {
@@ -142,12 +141,6 @@ class HomeViewModel @Inject constructor(
                 updateModeFromSettings()
             }
 
-            is HomeEvent.ToggleHideCompletedTasks -> {
-                _state.value = _state.value.copy(
-                    hideCompletedTasks = !_state.value.hideCompletedTasks
-                )
-            }
-
             is HomeEvent.StartEditingCategory -> {
                 val category = _state.value.focusCategories.find { it.id == event.categoryId }
                 _state.value = _state.value.copy(
@@ -213,8 +206,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             taskRepositoryImpl.getAllTasks().collect { tasks ->
                 val filteredTasks = filterTasksForStats(tasks)
-                _state.value = _state.value.copy(tasks = tasks)
+                _state.value = _state.value.copy(allTasks = tasks)
                 updateTaskStats(filteredTasks)
+            }
+        }
+        viewModelScope.launch {
+            taskRepositoryImpl.getAllRecurringTasks().collect { tasks ->
+                Log.d("HomeViewModel", "Observed recurring tasks: $tasks")
+                _state.value = _state.value.copy(recurringTasks = tasks)
             }
         }
     }

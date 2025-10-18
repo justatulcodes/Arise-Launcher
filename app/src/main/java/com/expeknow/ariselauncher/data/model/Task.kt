@@ -46,7 +46,7 @@ data class Task(
     val isCompleted: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
     val completedAt: Long? = null,
-    val isRepeated : Boolean = false,
+    val isRepeated : Boolean,
     val repeatDays: List<DaysOfWeek> = emptyList()
 )
 

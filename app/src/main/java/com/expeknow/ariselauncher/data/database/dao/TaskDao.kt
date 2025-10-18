@@ -50,4 +50,7 @@ interface TaskDao {
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1")
     fun getCompletedTaskCount(): Flow<Int>
 
+    @Query("SELECT * FROM tasks WHERE isRepeated = 1")
+    fun getAllRecurringTasks(): Flow<List<Task>>
+
 }

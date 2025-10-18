@@ -19,4 +19,5 @@ interface TaskDataSource {
     suspend fun markTaskAsIncomplete(taskId: String)
     fun getActiveTaskCount(): Flow<Int>
     fun getCompletedTaskCount(): Flow<Int>
+    suspend fun getAllRecurringTasks(): Flow<List<Task>>
 }
