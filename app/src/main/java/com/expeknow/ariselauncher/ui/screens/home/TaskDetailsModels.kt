@@ -17,7 +17,10 @@ data class TaskDetailsState(
     val newLinkTitle: String = "",
     val newLinkUrl: String = "",
     val newLinkType: TaskLinkType = TaskLinkType.LINK,
-    val newLinkDescription: String = ""
+    val newLinkDescription: String = "",
+    val isEditingRecurrence: Boolean = false,
+    val editingIsRepeated: Boolean = false,
+    val editingRepeatDays: List<com.expeknow.ariselauncher.data.model.DaysOfWeek> = emptyList()
 )
 
 sealed class TaskDetailsEvent {
@@ -47,6 +50,12 @@ sealed class TaskDetailsEvent {
     data class UpdateNewLinkType(val type: TaskLinkType) : TaskDetailsEvent()
     data object SaveNewLink : TaskDetailsEvent()
     data class RemoveLink(val linkId: String) : TaskDetailsEvent()
+
+    // Recurrence management events
+    data object StartEditingRecurrence : TaskDetailsEvent()
+    data class ToggleRepeatDay(val day: com.expeknow.ariselauncher.data.model.DaysOfWeek) : TaskDetailsEvent()
+    data class UpdateIsRepeated(val isRepeated: Boolean) : TaskDetailsEvent()
+    data object SaveRecurrence : TaskDetailsEvent()
 }
 
 data class TaskDetailsTheme(
