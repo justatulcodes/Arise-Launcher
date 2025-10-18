@@ -1,9 +1,7 @@
 package com.expeknow.ariselauncher.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalWindowInfo
 import com.expeknow.ariselauncher.ui.theme.*
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
@@ -22,11 +19,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -48,7 +40,6 @@ fun TaskDialog(
     var description by remember { mutableStateOf("") }
     var pointsValue by remember { mutableStateOf(10f) }
     var selectedCategory by remember { mutableStateOf(initialCategory) }
-    var showCategoryDropdown by remember { mutableStateOf(false) }
     var isRepeated by remember { mutableStateOf(false) }
     var repeatDays by remember { mutableStateOf<List<DaysOfWeek>>(emptyList()) }
 
@@ -140,51 +131,14 @@ fun TaskDialog(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text("Category", style = labelTextStyle)
                     Spacer(Modifier.height(2.dp))
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(40.dp)
-                                .clickable { showCategoryDropdown = true }
-                                .border(
-                                    width = 1.dp,
-                                    color = Color.White.copy(alpha = 0.2f),
-                                    shape = RoundedCornerShape(4.dp)
-                                )
-                                .padding(horizontal = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = getCategoryName(selectedCategory),
-                                color = Color.White,
-                                style = inputTextStyle,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Icon(
-                                Icons.Default.ArrowDropDown,
-                                contentDescription = "Select Category",
-                                tint = Color.White
-                            )
-                        }
 
-                        DropdownMenu(
-                            expanded = showCategoryDropdown,
-                            onDismissRequest = { showCategoryDropdown = false },
-                            modifier = Modifier
-                                .background(Color(0xFF1A1A1A))
-                                .width(300.dp)
-                        ) {
-                            availableCategories.forEach { category ->
-                                DropdownMenuItem(
-                                    text = { Text(getCategoryName(category), color = Color.White, fontSize = 14.sp) },
-                                    onClick = {
-                                        selectedCategory = category
-                                        showCategoryDropdown = false
-                                    }
-                                )
-                            }
+                    CategorySelectionChips(
+                        availableCategories = availableCategories,
+                        selectedCategory = selectedCategory,
+                        onCategorySelected = { category ->
+                            selectedCategory = category
                         }
-                    }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -354,6 +308,64 @@ private fun DayChip(
             style = TextStyle(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
+            )
+        )
+    }
+}
+
+@Composable
+private fun CategorySelectionChips(
+    availableCategories: List<TaskCategory>,
+    selectedCategory: TaskCategory,
+    onCategorySelected: (TaskCategory) -> Unit
+) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        availableCategories.forEach { category ->
+            val isSelected = category == selectedCategory
+            CategoryChip(
+                category = category,
+                isSelected = isSelected,
+                onSelected = onCategorySelected
+            )
+        }
+    }
+
+}
+
+@Composable
+private fun CategoryChip(
+    category: TaskCategory,
+    isSelected: Boolean,
+    onSelected: (TaskCategory) -> Unit
+) {
+    val categoryName = getCategoryName(category)
+
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(vertical = 4.dp)
+            .clickable { onSelected(category) }
+            .border(
+                width = 1.dp,
+                brush = SolidColor(if (isSelected) AccentGreen else Color.White.copy(alpha = 0.3f)),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .background(
+                color = if (isSelected) AccentGreen else Color.Transparent,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = categoryName,
+            color = if (isSelected) Color.Black else Color.White,
+            style = TextStyle(
+                fontSize = 14.sp,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
             )
         )
     }
