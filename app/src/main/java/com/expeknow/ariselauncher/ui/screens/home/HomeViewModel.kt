@@ -14,6 +14,7 @@ import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import com.expeknow.ariselauncher.ui.screens.home.Utils.getDayOfWeekFromTimeStampInMillis
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayEndTime
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayStartTime
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodaysDayOfWeek
@@ -206,6 +207,8 @@ class HomeViewModel @Inject constructor(
     private fun observeTasks() {
         viewModelScope.launch {
             taskRepositoryImpl.getAllTasks().collect { tasks ->
+                resetCompletedRecurringTasks(tasks)
+
                 val filteredTasks = filterTasksForStats(tasks)
                 _state.value = _state.value.copy(allTasks = tasks)
                 updateTaskStats(filteredTasks)
@@ -213,19 +216,36 @@ class HomeViewModel @Inject constructor(
         }
         viewModelScope.launch {
             taskRepositoryImpl.getAllRecurringTasks().collect { tasks ->
+                resetCompletedRecurringTasks(tasks)
+
                 val tasksForToday = getTasksRecurringToday(tasks)
                 _state.value = _state.value.copy(recurringTasks = tasksForToday)
             }
         }
     }
 
-    private fun getTasksRecurringToday(tasks: List<Task>): List<Task> {
-        val filteredTasks = tasks.filter { task ->
-            val dayOfWeek = getTodaysDayOfWeek()
-            task.isRepeated && task.repeatDays.contains(dayOfWeek)
+    private suspend fun resetCompletedRecurringTasks(tasks: List<Task>) {
+        val currentDayOfWeek = getTodaysDayOfWeek()
+
+        val tasksToReset = tasks.filter { task ->
+            task.isRepeated &&
+            task.isCompleted &&
+            task.completedAt != null &&
+            getDayOfWeekFromTimeStampInMillis(task.completedAt) != currentDayOfWeek
         }
 
-        return filteredTasks
+        tasksToReset.forEach { task ->
+            taskRepositoryImpl.updateTask(
+                task.copy(isCompleted = false, completedAt = null)
+            )
+        }
+    }
+
+    private fun getTasksRecurringToday(tasks: List<Task>): List<Task> {
+        val currentDayOfWeek = getTodaysDayOfWeek()
+        return tasks.filter { task ->
+            task.isRepeated && task.repeatDays.contains(currentDayOfWeek)
+        }
     }
 
     private fun filterTasksForStats(tasks: List<Task>): List<Task> {
