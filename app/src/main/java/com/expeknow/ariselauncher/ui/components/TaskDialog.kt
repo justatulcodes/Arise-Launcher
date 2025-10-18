@@ -19,9 +19,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
@@ -42,7 +48,7 @@ fun TaskDialog(
     var selectedCategory by remember { mutableStateOf(initialCategory) }
     var isRepeated by remember { mutableStateOf(false) }
     var repeatDays by remember { mutableStateOf<List<DaysOfWeek>>(emptyList()) }
-
+    val focusManager = LocalFocusManager.current
     val points = pointsValue.roundToInt()
     val windowInfo = LocalWindowInfo.current
     val focusRequester = remember { FocusRequester() }
@@ -102,8 +108,15 @@ fun TaskDialog(
                         cursorColor = Color.White,
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                    ),
                     )
-                )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
@@ -124,7 +137,11 @@ fun TaskDialog(
                         cursorColor = Color.White,
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent
-                    )
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusRequester.freeFocus() }
+                    ),
                 )
 
                 if (showCategorySelector) {

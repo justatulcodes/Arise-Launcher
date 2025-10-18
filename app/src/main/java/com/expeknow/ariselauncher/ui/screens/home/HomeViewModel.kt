@@ -16,6 +16,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayEndTime
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayStartTime
+import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodaysDayOfWeek
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 
@@ -212,10 +213,19 @@ class HomeViewModel @Inject constructor(
         }
         viewModelScope.launch {
             taskRepositoryImpl.getAllRecurringTasks().collect { tasks ->
-                Log.d("HomeViewModel", "Observed recurring tasks: $tasks")
-                _state.value = _state.value.copy(recurringTasks = tasks)
+                val tasksForToday = getTasksRecurringToday(tasks)
+                _state.value = _state.value.copy(recurringTasks = tasksForToday)
             }
         }
+    }
+
+    private fun getTasksRecurringToday(tasks: List<Task>): List<Task> {
+        val filteredTasks = tasks.filter { task ->
+            val dayOfWeek = getTodaysDayOfWeek()
+            task.isRepeated && task.repeatDays.contains(dayOfWeek)
+        }
+
+        return filteredTasks
     }
 
     private fun filterTasksForStats(tasks: List<Task>): List<Task> {
