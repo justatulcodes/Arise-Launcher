@@ -1,6 +1,6 @@
 package com.expeknow.ariselauncher.data.datasource
 
-import com.expeknow.ariselauncher.data.database.TaskDao
+import com.expeknow.ariselauncher.data.database.dao.TaskDao
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
@@ -33,4 +33,5 @@ class OfflineTaskDataSource(
 
     override fun getActiveTaskCount(): Flow<Int> = taskDao.getActiveTaskCount()
     override fun getCompletedTaskCount(): Flow<Int> = taskDao.getCompletedTaskCount()
+    override suspend fun getAllRecurringTasks(): Flow<List<Task>> = taskDao.getAllRecurringTasks()
 }

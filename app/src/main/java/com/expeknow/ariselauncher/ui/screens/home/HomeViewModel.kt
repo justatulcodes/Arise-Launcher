@@ -7,26 +7,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
-import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import com.expeknow.ariselauncher.ui.screens.home.Utils.getDayOfWeekFromTimeStampInMillis
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayEndTime
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayStartTime
+import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodaysDayOfWeek
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val appRepositoryImpl: AppRepository,
     private val taskRepositoryImpl: TaskRepository,
-    private val pointsLogRepositoryImpl: PointsLogRepository
+    private val pointsLogRepositoryImpl: PointsLogRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -35,6 +35,16 @@ class HomeViewModel @Inject constructor(
     init {
         loadInitialData()
         observePoints()
+        updateModeFromSettings()
+    }
+
+    private fun updateModeFromSettings() {
+        val tunnelVisionEnabled = settingsRepository.getTunnelVisionMode()
+        val shouldHideCompletedTasks = settingsRepository.getHideCompletedTasks()
+        _state.value = _state.value.copy(
+            mode = if (tunnelVisionEnabled) HomeMode.FOCUSED else HomeMode.SIMPLE,
+            hideCompletedTasks = shouldHideCompletedTasks
+        )
 
     }
 
@@ -101,7 +111,9 @@ class HomeViewModel @Inject constructor(
                         title = event.title,
                         description = event.description,
                         points = event.points,
-                        category = event.category
+                        category = event.category,
+                        isRepeated = event.isRepeated,
+                        repeatDays = event.repeatDays
                     )
                     _state.value = _state.value.copy(showAddTaskDialog = false)
                 }
@@ -124,15 +136,11 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.ToggleMode -> {
-                val newMode =
-                    if (_state.value.mode == HomeMode.SIMPLE) HomeMode.FOCUSED else HomeMode.SIMPLE
-                _state.value = _state.value.copy(mode = newMode)
-            }
-
-            is HomeEvent.ToggleHideCompletedTasks -> {
-                _state.value = _state.value.copy(
-                    hideCompletedTasks = !_state.value.hideCompletedTasks
-                )
+                // This is no longer needed as mode is controlled by settings
+                // But we'll keep it for backward compatibility
+                val tunnelVisionEnabled = !settingsRepository.getTunnelVisionMode()
+                settingsRepository.setTunnelVisionMode(tunnelVisionEnabled)
+                updateModeFromSettings()
             }
 
             is HomeEvent.StartEditingCategory -> {
@@ -199,10 +207,44 @@ class HomeViewModel @Inject constructor(
     private fun observeTasks() {
         viewModelScope.launch {
             taskRepositoryImpl.getAllTasks().collect { tasks ->
+                resetCompletedRecurringTasks(tasks)
+
                 val filteredTasks = filterTasksForStats(tasks)
-                _state.value = _state.value.copy(tasks = tasks)
+                _state.value = _state.value.copy(allTasks = tasks)
                 updateTaskStats(filteredTasks)
             }
+        }
+        viewModelScope.launch {
+            taskRepositoryImpl.getAllRecurringTasks().collect { tasks ->
+                resetCompletedRecurringTasks(tasks)
+
+                val tasksForToday = getTasksRecurringToday(tasks)
+                _state.value = _state.value.copy(recurringTasks = tasksForToday)
+            }
+        }
+    }
+
+    private suspend fun resetCompletedRecurringTasks(tasks: List<Task>) {
+        val currentDayOfWeek = getTodaysDayOfWeek()
+
+        val tasksToReset = tasks.filter { task ->
+            task.isRepeated &&
+            task.isCompleted &&
+            task.completedAt != null &&
+            getDayOfWeekFromTimeStampInMillis(task.completedAt) != currentDayOfWeek
+        }
+
+        tasksToReset.forEach { task ->
+            taskRepositoryImpl.updateTask(
+                task.copy(isCompleted = false, completedAt = null)
+            )
+        }
+    }
+
+    private fun getTasksRecurringToday(tasks: List<Task>): List<Task> {
+        val currentDayOfWeek = getTodaysDayOfWeek()
+        return tasks.filter { task ->
+            task.isRepeated && task.repeatDays.contains(currentDayOfWeek)
         }
     }
 

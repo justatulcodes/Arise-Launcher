@@ -244,7 +244,8 @@ fun TaskHistoryScreenPreview() {
                     title = "Presentation Template",
                     type = TaskLinkType.LINK
                 )
-            )
+            ),
+            isRepeated = false
         ),
         Task(
             id = "2",
@@ -253,7 +254,8 @@ fun TaskHistoryScreenPreview() {
             points = 20,
             category = TaskCategory.PHYSICAL,
             isCompleted = true,
-            completedAt = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000
+            completedAt = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000,
+            isRepeated = false
         ),
         Task(
             id = "3",
@@ -262,7 +264,8 @@ fun TaskHistoryScreenPreview() {
             points = 30,
             category = TaskCategory.INTELLIGENCE,
             isCompleted = true,
-            completedAt = System.currentTimeMillis()
+            completedAt = System.currentTimeMillis(),
+            isRepeated = false
         )
     )
 

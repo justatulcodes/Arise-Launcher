@@ -38,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextDecoration.Companion.LineThrough
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -609,7 +610,7 @@ fun FocusedTaskList(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(categories) { category ->
             val categoryTasks = tasks.filter { it.category == category.id }
@@ -626,6 +627,9 @@ fun FocusedTaskList(
                 onEditingNameChange = onEditingNameChange,
                 theme = theme
             )
+        }
+        item {
+            Spacer(Modifier.height(6.dp))
         }
     }
 }
@@ -684,11 +688,14 @@ private fun FocusedCategorySection(
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color.White.copy(alpha = 0.2f),
                             unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-                            cursorColor = Color.White
+                            cursorColor = Color.White,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent
                         ),
+                        singleLine = true,
                         modifier = Modifier
                             .weight(1f)
-                            .height(40.dp)
+                            .height(56.dp) // Increased height from 40dp to 56dp
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = onSaveEdit) {
@@ -779,13 +786,21 @@ private fun FocusedTaskItem(
     ) {
         Checkbox(
             checked = task.isCompleted,
-            onCheckedChange = { onToggleTask(task) },
             colors = CheckboxDefaults.colors(
                 checkedColor = categoryColor,
                 uncheckedColor = Color.White.copy(alpha = 0.4f),
                 checkmarkColor = Color.Black
             ),
+            onCheckedChange = null,
             modifier = Modifier.size(16.dp)
+                    .size(20.dp)
+                    .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            onToggleTask(task)
+                        }
+                    )
+                }
         )
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -799,7 +814,7 @@ private fun FocusedTaskItem(
                 task.title,
                 color = if (task.isCompleted) Color.White.copy(alpha = 0.5f) else Color.White,
                 style = MaterialTheme.typography.bodySmall,
-                textDecoration = if (task.isCompleted) androidx.compose.ui.text.style.TextDecoration.LineThrough else null,
+                textDecoration = if (task.isCompleted) LineThrough else null,
                 modifier = Modifier.weight(1f)
             )
             Text(

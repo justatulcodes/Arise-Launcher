@@ -45,7 +45,9 @@ data class Task(
     val relatedLinks: List<TaskLink> = emptyList(),
     val isCompleted: Boolean = false,
     val createdAt: Long = System.currentTimeMillis(),
-    val completedAt: Long? = null
+    val completedAt: Long? = null,
+    val isRepeated : Boolean,
+    val repeatDays: List<DaysOfWeek> = emptyList()
 )
 
 @Entity(tableName = "points_log")
@@ -58,21 +60,10 @@ data class PointsLog(
     val points: Int,
     val timestamp: Long = System.currentTimeMillis()
 )
+enum class DaysOfWeek {
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+}
 
 enum class PointsLogType {
     EARNED, SPENT
-}
-
-
-class TaskConverters {
-    @TypeConverter
-    fun fromTaskLinkList(value: List<TaskLink>): String {
-        return Gson().toJson(value)
-    }
-
-    @TypeConverter
-    fun toTaskLinkList(value: String): List<TaskLink> {
-        val listType = object : TypeToken<List<TaskLink>>() {}.type
-        return Gson().fromJson(value, listType)
-    }
 }

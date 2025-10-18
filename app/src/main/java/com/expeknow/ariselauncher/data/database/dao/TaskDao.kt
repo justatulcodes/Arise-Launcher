@@ -1,4 +1,4 @@
-package com.expeknow.ariselauncher.data.database
+package com.expeknow.ariselauncher.data.database.dao
 
 import androidx.room.*
 import com.expeknow.ariselauncher.data.model.Task
@@ -49,5 +49,8 @@ interface TaskDao {
 
     @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1")
     fun getCompletedTaskCount(): Flow<Int>
+
+    @Query("SELECT * FROM tasks WHERE isRepeated = 1")
+    fun getAllRecurringTasks(): Flow<List<Task>>
 
 }
