@@ -33,20 +33,6 @@ import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
 import android.content.Intent
 import android.util.Log
 
-private fun startTimerForApp(context: Context, packageName: String, appName: String) {
-    try {
-        val intent = Intent(context, AppUsageTimerService::class.java).apply {
-            action = AppUsageTimerService.ACTION_START_TRACKING
-            putExtra(AppUsageTimerService.EXTRA_APP_PACKAGE, packageName)
-            putExtra(AppUsageTimerService.EXTRA_APP_NAME, appName)
-        }
-        context.startService(intent)
-        Log.d(TAG, "Timer service started for $appName")
-    } catch (e: Exception) {
-        Log.e(TAG, "Failed to start timer service", e)
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -66,7 +52,6 @@ fun HomeScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
 
-    // Stop timer when returning to home screen
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
 //            if (event == Lifecycle.Event.ON_RESUME) {
@@ -77,8 +62,6 @@ fun HomeScreen(
 //                }
 //                context.startService(intent)
 //            }
-            startTimerForApp(context, "com.expeknow.ariselauncher", "Arise Launcher")
-
         }
 
         lifecycleOwner.lifecycle.addObserver(observer)
