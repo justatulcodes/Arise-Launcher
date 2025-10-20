@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.expeknow.ariselauncher.ui.navigation.AppNavigation
 import com.expeknow.ariselauncher.ui.theme.AriseLauncherTheme
 import com.expeknow.ariselauncher.utils.PackageChangeReceiver
+import com.expeknow.ariselauncher.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,6 +35,8 @@ class MainActivity : ComponentActivity() {
         registerReceiver(packageReceiver, filter)
         Log.d("PackageReceiver", "Package receiver registered")
 
+        checkAndLogPermissions()
+
         setContent {
             AriseLauncherTheme {
                 Surface(
@@ -45,5 +48,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun checkAndLogPermissions() {
+        val hasOverlay = PermissionHelper.hasOverlayPermission(this)
+        val hasUsageStats = PermissionHelper.hasUsageStatsPermission(this)
+        if(!hasOverlay) {
+            PermissionHelper.requestOverlayPermission(this)
+        }
+        if(!hasUsageStats) {
+            PermissionHelper.requestUsageStatsPermission(this)
+        }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }

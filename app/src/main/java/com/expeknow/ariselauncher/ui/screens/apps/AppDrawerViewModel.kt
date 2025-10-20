@@ -1,5 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.apps
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +15,9 @@ import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
+import com.expeknow.ariselauncher.service.AppUsageTimerService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,7 +25,8 @@ class AppDrawerViewModel @Inject constructor(
     private val taskRepositoryImpl: TaskRepository,
     private val pointsLogRepositoryImpl: PointsLogRepository,
     private val appRepositoryImpl: AppRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppDrawerState())
@@ -106,10 +111,17 @@ class AppDrawerViewModel @Inject constructor(
                             event.app.pointCost,
                             "NIL",
                             "Launched ${event.app.name}",
-
-                            )
+                        )
                     }
                 }
+
+                // Check if this app should show a timer
+                val monitoredAppName = MONITORED_APPS[event.app.packageName]
+                if (monitoredAppName != null) {
+                    Log.d(TAG, "Launching monitored app: $monitoredAppName")
+                    startTimerForApp(event.app.packageName, monitoredAppName)
+                }
+
                 appRepositoryImpl.launchApp(event.app.packageName)
             }
 
@@ -147,6 +159,29 @@ class AppDrawerViewModel @Inject constructor(
                 startCountdown()
             }
         }
+    }
+
+    private fun startTimerForApp(packageName: String, appName: String) {
+        try {
+            val intent = Intent(context, AppUsageTimerService::class.java).apply {
+                action = AppUsageTimerService.ACTION_START_TRACKING
+                putExtra(AppUsageTimerService.EXTRA_APP_PACKAGE, packageName)
+                putExtra(AppUsageTimerService.EXTRA_APP_NAME, appName)
+            }
+            context.startService(intent)
+            Log.d(TAG, "Timer service started for $appName")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start timer service", e)
+        }
+    }
+
+    companion object {
+        private const val TAG = "AppDrawerViewModel"
+        // Apps to monitor with timer
+        private val MONITORED_APPS = mapOf(
+            "com.instagram.android" to "Instagram",
+            "com.expeknow.ariselauncher" to "Arise Launcher"
+        )
     }
 
     fun getCategorizedApps(): Map<AppCategory, List<AppDrawerApp>> {

@@ -1,5 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
+import android.content.ContentValues.TAG
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,16 +16,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.TaskCategory
+import com.expeknow.ariselauncher.service.AppUsageTimerService
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
+import android.content.Intent
+import android.util.Log
+
+private fun startTimerForApp(context: Context, packageName: String, appName: String) {
+    try {
+        val intent = Intent(context, AppUsageTimerService::class.java).apply {
+            action = AppUsageTimerService.ACTION_START_TRACKING
+            putExtra(AppUsageTimerService.EXTRA_APP_PACKAGE, packageName)
+            putExtra(AppUsageTimerService.EXTRA_APP_NAME, appName)
+        }
+        context.startService(intent)
+        Log.d(TAG, "Timer service started for $appName")
+    } catch (e: Exception) {
+        Log.e(TAG, "Failed to start timer service", e)
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +63,30 @@ fun HomeScreen(
     )
     var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+
+    // Stop timer when returning to home screen
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+//            if (event == Lifecycle.Event.ON_RESUME) {
+//                Log.d("HomeScreen", "Home screen resumed - stopping timer")
+//                // Stop the timer service
+//                val intent = Intent(context, AppUsageTimerService::class.java).apply {
+//                    action = AppUsageTimerService.ACTION_STOP_TRACKING
+//                }
+//                context.startService(intent)
+//            }
+            startTimerForApp(context, "com.expeknow.ariselauncher", "Arise Launcher")
+
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     BackHandler {
         // do nothing to disable back navigation
