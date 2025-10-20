@@ -1,5 +1,7 @@
 package com.expeknow.ariselauncher
 
+import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
@@ -12,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.expeknow.ariselauncher.service.AppUsageTimerService
 import com.expeknow.ariselauncher.ui.navigation.AppNavigation
 import com.expeknow.ariselauncher.ui.theme.AriseLauncherTheme
 import com.expeknow.ariselauncher.utils.PackageChangeReceiver
@@ -62,7 +65,41 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    private fun startTimerForApp(context: Context, packageName: String, appName: String) {
+        try {
+            val intent = Intent(context, AppUsageTimerService::class.java).apply {
+                action = AppUsageTimerService.ACTION_START_TRACKING
+                putExtra(AppUsageTimerService.EXTRA_APP_PACKAGE, packageName)
+                putExtra(AppUsageTimerService.EXTRA_APP_NAME, appName)
+            }
+            context.startService(intent)
+            Log.d(TAG, "Timer service started for $appName")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start timer service", e)
+        }
     }
+
+    private fun stopTimerForApp(context: Context, packageName: String) {
+        try {
+            val intent = Intent(context, AppUsageTimerService::class.java).apply {
+                action = AppUsageTimerService.ACTION_STOP_TRACKING
+                putExtra(AppUsageTimerService.EXTRA_APP_PACKAGE, packageName)
+            }
+            context.startService(intent)
+        }
+        catch (e: Exception) {
+            Log.e(TAG, "Failed to stop timer service", e)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        startTimerForApp(this, packageName, "Arise Launcher")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        stopTimerForApp(this, packageName)
+    }
+
 }
