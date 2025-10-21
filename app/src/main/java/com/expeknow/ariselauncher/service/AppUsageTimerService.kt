@@ -27,6 +27,8 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.ui.screens.timer.DynamicIslandTimer
 import com.expeknow.ariselauncher.ui.theme.AriseLauncherTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,17 +38,21 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
-class AppUsageTimerService : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
+class AppUsageTimerService
+    : Service(), LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
 
+    @Inject
+    lateinit var pointsLogRepositoryImpl: PointsLogRepository
     private var windowManager: WindowManager? = null
     private var overlayView: ComposeView? = null
     private var layoutParams: WindowManager.LayoutParams? = null
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
     private var timerJob: Job? = null
     private var currentAppName: String = ""
-
+    private var currentAppPackage : String = ""
     private var isVisible by mutableStateOf(false)
     private var elapsedSeconds by mutableStateOf(0)
     private var pointsLost by mutableStateOf(0)
@@ -89,6 +95,7 @@ class AppUsageTimerService : Service(), LifecycleOwner, ViewModelStoreOwner, Sav
         when (intent?.action) {
             ACTION_START_TRACKING -> {
                 val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: "App"
+                currentAppPackage = intent.getStringExtra(EXTRA_APP_PACKAGE) ?: "com.expeknow.ariselauncher"
                 startTracking(appName)
             }
             ACTION_STOP_TRACKING -> {
@@ -211,6 +218,7 @@ class AppUsageTimerService : Service(), LifecycleOwner, ViewModelStoreOwner, Sav
                 elapsedSeconds++
                 if (elapsedSeconds % POINT_DEPLETION_INTERVAL_SECONDS == 0) {
                     pointsLost++
+                    pointsLogRepositoryImpl.spendPoints(1, currentAppPackage, currentAppName)
                 }
             }
         }
