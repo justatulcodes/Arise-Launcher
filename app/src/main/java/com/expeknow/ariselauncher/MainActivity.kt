@@ -1,6 +1,7 @@
 package com.expeknow.ariselauncher
 
-import android.content.ContentValues.TAG
+import android.app.usage.UsageEvents
+import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -24,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val packageReceiver = PackageChangeReceiver()
+    private val TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +67,34 @@ class MainActivity : ComponentActivity() {
 
     }
 
+    private fun getForegroundAppInfo(context: Context): Pair<String, String>? {
+        val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        val time = System.currentTimeMillis()
+        val usageEvents = usageStatsManager.queryEvents(time - 2000, time)
+        var lastEvent: UsageEvents.Event? = null
+
+        while (usageEvents.hasNextEvent()) {
+            val event = UsageEvents.Event()
+            usageEvents.getNextEvent(event)
+            if (event.eventType == UsageEvents.Event.MOVE_TO_FOREGROUND) {
+                lastEvent = event
+            }
+        }
+
+        lastEvent?.let { event ->
+            val packageName = event.packageName
+            val appName = try {
+                val appInfo = context.packageManager.getApplicationInfo(packageName, 0)
+                context.packageManager.getApplicationLabel(appInfo).toString()
+            } catch (e: Exception) {
+                packageName // fallback
+            }
+            return packageName to appName
+        }
+        return null
+    }
+
+
     private fun startTimerForApp(context: Context, packageName: String, appName: String) {
         try {
             val intent = Intent(context, AppUsageTimerService::class.java).apply {
@@ -94,7 +124,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        startTimerForApp(this, packageName, "Arise Launcher")
+        val (packageName, appName) = getForegroundAppInfo(this)
+            ?: return
+        startTimerForApp(this, packageName, appName)
     }
 
     override fun onStart() {
