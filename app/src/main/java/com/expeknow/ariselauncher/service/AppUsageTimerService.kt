@@ -21,16 +21,20 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.ui.screens.timer.DynamicIslandTimer
 import com.expeknow.ariselauncher.ui.theme.AriseLauncherTheme
+import com.expeknow.ariselauncher.utils.AppClassifier
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +50,9 @@ class AppUsageTimerService
 
     @Inject
     lateinit var pointsLogRepositoryImpl: PointsLogRepository
+
+    @Inject
+    lateinit var appInfoRepositoryImpl: AppRepository
     private var windowManager: WindowManager? = null
     private var overlayView: ComposeView? = null
     private var layoutParams: WindowManager.LayoutParams? = null
@@ -77,7 +84,7 @@ class AppUsageTimerService
         const val EXTRA_APP_NAME = "app_name"
 
         // Point depletion rate: 1 point every 10 seconds
-        private const val POINT_DEPLETION_INTERVAL_SECONDS = 10
+        private var POINT_DEPLETION_INTERVAL_SECONDS = 10
     }
 
     override fun onCreate() {
@@ -96,7 +103,10 @@ class AppUsageTimerService
             ACTION_START_TRACKING -> {
                 val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: "App"
                 currentAppPackage = intent.getStringExtra(EXTRA_APP_PACKAGE) ?: "com.expeknow.ariselauncher"
-                startTracking(appName)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    setPointDepletionRate(currentAppPackage)
+                    startTracking(appName)
+                }
             }
             ACTION_STOP_TRACKING -> {
                 stopTracking()
@@ -104,6 +114,28 @@ class AppUsageTimerService
         }
         return START_STICKY
     }
+
+    private fun setPointDepletionRate(currentAppPackage: String) {
+        val appCategoryString = appInfoRepositoryImpl.getAppCategory(packageName)
+        val appCategory = AppClassifier.mapCategoryToAppCategory(appCategoryString)
+        val appPointCost = AppClassifier.getAppPointCost(appCategory)
+        val depletionIntervalSeconds = calculateDepletionInterval(appPointCost)
+        Log.d(TAG, "App: $currentAppPackage | Category: $appCategory | Cost: $appPointCost | Interval: $depletionIntervalSeconds s")
+        POINT_DEPLETION_INTERVAL_SECONDS = depletionIntervalSeconds
+
+    }
+    private fun calculateDepletionInterval(pointCost: Int): Int {
+        return when {
+            pointCost == 0 -> Int.MAX_VALUE // effectively no depletion
+            pointCost <= 5 -> 30 // slower depletion
+            pointCost <= 10 -> 20
+            pointCost <= 20 -> 10
+            pointCost <= 25 -> 7
+            pointCost <= 30 -> 5
+            else -> 3 // fastest depletion for most addictive apps
+        }
+    }
+
 
     private fun startTracking(appName: String) {
         val hasPermission = Settings.canDrawOverlays(this)

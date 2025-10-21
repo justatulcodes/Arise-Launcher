@@ -15,6 +15,9 @@ interface AppInfoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAppInfo(appInfo: AppInfo)
 
+    @Query("SELECT category FROM app_info WHERE packageName = :packageName")
+    fun getAppCategory(packageName: String): String
+
     @Query("DELETE FROM app_info WHERE packageName = :packageName")
     fun deleteAppInfo(packageName: String)
 

@@ -25,4 +25,6 @@ class AppInfoDataSource(
 
     fun deleteAllAppInfo() = appInfoDao.deleteAllAppInfo()
 
+    fun getAppCategory(packageName: String) = appInfoDao.getAppCategory(packageName)
+
 }
