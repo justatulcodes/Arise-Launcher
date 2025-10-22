@@ -7,18 +7,20 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
+import com.expeknow.ariselauncher.data.database.dao.DriveItemDao
 import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
 import com.expeknow.ariselauncher.data.database.dao.TaskDao
 import com.expeknow.ariselauncher.data.database.dao.TaskLinkDao
 import com.expeknow.ariselauncher.data.model.AppInfo
+import com.expeknow.ariselauncher.data.model.DriveItem
 import com.expeknow.ariselauncher.data.model.PointsLog
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskConverters
 import com.expeknow.ariselauncher.data.model.TaskLink
 
 @Database(
-    entities = [Task::class, TaskLink::class, PointsLog::class, AppInfo::class],
-    version = 1,
+    entities = [Task::class, TaskLink::class, PointsLog::class, AppInfo::class, DriveItem::class],
+    version = 2,
     exportSchema = true
 )
 @TypeConverters(TaskConverters::class)
@@ -28,6 +30,7 @@ abstract class AriseLauncherDatabase : RoomDatabase() {
     abstract fun taskLinkDao(): TaskLinkDao
     abstract fun pointsLogDao(): PointsLogDao
     abstract fun appInfoDao(): AppInfoDao
+    abstract fun driveItemDao(): DriveItemDao
 
     companion object {
         @Volatile
