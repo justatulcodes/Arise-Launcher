@@ -42,6 +42,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -103,9 +104,15 @@ class AppUsageTimerService
             ACTION_START_TRACKING -> {
                 val appName = intent.getStringExtra(EXTRA_APP_NAME) ?: "App"
                 currentAppPackage = intent.getStringExtra(EXTRA_APP_PACKAGE) ?: "com.expeknow.ariselauncher"
-                lifecycleScope.launch(Dispatchers.IO) {
-                    setPointDepletionRate(currentAppPackage)
-                    startTracking(appName)
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        setPointDepletionRate(currentAppPackage)
+                    }
+                    if(POINT_DEPLETION_INTERVAL_SECONDS != Int.MAX_VALUE){
+                        startTracking(appName)
+                    } else {
+                        Log.d(TAG, "App $currentAppPackage has no point cost. Timer will not start.")
+                    }
                 }
             }
             ACTION_STOP_TRACKING -> {
@@ -116,7 +123,7 @@ class AppUsageTimerService
     }
 
     private fun setPointDepletionRate(currentAppPackage: String) {
-        val appCategoryString = appInfoRepositoryImpl.getAppCategory(packageName)
+        val appCategoryString = appInfoRepositoryImpl.getAppCategory(currentAppPackage)
         val appCategory = AppClassifier.mapCategoryToAppCategory(appCategoryString)
         val appPointCost = AppClassifier.getAppPointCost(appCategory)
         val depletionIntervalSeconds = calculateDepletionInterval(appPointCost)
@@ -250,7 +257,10 @@ class AppUsageTimerService
                 elapsedSeconds++
                 if (elapsedSeconds % POINT_DEPLETION_INTERVAL_SECONDS == 0) {
                     pointsLost++
-                    pointsLogRepositoryImpl.spendPoints(1, currentAppPackage, currentAppName)
+                    pointsLogRepositoryImpl.spendPoints(
+                        amount = 1,
+                        taskId = currentAppPackage,
+                        taskName = "Used ${currentAppName}")
                 }
             }
         }
