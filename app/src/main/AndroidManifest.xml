@@ -44,13 +44,6 @@
             </intent-filter>
         </activity>
 
-        <!-- App Monitor Service - Detects when monitored apps are opened -->
-        <service
-            android:name=".service.AppMonitorService"
-            android:enabled="true"
-            android:exported="false" />
-
-        <!-- App Usage Timer Service - Shows the dynamic island timer overlay -->
         <service
             android:name=".service.AppUsageTimerService"
             android:enabled="true"
