@@ -129,12 +129,18 @@ class AppUsageTimerService
     }
 
     private fun setPointDepletionRate(currentAppPackage: String) {
-        val appCategoryString = appInfoRepositoryImpl.getAppCategory(currentAppPackage)
-        val appCategory = AppClassifier.mapCategoryToAppCategory(appCategoryString)
-        val appPointCost = AppClassifier.getAppPointCost(appCategory)
-        val depletionIntervalSeconds = calculateDepletionInterval(appPointCost)
-        Log.d(TAG, "App: $currentAppPackage | Category: $appCategory | Cost: $appPointCost | Interval: $depletionIntervalSeconds s")
-        POINT_DEPLETION_INTERVAL_SECONDS = depletionIntervalSeconds
+        try {
+            val appCategoryString = appInfoRepositoryImpl.getAppCategory(currentAppPackage)
+            val appCategory = AppClassifier.mapCategoryToAppCategory(appCategoryString)
+            val appPointCost = AppClassifier.getAppPointCost(appCategory)
+            val depletionIntervalSeconds = calculateDepletionInterval(appPointCost)
+            Log.d(TAG, "App: $currentAppPackage | Category: $appCategory | Cost: $appPointCost | Interval: $depletionIntervalSeconds s")
+            POINT_DEPLETION_INTERVAL_SECONDS = depletionIntervalSeconds
+        } catch (e : IllegalStateException) {
+            // this block is triggered when arise launcher's package name is passed in getAppCategory
+            Log.e(TAG, "App: $currentAppPackage caused exception: ${e.message}")
+        }
+
 
     }
     private fun calculateDepletionInterval(pointCost: Int): Int {
