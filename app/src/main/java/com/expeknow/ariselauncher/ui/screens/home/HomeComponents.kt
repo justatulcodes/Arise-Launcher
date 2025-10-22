@@ -88,7 +88,7 @@ fun EnhancedPointsHeader(
                         style = MaterialTheme.typography.displaySmall,
                         color = theme.accent,
                         fontWeight = FontWeight.Black,
-                        fontSize = 48.sp,
+                        fontSize = if ("$currentPoints".length > 5) 36.sp else 48.sp
                     )
                     Text(
                         "CURRENT POINTS",

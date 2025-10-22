@@ -1,5 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.apps
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +15,9 @@ import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
+import com.expeknow.ariselauncher.service.AppUsageTimerService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,7 +25,8 @@ class AppDrawerViewModel @Inject constructor(
     private val taskRepositoryImpl: TaskRepository,
     private val pointsLogRepositoryImpl: PointsLogRepository,
     private val appRepositoryImpl: AppRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AppDrawerState())
@@ -106,8 +111,7 @@ class AppDrawerViewModel @Inject constructor(
                             event.app.pointCost,
                             "NIL",
                             "Launched ${event.app.name}",
-
-                            )
+                        )
                     }
                 }
                 appRepositoryImpl.launchApp(event.app.packageName)

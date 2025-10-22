@@ -14,4 +14,5 @@ interface AppRepository {
 
     fun openDefaultLauncherSettings()
 
+    fun getAppCategory(packageName: String) : String
 }
