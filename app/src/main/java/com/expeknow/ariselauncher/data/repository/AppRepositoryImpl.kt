@@ -134,4 +134,8 @@ class AppRepositoryImpl(
     override fun openDefaultLauncherSettings() {
         LauncherUtils.openDefaultLauncherSettings(context)
     }
+
+    override fun getAppCategory(packageName: String): String {
+        return appInfoDataSource.getAppCategory(packageName)
+    }
 }
