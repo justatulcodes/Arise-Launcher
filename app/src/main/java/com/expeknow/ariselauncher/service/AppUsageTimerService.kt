@@ -6,7 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PixelFormat
+import android.os.Build
 import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
@@ -64,6 +67,8 @@ class AppUsageTimerService
     private var isVisible by mutableStateOf(false)
     private var elapsedSeconds by mutableStateOf(0)
     private var pointsLost by mutableStateOf(0)
+    private var vibrator: Vibrator? = null
+
 
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
@@ -83,6 +88,7 @@ class AppUsageTimerService
         const val ACTION_STOP_TRACKING = "com.expeknow.ariselauncher.STOP_TRACKING"
         const val EXTRA_APP_PACKAGE = "app_package"
         const val EXTRA_APP_NAME = "app_name"
+        private const val VIBRATION_DURATION_MS = 200L
 
         // Point depletion rate: 1 point every 10 seconds
         private var POINT_DEPLETION_INTERVAL_SECONDS = 10
@@ -249,6 +255,20 @@ class AppUsageTimerService
         }
     }
 
+    private fun vibrateDevice() {
+        try {
+            vibrator?.vibrate(
+                VibrationEffect.createOneShot(
+                    VIBRATION_DURATION_MS,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
+            Log.d(TAG, "Vibration triggered at $pointsLost points lost")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error triggering vibration", e)
+        }
+    }
+
     private fun startTimer() {
         timerJob?.cancel()
         timerJob = serviceScope.launch {
@@ -257,6 +277,9 @@ class AppUsageTimerService
                 elapsedSeconds++
                 if (elapsedSeconds % POINT_DEPLETION_INTERVAL_SECONDS == 0) {
                     pointsLost++
+//                    if (pointsLost % 10 == 0) {
+//                        vibrateDevice()
+//                    }
                     pointsLogRepositoryImpl.spendPoints(
                         amount = 1,
                         taskId = currentAppPackage,
