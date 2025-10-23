@@ -43,7 +43,7 @@ abstract class AriseLauncherDatabase : RoomDatabase() {
                     AriseLauncherDatabase::class.java,
                     "arise_launcher_database"
                 )
-                    .fallbackToDestructiveMigration(true)
+                    .fallbackToDestructiveMigration(false)
                     .build()
                 INSTANCE = instance
                 instance
