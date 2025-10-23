@@ -61,7 +61,7 @@ fun EnhancedPointsHeader(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
@@ -454,7 +454,7 @@ fun EnhancedProgressBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 16.dp)
     ) {
         Box(
             modifier = Modifier
@@ -609,8 +609,8 @@ fun FocusedTaskList(
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(categories) { category ->
             val categoryTasks = tasks.filter { it.category == category.id }
@@ -886,7 +886,6 @@ fun TasksCompletedCelebration(
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "celebration")
 
-    // Main pulsing animation for the central icon
     val pulseAnimation by infiniteTransition.animateFloat(
         initialValue = 0.8f,
         targetValue = 1.2f,
@@ -895,16 +894,6 @@ fun TasksCompletedCelebration(
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulse"
-    )
-
-    // Floating icons data with different animations
-    val floatingIcons = listOf(
-        Triple(Icons.Filled.Star, "0ms", Offset(50f, 80f)),
-        Triple(Icons.Filled.WorkspacePremium, "500ms", Offset(300f, 120f)),
-        Triple(Icons.Filled.Bolt, "1000ms", Offset(80f, 200f)),
-        Triple(Icons.Filled.EmojiEvents, "1500ms", Offset(280f, 60f)),
-        Triple(Icons.Filled.TrackChanges, "2000ms", Offset(40f, 160f)),
-        Triple(Icons.Filled.CheckCircle, "2500ms", Offset(320f, 180f))
     )
 
     val scrollState = rememberScrollState()
@@ -939,49 +928,13 @@ fun TasksCompletedCelebration(
                     )
             )
 
-            // Floating celebration icons
-            floatingIcons.forEachIndexed { index, (icon, delay, position) ->
-                val bounceAnimation by infiniteTransition.animateFloat(
-                    initialValue = 0f,
-                    targetValue = 20f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(
-                            durationMillis = 2000 + (index * 200),
-                            delayMillis = delay.removeSuffix("ms").toInt(),
-                            easing = EaseInOut
-                        ),
-                        repeatMode = RepeatMode.Reverse
-                    ),
-                    label = "bounce$index"
-                )
-
-                Box(
-                    modifier = Modifier
-                        .offset(
-                            x = position.x.dp,
-                            y = (position.y - bounceAnimation).dp
-                        )
-                        .size(24.dp)
-                ) {
-                    Icon(
-                        icon,
-                        contentDescription = null,
-                        tint = theme.accent.copy(alpha = 0.6f),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-
-            // Central celebration content
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(32.dp)
+                modifier = Modifier.padding(24.dp)
             ) {
-                // Main celebration icon with pulsing ring
                 Box(
                     contentAlignment = Alignment.Center
                 ) {
-                    // Pulsing ring effect
                     Box(
                         modifier = Modifier
                             .size((120 * pulseAnimation).dp)
@@ -996,7 +949,6 @@ fun TasksCompletedCelebration(
                             )
                     )
 
-                    // Main icon container
                     Box(
                         modifier = Modifier
                             .size(96.dp)
@@ -1022,7 +974,6 @@ fun TasksCompletedCelebration(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Celebration text
                 Text(
                     "ALL TASKS COMPLETED",
                     style = MaterialTheme.typography.headlineMedium,
@@ -1091,45 +1042,6 @@ fun TasksCompletedCelebration(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Motivational quote with border accent
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Color.Black.copy(alpha = 0.3f),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = theme.border,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .padding(start = 4.dp)
-                ) {
-                    Row {
-                        Box(
-                            modifier = Modifier
-                                .width(4.dp)
-                                .height(60.dp)
-                                .background(
-                                    theme.accent,
-                                    RoundedCornerShape(2.dp)
-                                )
-                        )
-
-                        Text(
-                            "\"Excellence is not a skill, it's an attitude. Today you've proven yours.\"",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Next steps suggestion
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -1161,7 +1073,7 @@ fun FloatingAddButton(
         Icon(
             Icons.Filled.Add,
             contentDescription = "Add Task",
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(16.dp)
         )
     }
 }

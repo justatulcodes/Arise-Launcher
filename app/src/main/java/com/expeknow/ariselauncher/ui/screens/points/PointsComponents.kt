@@ -252,7 +252,7 @@ fun StatsGrid(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         StatCard(
             icon = Icons.Filled.TrendingUp,

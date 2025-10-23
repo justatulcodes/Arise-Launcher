@@ -8,745 +8,208 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
-import androidx.compose.ui.tooling.preview.Preview
-
-data class DriveTheme(
-    val background: Color = Color.Black,
-    val surface: Color = Color(0xFF1F1F1F),
-    val textPrimary: Color = Color.White,
-    val textSecondary: Color = Color(0xFF9CA3AF),
-    val border: Color = Color.White.copy(alpha = 0.2f),
-    val accent: Color = Color.White
-)
+import com.expeknow.ariselauncher.data.model.DriveItem
+import com.expeknow.ariselauncher.data.model.DriveItemType
+import com.expeknow.ariselauncher.ui.theme.*
+import java.io.File
 
 @Composable
-fun DriveHeader(
-    currentTab: String,
-    onTabSelect: (String) -> Unit,
-    theme: DriveTheme
+fun DriveItemCard(
+    item: DriveItem,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    onVideoClick: (String) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .background(theme.surface)
-            .padding(16.dp)
-    ) {
-        Text(
-            text = "YOUR DRIVE",
-            style = MaterialTheme.typography.titleLarge,
-            color = theme.textPrimary,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+    var showMenu by remember { mutableStateOf(false) }
 
-        // Tabs
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = theme.border,
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .clip(RoundedCornerShape(8.dp))
-                .background(theme.surface)
-        ) {
-            listOf("quotes", "goals", "reminders").forEach { tab ->
-                val isSelected = tab == currentTab
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp)
-                        .background(
-                            if (isSelected) theme.accent else Color.Transparent,
-                            RoundedCornerShape(8.dp)
-                        )
-                        .clickable { onTabSelect(tab) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = tab.uppercase(),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = if (isSelected) Color.Black else theme.textPrimary
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun DriveHeaderPreview() {
-    DriveHeader(
-        currentTab = "quotes",
-        onTabSelect = {},
-        theme = DriveTheme()
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun FeaturedQuoteCardPreview() {
-    val sampleQuote = MotivationalQuote(
-        id = "1",
-        text = "The only impossible journey is the one you never begin",
-        author = "Tony Robbins",
-        category = "motivation"
-    )
-
-    FeaturedQuoteCard(
-        quote = sampleQuote,
-        onNextQuote = {},
-        theme = DriveTheme()
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun CategoryQuoteCardPreview() {
-    CategoryQuoteCard(
-        icon = Icons.Filled.Lightbulb,
-        category = "DISCIPLINE",
-        quote = "Self-discipline is the magic power that makes you virtually unstoppable.",
-        theme = DriveTheme()
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun EmergencyMotivationCardPreview() {
-    EmergencyMotivationCard(theme = DriveTheme())
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun VisionBoardSectionPreview() {
-    val sampleVisionCards = listOf(
-        VisionCard(
-            id = "1",
-            title = "Dream Home",
-            description = "My ideal living space",
-            imageUrl = "https://example.com/image.jpg",
-            category = "wealth"
-        )
-    )
-
-    VisionBoardSection(
-        visionCards = sampleVisionCards,
-        onAddVision = {},
-        onEditVision = {},
-        theme = DriveTheme()
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun WhyRemindersSectionPreview() {
-    val sampleWhyReasons = listOf(
-        WhyReason(
-            id = "1",
-            title = "Family",
-            description = "To provide a better life for my loved ones"
-        ),
-        WhyReason(
-            id = "2",
-            title = "Freedom",
-            description = "To have the freedom to choose my path"
-        )
-    )
-
-    WhyRemindersSection(
-        whyReasons = sampleWhyReasons,
-        onEditWhy = {},
-        onAddWhy = {},
-        onDeleteWhy = {},
-        theme = DriveTheme()
-    )
-}
-
-@Composable
-fun FeaturedQuoteCard(
-    quote: MotivationalQuote,
-    onNextQuote: () -> Unit,
-    theme: DriveTheme
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 2.dp,
-                color = theme.border,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .background(
-                theme.surface,
-                RoundedCornerShape(16.dp)
-            )
-            .padding(24.dp)
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        color = SurfaceCard
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(16.dp)
         ) {
-            Icon(
-                imageVector = Icons.Filled.FormatQuote,
-                contentDescription = "Quote",
-                tint = theme.textPrimary.copy(alpha = 0.6f),
-                modifier = Modifier.size(32.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "\"${quote.text}\"",
-                style = MaterialTheme.typography.bodyLarge,
-                color = theme.textPrimary,
-                fontStyle = FontStyle.Italic,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "— ${quote.author}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = theme.textPrimary.copy(alpha = 0.7f)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = onNextQuote,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = theme.textPrimary
-                ),
-                modifier = Modifier.border(
-                    width = 1.dp,
-                    color = theme.border,
-                    shape = RoundedCornerShape(8.dp)
-                )
-            ) {
-                Text("Next Quote")
-            }
-        }
-    }
-}
-
-@Composable
-fun CategoryQuoteCard(
-    icon: ImageVector,
-    category: String,
-    quote: String,
-    theme: DriveTheme = DriveTheme(),
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .border(
-                width = 1.dp,
-                color = theme.border,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .background(
-                theme.surface,
-                RoundedCornerShape(12.dp)
-            )
-            .padding(12.dp)
-    ) {
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = category,
-                    tint = theme.textPrimary,
-                    modifier = Modifier.size(16.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = category,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = theme.textPrimary
-                )
-            }
-
-            Text(
-                text = quote,
-                style = MaterialTheme.typography.bodySmall,
-                color = theme.textPrimary.copy(alpha = 0.7f)
-            )
-        }
-    }
-}
-
-@Composable
-fun CustomQuotesSection(
-    customQuotes: List<MotivationalQuote>,
-    onAddQuote: () -> Unit,
-    onDeleteQuote: (String) -> Unit,
-    theme: DriveTheme
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = theme.border,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .background(
-                theme.surface,
-                RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp)
-    ) {
-        Column {
+            // Header with type and actions
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "YOUR CUSTOM QUOTES",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = theme.textPrimary
-                )
-
-                IconButton(onClick = onAddQuote) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Add Quote",
-                        tint = theme.textPrimary
+                        imageVector = when (item.type) {
+                            DriveItemType.QUOTE -> Icons.Default.FormatQuote
+                            DriveItemType.IMAGE -> Icons.Default.Image
+                            DriveItemType.VIDEO -> Icons.Default.PlayCircle
+                        },
+                        contentDescription = null,
+                        tint = AccentGreen,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = item.type.name,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AccentGreen
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if (customQuotes.isEmpty()) {
-                EmptyCustomQuotesPlaceholder(theme)
-            } else {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    customQuotes.forEach { quote ->
-                        CustomQuoteItem(
-                            quote = quote,
-                            onDelete = { onDeleteQuote(quote.id) },
-                            theme = theme
+                Box {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = "More options",
+                            tint = Color.White
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Edit") },
+                            onClick = {
+                                showMenu = false
+                                onEdit()
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Edit, contentDescription = null)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Delete") },
+                            onClick = {
+                                showMenu = false
+                                onDelete()
+                            },
+                            leadingIcon = {
+                                Icon(Icons.Default.Delete, contentDescription = null)
+                            }
                         )
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun VisionBoardSection(
-    visionCards: List<VisionCard>,
-    onAddVision: () -> Unit,
-    onEditVision: (VisionCard) -> Unit,
-    theme: DriveTheme
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 2.dp,
-                color = theme.border,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .background(
-                theme.surface,
-                RoundedCornerShape(16.dp)
-            )
-            .padding(16.dp)
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "YOUR VISION BOARD",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = theme.textPrimary
-                )
-
-                IconButton(onClick = onAddVision) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "Add Vision",
-                        tint = theme.textPrimary
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                visionCards.forEach { card ->
-                    VisionCardItem(
-                        visionCard = card,
-                        onClick = { onEditVision(card) },
-                        theme = theme
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun WhyRemindersSection(
-    whyReasons: List<WhyReason>,
-    onEditWhy: () -> Unit,
-    onAddWhy: () -> Unit,
-    onDeleteWhy: (String) -> Unit,
-    theme: DriveTheme
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 2.dp,
-                color = theme.border,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .background(
-                theme.surface,
-                RoundedCornerShape(16.dp)
-            )
-            .padding(24.dp)
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Filled.Favorite,
-                contentDescription = "Heart",
-                tint = theme.textPrimary,
-                modifier = Modifier.size(32.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "REMEMBER YOUR WHY",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = theme.textPrimary
-                )
-
-                IconButton(onClick = onEditWhy) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "Edit Why",
-                        tint = theme.textPrimary.copy(alpha = 0.4f),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                whyReasons.forEach { reason ->
-                    WhyReasonItem(
-                        whyReason = reason,
-                        onEdit = { /* Handle edit */ },
-                        onDelete = { onDeleteWhy(reason.id) },
-                        theme = theme
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = onAddWhy,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = theme.textPrimary.copy(alpha = 0.6f)
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 2.dp,
-                        color = theme.border,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = "Add",
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Add Your Why")
-            }
-        }
-    }
-}
-
-@Composable
-fun EmergencyMotivationCard(theme: DriveTheme) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = Color(0xFFE57373).copy(alpha = 0.4f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .background(
-                Color(0xFFE57373).copy(alpha = 0.1f),
-                RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp)
-    ) {
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Filled.Lightbulb,
-                    contentDescription = "Target",
-                    tint = Color(0xFFE57373),
-                    modifier = Modifier.size(16.dp)
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = "WHEN YOU WANT TO QUIT",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Color(0xFFE57373)
-                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                val motivations = listOf(
-                    "Remember: Discipline weighs ounces, regret weighs tons",
-                    "You've already started - don't waste that progress",
-                    "Future you is counting on present you",
-                    "Every elite person felt exactly how you feel right now"
-                )
-
-                motivations.forEach { motivation ->
+            // Content based on type
+            when (item.type) {
+                DriveItemType.QUOTE -> {
                     Text(
-                        text = "• $motivation",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = theme.textPrimary.copy(alpha = 0.8f)
+                        text = "\"${item.content}\"",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = TaskTitle,
+                        modifier = Modifier.padding(vertical = 8.dp)
                     )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EmptyCustomQuotesPlaceholder(theme: DriveTheme) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 32.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Filled.FormatQuote,
-                contentDescription = "No Quotes",
-                tint = theme.textPrimary.copy(alpha = 0.4f),
-                modifier = Modifier.size(32.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "No custom quotes yet.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = theme.textPrimary.copy(alpha = 0.4f)
-            )
-
-            Text(
-                text = "Add your favorite motivational quotes!",
-                style = MaterialTheme.typography.bodySmall,
-                color = theme.textPrimary.copy(alpha = 0.4f)
-            )
-        }
-    }
-}
-
-@Composable
-fun CustomQuoteItem(
-    quote: MotivationalQuote,
-    onDelete: () -> Unit,
-    theme: DriveTheme
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = theme.border.copy(alpha = 0.5f),
-                shape = RoundedCornerShape(8.dp)
-            )
-            .padding(12.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "\"${quote.text}\"",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = theme.textPrimary,
-                    fontStyle = FontStyle.Italic
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "— ${quote.author}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = theme.textPrimary.copy(alpha = 0.7f)
-                )
-            }
-
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.size(24.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Delete,
-                    contentDescription = "Delete",
-                    tint = Color(0xFFE57373),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun VisionCardItem(
-    visionCard: VisionCard,
-    onClick: () -> Unit,
-    theme: DriveTheme
-) {
-    val categoryColor = when (visionCard.category) {
-        "intelligence" -> Color(0xFF64B5F6)
-        "physical" -> Color(0xFFFFB74D)
-        "wealth" -> Color(0xFF81C784)
-        else -> theme.textPrimary
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = categoryColor.copy(alpha = 0.3f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .background(
-                categoryColor.copy(alpha = 0.1f),
-                RoundedCornerShape(12.dp)
-            )
-            .clickable { onClick() }
-            .padding(12.dp)
-    ) {
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 12.dp)
-            ) {
-                Icon(
-                    imageVector = when (visionCard.category) {
-                        "intelligence" -> Icons.Filled.Psychology
-                        "physical" -> Icons.Filled.Bolt
-                        "wealth" -> Icons.Filled.AttachMoney
-                        else -> Icons.Filled.Lightbulb
-                    },
-                    contentDescription = visionCard.category,
-                    tint = categoryColor,
-                    modifier = Modifier.size(20.dp)
-                )
-
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column {
-                    Text(
-                        text = visionCard.title,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = theme.textPrimary
-                    )
-
-                    Text(
-                        text = visionCard.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = theme.textPrimary.copy(alpha = 0.7f)
-                    )
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                AsyncImage(
-                    model = visionCard.imageUrl,
-                    contentDescription = visionCard.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.2f))
-                )
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                ) {
-                    Surface(
-                        color = Color.Black.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(4.dp),
-                        border = androidx.compose.foundation.BorderStroke(
-                            width = 1.dp,
-                            color = theme.border
-                        )
-                    ) {
+                    if (item.author.isNotEmpty()) {
                         Text(
-                            text = "Click to Edit",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = theme.textPrimary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            text = "— ${item.author}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontStyle = FontStyle.Italic,
+                            color = BannerTextGray
+                        )
+                    }
+                }
+
+                DriveItemType.IMAGE -> {
+                    if (item.title.isNotEmpty()) {
+                        Text(
+                            text = item.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = TaskTitle,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    // Handle both local file paths and URLs
+                    val imageModel = if (item.content.startsWith("/")) {
+                        File(item.content)
+                    } else {
+                        item.content
+                    }
+                    AsyncImage(
+                        model = imageModel,
+                        contentDescription = item.title,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    if (item.description.isNotEmpty()) {
+                        Text(
+                            text = item.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = BannerTextGray,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                }
+
+                DriveItemType.VIDEO -> {
+                    if (item.title.isNotEmpty()) {
+                        Text(
+                            text = item.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = TaskTitle,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    // Video preview box - clickable
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.Black.copy(alpha = 0.5f))
+                            .border(1.dp, DividerGray, RoundedCornerShape(8.dp))
+                            .clickable { onVideoClick(item.content) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.PlayCircle,
+                                contentDescription = "Play video",
+                                tint = AccentGreen,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Text(
+                                text = "Tap to watch",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = AccentGreen
+                            )
+                            Text(
+                                text = item.content,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = BannerTextGray,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                        }
+                    }
+                    if (item.description.isNotEmpty()) {
+                        Text(
+                            text = item.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = BannerTextGray,
+                            modifier = Modifier.padding(top = 8.dp)
                         )
                     }
                 }
@@ -756,71 +219,258 @@ fun VisionCardItem(
 }
 
 @Composable
-fun WhyReasonItem(
-    whyReason: WhyReason,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-    theme: DriveTheme
+fun AddDriveItemDialog(
+    itemType: DriveItemType,
+    editingItem: DriveItem?,
+    onDismiss: () -> Unit,
+    onTypeSelect: (DriveItemType) -> Unit,
+    onSave: (DriveItemType, String, String, String, String) -> Unit,
+    onImagePick: () -> Unit,
+    isSavingImage: Boolean
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = theme.border,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .background(
-                theme.textPrimary.copy(alpha = 0.05f),
-                RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+    var selectedType by remember(editingItem) { mutableStateOf(editingItem?.type ?: itemType) }
+    var content by remember(editingItem) { mutableStateOf(editingItem?.content ?: "") }
+    var title by remember(editingItem) { mutableStateOf(editingItem?.title ?: "") }
+    var author by remember(editingItem) { mutableStateOf(editingItem?.author ?: "") }
+    var description by remember(editingItem) { mutableStateOf(editingItem?.description ?: "") }
+    var useImageUrl by remember { mutableStateOf(true) }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = SurfaceCard
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth()
+            ) {
                 Text(
-                    text = whyReason.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = theme.textPrimary,
-                    fontWeight = FontWeight.Medium
+                    text = if (editingItem != null) "Edit Item" else "Add Motivation",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = Color.White
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
+                // Type selector
                 Text(
-                    text = whyReason.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = theme.textPrimary.copy(alpha = 0.7f)
+                    text = "Type",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = BannerTextGray,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
-            }
-
-            Row {
-                IconButton(
-                    onClick = onEdit,
-                    modifier = Modifier.size(24.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "Edit",
-                        tint = theme.textPrimary.copy(alpha = 0.4f),
-                        modifier = Modifier.size(16.dp)
-                    )
+                    DriveItemType.entries.forEach { type ->
+                        FilterChip(
+                            selected = selectedType == type,
+                            onClick = {
+                                selectedType = type
+                                onTypeSelect(type)
+                            },
+                            label = { Text(type.name) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = AccentGreen,
+                                selectedLabelColor = Color.Black
+                            )
+                        )
+                    }
                 }
 
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(24.dp)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Dynamic fields based on type
+                when (selectedType) {
+                    DriveItemType.QUOTE -> {
+                        OutlinedTextField(
+                            value = content,
+                            onValueChange = { content = it },
+                            label = { Text("Quote") },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 3,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = author,
+                            onValueChange = { author = it },
+                            label = { Text("Author (optional)") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                    }
+
+                    DriveItemType.IMAGE -> {
+                        OutlinedTextField(
+                            value = title,
+                            onValueChange = { title = it },
+                            label = { Text("Title") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Toggle between URL and Gallery
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            FilterChip(
+                                selected = useImageUrl,
+                                onClick = { useImageUrl = true },
+                                label = { Text("URL") },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = AccentGreen,
+                                    selectedLabelColor = Color.Black
+                                )
+                            )
+                            FilterChip(
+                                selected = !useImageUrl,
+                                onClick = { useImageUrl = false },
+                                label = { Text("Gallery") },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = AccentGreen,
+                                    selectedLabelColor = Color.Black
+                                )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        if (useImageUrl) {
+                            OutlinedTextField(
+                                value = content,
+                                onValueChange = { content = it },
+                                label = { Text("Image URL") },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = AccentGreen,
+                                    focusedLabelColor = AccentGreen,
+                                    cursorColor = AccentGreen
+                                )
+                            )
+                        } else {
+                            Button(
+                                onClick = onImagePick,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = AccentGreen,
+                                    contentColor = Color.Black
+                                ),
+                                enabled = !isSavingImage
+                            ) {
+                                if (isSavingImage) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = Color.Black
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Saving...")
+                                } else {
+                                    Icon(Icons.Default.Image, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Pick from Gallery")
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = description,
+                            onValueChange = { description = it },
+                            label = { Text("Description (optional)") },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 2,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                    }
+
+                    DriveItemType.VIDEO -> {
+                        OutlinedTextField(
+                            value = title,
+                            onValueChange = { title = it },
+                            label = { Text("Title") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = content,
+                            onValueChange = { content = it },
+                            label = { Text("Video URL") },
+                            placeholder = { Text("YouTube, Instagram, or web link") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = description,
+                            onValueChange = { description = it },
+                            label = { Text("Description (optional)") },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 2,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Action buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Delete",
-                        tint = Color(0xFFE57373).copy(alpha = 0.6f),
-                        modifier = Modifier.size(16.dp)
-                    )
+                    TextButton(onClick = onDismiss) {
+                        Text("Cancel", color = BannerTextGray)
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            if (content.isNotEmpty() || (selectedType == DriveItemType.IMAGE && !useImageUrl)) {
+                                onSave(selectedType, content, title, author, description)
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AccentGreen,
+                            contentColor = Color.Black
+                        ),
+                        enabled = (content.isNotEmpty() || (selectedType == DriveItemType.IMAGE && !useImageUrl)) && !isSavingImage
+                    ) {
+                        Text(if (editingItem != null) "Update" else "Save")
+                    }
                 }
             }
         }

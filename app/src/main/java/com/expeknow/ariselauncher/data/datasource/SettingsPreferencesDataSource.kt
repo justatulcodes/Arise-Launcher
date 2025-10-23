@@ -23,6 +23,8 @@ class SettingsPreferencesDataSource @Inject constructor(
         private const val KEY_DISTRACTION_APPS_DELAY = "distraction_apps_delay"
         private const val KEY_POINT_THRESHOLD = "point_threshold"
         private const val KEY_WARNINGS_ENABLED = "warnings_enabled"
+
+        private const val KEY_SHOULD_TRIGGER_APP_DRAWER_KEYBOARD = "app_drawer_keyboard"
     }
 
     fun getHideCompletedTasks(): Boolean = prefs.getBoolean(KEY_HIDE_COMPLETED_TASKS, true)
@@ -47,6 +49,10 @@ class SettingsPreferencesDataSource @Inject constructor(
     fun getWarningsEnabled(): Boolean = prefs.getBoolean(KEY_WARNINGS_ENABLED, true)
     fun setWarningsEnabled(enabled: Boolean) =
         prefs.edit { putBoolean(KEY_WARNINGS_ENABLED, enabled) }
+
+    fun getShouldTriggerAppDrawerKeyboard(): Boolean = prefs.getBoolean(KEY_SHOULD_TRIGGER_APP_DRAWER_KEYBOARD, false)
+    fun setShouldTriggerAppDrawerKeyboard(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_SHOULD_TRIGGER_APP_DRAWER_KEYBOARD, enabled) }
 
     fun resetAllSettings() {
         prefs.edit { clear() }
