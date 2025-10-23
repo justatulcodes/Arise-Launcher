@@ -2,6 +2,7 @@ package com.expeknow.ariselauncher.ui.screens.drive
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,12 +22,14 @@ import coil.compose.AsyncImage
 import com.expeknow.ariselauncher.data.model.DriveItem
 import com.expeknow.ariselauncher.data.model.DriveItemType
 import com.expeknow.ariselauncher.ui.theme.*
+import java.io.File
 
 @Composable
 fun DriveItemCard(
     item: DriveItem,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onVideoClick: (String) -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -131,8 +134,14 @@ fun DriveItemCard(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }
+                    // Handle both local file paths and URLs
+                    val imageModel = if (item.content.startsWith("/")) {
+                        File(item.content)
+                    } else {
+                        item.content
+                    }
                     AsyncImage(
-                        model = item.content,
+                        model = imageModel,
                         contentDescription = item.title,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -159,14 +168,15 @@ fun DriveItemCard(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                     }
-                    // Video preview box
+                    // Video preview box - clickable
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(180.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(Color.Black.copy(alpha = 0.5f))
-                            .border(1.dp, DividerGray, RoundedCornerShape(8.dp)),
+                            .border(1.dp, DividerGray, RoundedCornerShape(8.dp))
+                            .clickable { onVideoClick(item.content) },
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -175,9 +185,14 @@ fun DriveItemCard(
                         ) {
                             Icon(
                                 Icons.Default.PlayCircle,
-                                contentDescription = "Video",
+                                contentDescription = "Play video",
                                 tint = AccentGreen,
                                 modifier = Modifier.size(48.dp)
+                            )
+                            Text(
+                                text = "Tap to watch",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = AccentGreen
                             )
                             Text(
                                 text = item.content,
@@ -209,13 +224,16 @@ fun AddDriveItemDialog(
     editingItem: DriveItem?,
     onDismiss: () -> Unit,
     onTypeSelect: (DriveItemType) -> Unit,
-    onSave: (DriveItemType, String, String, String, String) -> Unit
+    onSave: (DriveItemType, String, String, String, String) -> Unit,
+    onImagePick: () -> Unit,
+    isSavingImage: Boolean
 ) {
     var selectedType by remember(editingItem) { mutableStateOf(editingItem?.type ?: itemType) }
     var content by remember(editingItem) { mutableStateOf(editingItem?.content ?: "") }
     var title by remember(editingItem) { mutableStateOf(editingItem?.title ?: "") }
     var author by remember(editingItem) { mutableStateOf(editingItem?.author ?: "") }
     var description by remember(editingItem) { mutableStateOf(editingItem?.description ?: "") }
+    var useImageUrl by remember { mutableStateOf(true) }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -306,17 +324,71 @@ fun AddDriveItemDialog(
                             )
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        OutlinedTextField(
-                            value = content,
-                            onValueChange = { content = it },
-                            label = { Text("Image URL") },
+
+                        // Toggle between URL and Gallery
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = AccentGreen,
-                                focusedLabelColor = AccentGreen,
-                                cursorColor = AccentGreen
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            FilterChip(
+                                selected = useImageUrl,
+                                onClick = { useImageUrl = true },
+                                label = { Text("URL") },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = AccentGreen,
+                                    selectedLabelColor = Color.Black
+                                )
                             )
-                        )
+                            FilterChip(
+                                selected = !useImageUrl,
+                                onClick = { useImageUrl = false },
+                                label = { Text("Gallery") },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = AccentGreen,
+                                    selectedLabelColor = Color.Black
+                                )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        if (useImageUrl) {
+                            OutlinedTextField(
+                                value = content,
+                                onValueChange = { content = it },
+                                label = { Text("Image URL") },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = AccentGreen,
+                                    focusedLabelColor = AccentGreen,
+                                    cursorColor = AccentGreen
+                                )
+                            )
+                        } else {
+                            Button(
+                                onClick = onImagePick,
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = AccentGreen,
+                                    contentColor = Color.Black
+                                ),
+                                enabled = !isSavingImage
+                            ) {
+                                if (isSavingImage) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = Color.Black
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Saving...")
+                                } else {
+                                    Icon(Icons.Default.Image, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Pick from Gallery")
+                                }
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(12.dp))
                         OutlinedTextField(
                             value = description,
@@ -349,6 +421,7 @@ fun AddDriveItemDialog(
                             value = content,
                             onValueChange = { content = it },
                             label = { Text("Video URL") },
+                            placeholder = { Text("YouTube, Instagram, or web link") },
                             modifier = Modifier.fillMaxWidth(),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = AccentGreen,
@@ -386,7 +459,7 @@ fun AddDriveItemDialog(
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = {
-                            if (content.isNotEmpty()) {
+                            if (content.isNotEmpty() || (selectedType == DriveItemType.IMAGE && !useImageUrl)) {
                                 onSave(selectedType, content, title, author, description)
                             }
                         },
@@ -394,7 +467,7 @@ fun AddDriveItemDialog(
                             containerColor = AccentGreen,
                             contentColor = Color.Black
                         ),
-                        enabled = content.isNotEmpty()
+                        enabled = (content.isNotEmpty() || (selectedType == DriveItemType.IMAGE && !useImageUrl)) && !isSavingImage
                     ) {
                         Text(if (editingItem != null) "Update" else "Save")
                     }
