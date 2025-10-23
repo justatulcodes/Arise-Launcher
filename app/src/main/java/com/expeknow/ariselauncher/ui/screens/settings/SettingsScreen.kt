@@ -42,7 +42,7 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             DefaultLauncherSection(
@@ -146,12 +146,13 @@ fun SettingsScreen(
 private fun SettingsHeader() {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Column(modifier = Modifier.padding(start = 8.dp)) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        ) {
             Text(
                 "CONTROL CENTER",
                 style = MaterialTheme.typography.headlineSmall.copy(

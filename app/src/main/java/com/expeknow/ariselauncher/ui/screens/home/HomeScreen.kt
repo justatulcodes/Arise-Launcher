@@ -49,27 +49,6 @@ fun HomeScreen(
     )
     var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-//            if (event == Lifecycle.Event.ON_RESUME) {
-//                Log.d("HomeScreen", "Home screen resumed - stopping timer")
-//                // Stop the timer service
-//                val intent = Intent(context, AppUsageTimerService::class.java).apply {
-//                    action = AppUsageTimerService.ACTION_STOP_TRACKING
-//                }
-//                context.startService(intent)
-//            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
 
     BackHandler {
         // do nothing to disable back navigation
@@ -139,8 +118,8 @@ fun HomeScreen(
                                     LazyColumn(
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .padding(horizontal = 24.dp),
-                                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                                            .padding(horizontal = 16.dp),
+                                        verticalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
                                         items(simpleTasks) { task ->
                                             SimpleTaskItem(
