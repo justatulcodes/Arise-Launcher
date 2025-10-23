@@ -1,5 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.drive
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +13,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -25,6 +29,21 @@ fun DriveScreen(
     viewModel: DriveViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // Image picker launcher
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            // Store title and description for the picked image
+            var tempTitle = ""
+            var tempDescription = ""
+
+            // Show a simple dialog to get title and description
+            // For now, we'll pass empty values - you can enhance this later
+            viewModel.onEvent(DriveEvent.SaveImageFromUri(it, tempTitle, tempDescription))
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -62,7 +81,10 @@ fun DriveScreen(
                         DriveItemCard(
                             item = item,
                             onEdit = { viewModel.onEvent(DriveEvent.StartEditItem(item)) },
-                            onDelete = { viewModel.onEvent(DriveEvent.DeleteItem(item.id)) }
+                            onDelete = { viewModel.onEvent(DriveEvent.DeleteItem(item.id)) },
+                            onVideoClick = { videoUrl ->
+                                viewModel.onEvent(DriveEvent.OpenVideo(videoUrl))
+                            }
                         )
                     }
                 }
@@ -113,7 +135,11 @@ fun DriveScreen(
                         )
                     )
                 }
-            }
+            },
+            onImagePick = {
+                imagePickerLauncher.launch("image/*")
+            },
+            isSavingImage = state.isSavingImage
         )
     }
 }
@@ -129,14 +155,16 @@ private fun DriveHeader() {
         ) {
             Text(
                 text = "YOUR DRIVE",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.2.sp
+                ),
                 color = Color.White
             )
             Text(
                 text = "Stay motivated with quotes, images, and videos",
-                style = MaterialTheme.typography.bodyMedium,
-                color = BannerTextGray,
-                modifier = Modifier.padding(top = 4.dp)
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White.copy(alpha = 0.6f),
             )
         }
     }
