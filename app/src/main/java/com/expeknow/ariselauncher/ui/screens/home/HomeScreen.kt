@@ -32,6 +32,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
 import android.content.Intent
 import android.util.Log
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +44,7 @@ fun HomeScreen(
 ) {
 
     val theme = HomeTheme()
-
+    val keyboardController = LocalSoftwareKeyboardController.current
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
     )
@@ -230,6 +231,7 @@ fun HomeScreen(
     if (showAppDrawerBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
+                keyboardController?.hide()
                 showAppDrawerBottomSheet = false
                 appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
                                },
