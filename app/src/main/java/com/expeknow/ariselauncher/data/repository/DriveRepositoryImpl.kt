@@ -47,23 +47,19 @@ class DriveRepositoryImpl @Inject constructor(
         try {
             val intent = when {
                 videoUrl.contains("youtube.com") || videoUrl.contains("youtu.be") -> {
-                    // Try YouTube app first, fallback to browser
                     Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl)).apply {
                         setPackage("com.google.android.youtube")
                     }
                 }
                 videoUrl.contains("instagram.com") -> {
-                    // Try Instagram app first, fallback to browser
                     Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl)).apply {
                         setPackage("com.instagram.android")
                     }
                 }
                 URLUtil.isValidUrl(videoUrl) -> {
-                    // Generic web URL
                     Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
                 }
                 else -> {
-                    // Assume it's a local file or content URI
                     Intent(Intent.ACTION_VIEW).apply {
                         setDataAndType(Uri.parse(videoUrl), "video/*")
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -73,11 +69,9 @@ class DriveRepositoryImpl @Inject constructor(
 
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 
-            // Try to start the intent, if it fails try without package (fallback to browser)
             try {
                 context.startActivity(intent)
             } catch (e: Exception) {
-                // If app-specific intent fails, try generic intent
                 val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl))
                 fallbackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(fallbackIntent)

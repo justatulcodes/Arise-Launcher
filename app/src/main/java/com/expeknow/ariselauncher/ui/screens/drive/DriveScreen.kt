@@ -5,6 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -19,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.expeknow.ariselauncher.data.model.DriveItem
 import com.expeknow.ariselauncher.data.model.DriveItemType
 import com.expeknow.ariselauncher.ui.theme.*
 
@@ -30,17 +30,12 @@ fun DriveScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // Image picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
-            // Store title and description for the picked image
             var tempTitle = ""
             var tempDescription = ""
-
-            // Show a simple dialog to get title and description
-            // For now, we'll pass empty values - you can enhance this later
             viewModel.onEvent(DriveEvent.SaveImageFromUri(it, tempTitle, tempDescription))
         }
     }
@@ -53,10 +48,15 @@ fun DriveScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Header
             DriveHeader()
 
-            // Content
+            DriveFilterChips(
+                selectedFilter = state.selectedFilter,
+                onFilterSelect = { filter ->
+                    viewModel.onEvent(DriveEvent.SelectFilter(filter))
+                }
+            )
+
             if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -64,8 +64,8 @@ fun DriveScreen(
                 ) {
                     CircularProgressIndicator(color = AccentGreen)
                 }
-            } else if (state.driveItems.isEmpty()) {
-                EmptyDriveState()
+            } else if (state.filteredItems.isEmpty()) {
+                EmptyDriveState(hasFilter = state.selectedFilter != null)
             } else {
                 LazyColumn(
                     modifier = Modifier
@@ -75,7 +75,7 @@ fun DriveScreen(
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
                     items(
-                        items = state.driveItems,
+                        items = state.filteredItems,
                         key = { it.id }
                     ) { item ->
                         DriveItemCard(
@@ -145,13 +145,76 @@ fun DriveScreen(
 }
 
 @Composable
+private fun DriveFilterChips(
+    selectedFilter: DriveItemType?,
+    onFilterSelect: (DriveItemType?) -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = Color.Black
+    ) {
+        LazyRow(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                FilterChip(
+                    selected = selectedFilter == null,
+                    onClick = { onFilterSelect(null) },
+                    label = { Text("All") },
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = SurfaceCard,
+                        labelColor = Color.White,
+                        selectedContainerColor = AccentGreen,
+                        selectedLabelColor = Color.Black
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = selectedFilter == null,
+                        borderColor = DividerGray,
+                        selectedBorderColor = AccentGreen
+                    )
+                )
+            }
+
+            items(DriveItemType.entries) { type ->
+                FilterChip(
+                    selected = selectedFilter == type,
+                    onClick = { onFilterSelect(type) },
+                    label = {
+                        Text(
+                            when (type) {
+                                DriveItemType.QUOTE -> "Quotes"
+                                DriveItemType.IMAGE -> "Images"
+                                DriveItemType.VIDEO -> "Videos"
+                            }
+                        )
+                    },
+                    colors = FilterChipDefaults.filterChipColors(
+                        containerColor = SurfaceCard,
+                        labelColor = Color.White,
+                        selectedContainerColor = AccentGreen,
+                        selectedLabelColor = Color.Black
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = selectedFilter == type,
+                        borderColor = DividerGray,
+                        selectedBorderColor = AccentGreen
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun DriveHeader() {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = SurfaceBanner
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Text(
                 text = "YOUR DRIVE",
@@ -171,7 +234,7 @@ private fun DriveHeader() {
 }
 
 @Composable
-private fun EmptyDriveState() {
+private fun EmptyDriveState(hasFilter: Boolean = false) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -183,12 +246,16 @@ private fun EmptyDriveState() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "No motivational content yet",
+                text = if (hasFilter) "No items in this category" else "No motivational content yet",
                 style = MaterialTheme.typography.titleMedium,
                 color = TaskTitle
             )
             Text(
-                text = "Add quotes, images, or videos to keep yourself motivated",
+                text = if (hasFilter) {
+                    "Try selecting a different filter or add new content"
+                } else {
+                    "Add quotes, images, or videos to keep yourself motivated"
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = BannerTextGray,
                 modifier = Modifier.padding(horizontal = 24.dp)

@@ -16,7 +16,6 @@ interface DriveRepository {
     suspend fun deleteDriveItemById(itemId: String)
     suspend fun deleteAllDriveItems()
 
-    // Utility methods
     fun openVideo(context: Context, videoUrl: String)
     suspend fun saveImageFromUri(context: Context, uri: Uri): String?
 }

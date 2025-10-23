@@ -15,35 +15,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class DriveState(
-    val driveItems: List<DriveItem> = emptyList(),
-    val isLoading: Boolean = false,
-    val showAddDialog: Boolean = false,
-    val selectedItemType: DriveItemType = DriveItemType.QUOTE,
-    val editingItem: DriveItem? = null,
-    val isSavingImage: Boolean = false
-)
-
-sealed class DriveEvent {
-    data class AddItem(
-        val type: DriveItemType,
-        val content: String,
-        val title: String = "",
-        val author: String = "",
-        val description: String = ""
-    ) : DriveEvent()
-
-    data class UpdateItem(val item: DriveItem) : DriveEvent()
-    data class DeleteItem(val itemId: String) : DriveEvent()
-    data class SelectItemType(val type: DriveItemType) : DriveEvent()
-    data object ShowAddDialog : DriveEvent()
-    data object HideAddDialog : DriveEvent()
-    data class StartEditItem(val item: DriveItem) : DriveEvent()
-    data object CancelEdit : DriveEvent()
-    data class OpenVideo(val videoUrl: String) : DriveEvent()
-    data class SaveImageFromUri(val uri: Uri, val title: String, val description: String) : DriveEvent()
-}
-
 @HiltViewModel
 class DriveViewModel @Inject constructor(
     private val repository: DriveRepository,
@@ -63,9 +34,18 @@ class DriveViewModel @Inject constructor(
             repository.getAllDriveItems().collect { items ->
                 _state.value = _state.value.copy(
                     driveItems = items,
+                    filteredItems = filterItems(items, _state.value.selectedFilter),
                     isLoading = false
                 )
             }
+        }
+    }
+
+    private fun filterItems(items: List<DriveItem>, filter: DriveItemType?): List<DriveItem> {
+        return if (filter == null) {
+            items
+        } else {
+            items.filter { it.type == filter }
         }
     }
 
@@ -103,6 +83,14 @@ class DriveViewModel @Inject constructor(
 
             is DriveEvent.SelectItemType -> {
                 _state.value = _state.value.copy(selectedItemType = event.type)
+            }
+
+            is DriveEvent.SelectFilter -> {
+                val filteredItems = filterItems(_state.value.driveItems, event.type)
+                _state.value = _state.value.copy(
+                    selectedFilter = event.type,
+                    filteredItems = filteredItems
+                )
             }
 
             is DriveEvent.ShowAddDialog -> {
