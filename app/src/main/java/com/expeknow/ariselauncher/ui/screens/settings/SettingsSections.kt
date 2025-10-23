@@ -80,6 +80,24 @@ fun TunnelVisionSection(
 }
 
 @Composable
+fun KeyboardTriggerSection(
+    keyboardTriggerEnabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+    theme: SettingsTheme
+) {
+    SettingsCard(theme) {
+        SettingsToggleItem(
+            title = "AUTO-SHOW KEYBOARD",
+            subtitle = "Automatically open keyboard in app drawer",
+            description = "When enabled, the keyboard will appear immediately when you open the app drawer for quick app search",
+            checked = keyboardTriggerEnabled,
+            onCheckedChange = onToggle,
+            theme = theme
+        )
+    }
+}
+
+@Composable
 fun AccessDelaysSection(
     appDrawerDelay: Float,
     distractionAppsDelay: Float,
@@ -219,8 +237,6 @@ fun ResourcesSection(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // This would typically be populated with actual resource data
-        // For now, it's a placeholder
         Text(
             "Resource links will be displayed here",
             style = MaterialTheme.typography.bodyMedium,
@@ -305,6 +321,16 @@ fun TaskCompletionSectionPreview() {
 fun TunnelVisionSectionPreview() {
     TunnelVisionSection(
         tunnelVisionMode = true,
+        onToggle = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun KeyboardTriggerSectionPreview() {
+    KeyboardTriggerSection(
+        keyboardTriggerEnabled = true,
         onToggle = {},
         theme = SettingsTheme()
     )

@@ -69,6 +69,14 @@ fun SettingsScreen(
                 theme = theme
             )
 
+            KeyboardTriggerSection(
+                keyboardTriggerEnabled = state.keyboardTriggerEnabled,
+                onToggle = { enabled: Boolean ->
+                    viewModel.onEvent(SettingsEvent.ToggleKeyboardTrigger(enabled))
+                },
+                theme = theme
+            )
+
             AccessDelaysSection(
                 appDrawerDelay = state.appDrawerDelay,
                 distractionAppsDelay = state.distractionAppsDelay,
