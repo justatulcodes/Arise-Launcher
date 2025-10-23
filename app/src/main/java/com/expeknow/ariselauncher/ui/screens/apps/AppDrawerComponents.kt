@@ -26,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 
 @Composable
@@ -169,7 +171,8 @@ fun AppDrawerHeader(
 fun AppDrawerSearchBar(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
-    theme: AppDrawerTheme
+    theme: AppDrawerTheme,
+    focusRequester: FocusRequester? = null
 ) {
     Row(
         modifier = Modifier
@@ -207,7 +210,15 @@ fun AppDrawerSearchBar(
             BasicTextField(
                 value = searchQuery,
                 onValueChange = onSearchQueryChange,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (focusRequester != null) {
+                            Modifier.focusRequester(focusRequester)
+                        } else {
+                            Modifier
+                        }
+                    ),
                 textStyle = TextStyle(
                     color = Color.White,
                     fontSize = 16.sp,

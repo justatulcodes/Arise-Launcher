@@ -19,5 +19,8 @@ interface SettingsRepository {
     fun getWarningsEnabled(): Boolean
     fun setWarningsEnabled(enabled: Boolean)
 
+    fun getShouldTriggerKeyboardInAppDrawer(): Boolean
+    fun setShouldTriggerKeyboardInAppDrawer(shouldTrigger: Boolean)
+
     fun resetAllSettings()
 }

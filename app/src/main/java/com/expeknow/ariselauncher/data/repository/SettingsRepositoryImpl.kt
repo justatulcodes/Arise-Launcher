@@ -33,5 +33,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun setWarningsEnabled(enabled: Boolean) =
         preferencesDataSource.setWarningsEnabled(enabled)
 
+    override fun getShouldTriggerKeyboardInAppDrawer() =
+        preferencesDataSource.getShouldTriggerAppDrawerKeyboard()
+
+    override fun setShouldTriggerKeyboardInAppDrawer(shouldTrigger: Boolean) =
+        preferencesDataSource.setShouldTriggerAppDrawerKeyboard(shouldTrigger)
+
+
     override fun resetAllSettings() = preferencesDataSource.resetAllSettings()
 }

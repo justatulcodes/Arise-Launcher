@@ -3,15 +3,18 @@ package com.expeknow.ariselauncher.di
 import android.content.Context
 import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.data.datasource.SettingsPreferencesDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.DriveItemDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.PointsLogDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskLinkDataSource
 import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.DriveRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.SettingsRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.TaskLinkRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.DriveRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskLinkRepository
@@ -57,6 +60,12 @@ object RepositoryModule {
     @Provides
     fun provideSettingsRepository(settingsPreferencesDataSource: SettingsPreferencesDataSource) : SettingsRepository {
         return SettingsRepositoryImpl(settingsPreferencesDataSource)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDriveRepository(driveItemDataSource: DriveItemDataSource): DriveRepository {
+        return DriveRepositoryImpl(driveItemDataSource)
     }
 
 }

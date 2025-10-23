@@ -3,6 +3,7 @@ package com.expeknow.ariselauncher.di
 import android.content.Context
 import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
 import com.expeknow.ariselauncher.data.database.AriseLauncherDatabase
+import com.expeknow.ariselauncher.data.database.dao.DriveItemDao
 import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
 import com.expeknow.ariselauncher.data.database.dao.TaskDao
 import com.expeknow.ariselauncher.data.database.dao.TaskLinkDao
@@ -42,6 +43,11 @@ object DatabaseModule {
     @Provides
     fun provideAppInfoDao(database: AriseLauncherDatabase) : AppInfoDao {
         return database.appInfoDao()
+    }
+
+    @Provides
+    fun provideDriveItemDao(database: AriseLauncherDatabase) : DriveItemDao {
+        return database.driveItemDao()
     }
 
 }

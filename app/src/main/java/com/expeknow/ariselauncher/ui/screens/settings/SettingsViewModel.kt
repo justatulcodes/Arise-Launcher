@@ -43,7 +43,8 @@ class SettingsViewModel @Inject constructor(
             appDrawerDelay = settingsRepository.getAppDrawerDelay(),
             distractionAppsDelay = settingsRepository.getDistractionAppsDelay(),
             pointThreshold = settingsRepository.getPointThreshold(),
-            warningsEnabled = settingsRepository.getWarningsEnabled()
+            warningsEnabled = settingsRepository.getWarningsEnabled(),
+            keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer()
         )
     }
 
@@ -84,6 +85,11 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ToggleWarnings -> {
                 _state.value = _state.value.copy(warningsEnabled = event.enabled)
                 settingsRepository.setWarningsEnabled(event.enabled)
+            }
+
+            is SettingsEvent.ToggleKeyboardTrigger -> {
+                _state.value = _state.value.copy(keyboardTriggerEnabled = event.enabled)
+                settingsRepository.setShouldTriggerKeyboardInAppDrawer(event.enabled)
             }
 
             is SettingsEvent.SetDefaultLauncher -> {
