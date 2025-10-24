@@ -1,6 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
 import android.util.Log
+import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +13,6 @@ import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
-import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
-import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getDayOfWeekFromTimeStampInMillis
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayEndTime
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayStartTime
@@ -33,9 +32,9 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
     init {
+        updateModeFromSettings()
         loadInitialData()
         observePoints()
-        updateModeFromSettings()
     }
 
     private fun updateModeFromSettings() {
@@ -54,10 +53,6 @@ class HomeViewModel @Inject constructor(
             observeTasks()
         }
     }
-    fun getCategorizedApps(): Map<AppCategory, List<AppDrawerApp>> {
-        return _state.value.apps.groupBy { it.category }
-    }
-
     private fun observePoints() {
         viewModelScope.launch {
             pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
@@ -207,16 +202,16 @@ class HomeViewModel @Inject constructor(
     private fun observeTasks() {
         viewModelScope.launch {
             taskRepositoryImpl.getAllTasks().collect { tasks ->
-                resetCompletedRecurringTasks(tasks)
+                markCompletedRecurringTasksAsIncomplete(tasks)
 
-                val filteredTasks = filterTasksForStats(tasks)
+                val filteredTasks = getTasksCreatedTodayOrTasksNotYetCompleted(tasks)
                 _state.value = _state.value.copy(allTasks = tasks)
                 updateTaskStats(filteredTasks)
             }
         }
         viewModelScope.launch {
-            taskRepositoryImpl.getAllRecurringTasks().collect { tasks ->
-                resetCompletedRecurringTasks(tasks)
+            taskRepositoryImpl.getAllTasks().collect { tasks ->
+                markCompletedRecurringTasksAsIncomplete(tasks)
 
                 val tasksForToday = getTasksRecurringToday(tasks)
                 _state.value = _state.value.copy(recurringTasks = tasksForToday)
@@ -224,7 +219,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun resetCompletedRecurringTasks(tasks: List<Task>) {
+    private suspend fun markCompletedRecurringTasksAsIncomplete(tasks: List<Task>) {
         val currentDayOfWeek = getTodaysDayOfWeek()
 
         val tasksToReset = tasks.filter { task ->
@@ -243,35 +238,59 @@ class HomeViewModel @Inject constructor(
 
     private fun getTasksRecurringToday(tasks: List<Task>): List<Task> {
         val currentDayOfWeek = getTodaysDayOfWeek()
-        return tasks.filter { task ->
-            task.isRepeated && task.repeatDays.contains(currentDayOfWeek)
+        val tasksRecurringToday = tasks.filter { task ->
+            task.category in listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS)
+                    && (task.repeatDays.contains(currentDayOfWeek)
+                    || task.repeatDays.isEmpty())
         }
+        return tasksRecurringToday
     }
 
-    private fun filterTasksForStats(tasks: List<Task>): List<Task> {
+    private fun getTasksCreatedTodayOrTasksNotYetCompleted(tasks: List<Task>): List<Task> {
         val todayStart = getTodayStartTime()
         val todayEnd = getTodayEndTime()
 
         return tasks.filter { task ->
             val taskTime = task.createdAt
             val isToday = taskTime in todayStart..todayEnd
-
-            // Include if: task is from today OR task is uncompleted (regardless of date)
             isToday || !task.isCompleted
         }
     }
 
 
     private fun updateTaskStats(tasks: List<Task>) {
-        val completedCount = tasks.count { it.isCompleted }
-        val totalCount = tasks.size
-        val totalPoints = tasks.sumOf { it.points }
+        val taskViewMode = _state.value.mode
+        when(taskViewMode) {
+            HomeMode.SIMPLE -> {
+                val personalTasks = tasks.filter { it.category == TaskCategory.PERSONAL }
+                val completedCount = personalTasks.count { it.isCompleted }
+                val totalCount = personalTasks.filter {
+                    !it.isRepeated || it.repeatDays.contains(getTodaysDayOfWeek())
+                }.size
+                val totalPoints = personalTasks.sumOf { it.points }
+                _state.value = _state.value.copy(
+                    completedTasks = completedCount,
+                    totalTasks = totalCount,
+                    earnedPoints = totalPoints
+                )
 
-        _state.value = _state.value.copy(
-            completedTasks = completedCount,
-            totalTasks = totalCount,
-            earnedPoints = totalPoints
+            }
 
-        )
+            HomeMode.FOCUSED -> {
+                val focusedTasks = tasks.filter { it.category in
+                        listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS)}
+                val completedCount = focusedTasks.count { it.isCompleted }
+                val totalCount = focusedTasks.filter {
+                    !it.isRepeated || it.repeatDays.contains(getTodaysDayOfWeek()) || it.repeatDays.isEmpty()
+                }.size
+                val totalPoints = focusedTasks.sumOf { it.points }
+                _state.value = _state.value.copy(
+                    completedTasks = completedCount,
+                    totalTasks = totalCount,
+                    earnedPoints = totalPoints
+                )
+
+            }
+        }
     }
 }
