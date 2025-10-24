@@ -235,7 +235,7 @@ fun TaskHistoryScreenPreview() {
             title = "Complete Project Presentation",
             description = "Finish the quarterly presentation for the team meeting",
             points = 50,
-            category = TaskCategory.WORK,
+            category = TaskCategory.SKILLS,
             isCompleted = true,
             completedAt = System.currentTimeMillis() - 2 * 24 * 60 * 60 * 1000,
             relatedLinks = listOf(
@@ -252,7 +252,7 @@ fun TaskHistoryScreenPreview() {
             title = "Daily Workout Routine",
             description = "Complete 30 minutes of cardio and strength training",
             points = 20,
-            category = TaskCategory.PHYSICAL,
+            category = TaskCategory.PEOPLE,
             isCompleted = true,
             completedAt = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000,
             isRepeated = false
@@ -262,7 +262,7 @@ fun TaskHistoryScreenPreview() {
             title = "Read Book Chapter",
             description = "Read chapter 5 of 'Deep Work' by Cal Newport",
             points = 30,
-            category = TaskCategory.INTELLIGENCE,
+            category = TaskCategory.OPPORTUNITY,
             isCompleted = true,
             completedAt = System.currentTimeMillis(),
             isRepeated = false

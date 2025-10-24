@@ -89,8 +89,6 @@ class PointsViewModel @Inject constructor(
                 val taskStats = TaskStats(
                     totalTasks = totalTasks,
                     completedTasks = completedCount,
-                    urgentTasks = activeTasks.count { it.category == com.expeknow.ariselauncher.data.model.TaskCategory.URGENT },
-                    workTasks = activeTasks.count { it.category == com.expeknow.ariselauncher.data.model.TaskCategory.WORK },
                     personalTasks = activeTasks.count { it.category == com.expeknow.ariselauncher.data.model.TaskCategory.PERSONAL },
                     completionRatio = completionRatio,
                     todayCompleted = completedTasks.count { 
