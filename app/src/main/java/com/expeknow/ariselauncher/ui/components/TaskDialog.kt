@@ -358,16 +358,9 @@ private fun CategoryChip(
 private fun getCategoryName(category: TaskCategory): String {
     return when (category) {
         TaskCategory.PERSONAL -> "Personal"
-        TaskCategory.WORK -> "Work"
-        TaskCategory.URGENT -> "Urgent"
-        TaskCategory.IMPORTANT -> "Important"
-        TaskCategory.INTELLIGENCE -> "Intelligence"
-        TaskCategory.PHYSICAL -> "Physical"
-        TaskCategory.WEALTH -> "Wealth"
-        TaskCategory.BECOMING_INTELLIGENT -> "Becoming Intelligent"
-        TaskCategory.BECOMING_MUSCULAR -> "Becoming Muscular"
-        TaskCategory.BECOMING_RICH -> "Becoming Rich"
-        TaskCategory.MISCELLANEOUS -> "Miscellaneous"
+        TaskCategory.PEOPLE -> "People"
+        TaskCategory.OPPORTUNITY -> "Opportunity"
+        TaskCategory.SKILLS -> "Skills"
     }
 }
 

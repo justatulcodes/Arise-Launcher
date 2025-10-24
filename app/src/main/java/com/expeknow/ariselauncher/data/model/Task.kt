@@ -2,10 +2,7 @@ package com.expeknow.ariselauncher.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.util.UUID
 
 @Entity(tableName = "task_links")
@@ -24,12 +21,7 @@ enum class TaskLinkType {
 }
 
 enum class TaskCategory {
-    // Original categories for focused development
-    BECOMING_INTELLIGENT, BECOMING_MUSCULAR, BECOMING_RICH, MISCELLANEOUS,
-
-    // Additional categories for UI compatibility
-    INTELLIGENCE, PHYSICAL, WEALTH,
-    PERSONAL, WORK, URGENT, IMPORTANT
+    PEOPLE, OPPORTUNITY, SKILLS, PERSONAL
 }
 
 @Entity(tableName = "tasks")
@@ -40,7 +32,7 @@ data class Task(
     val title: String,
     val description: String = "",
     val points: Int = 0,
-    val category: TaskCategory = TaskCategory.MISCELLANEOUS,
+    val category: TaskCategory = TaskCategory.PERSONAL,
     val priority: Int = 1,
     val relatedLinks: List<TaskLink> = emptyList(),
     val isCompleted: Boolean = false,

@@ -23,7 +23,7 @@ interface TaskRepository {
         title: String,
         description: String = "",
         points: Int = 0,
-        category: TaskCategory = TaskCategory.MISCELLANEOUS,
+        category: TaskCategory = TaskCategory.PERSONAL,
         priority: Int = 1,
         isRepeated: Boolean = false,
         repeatDays: List<DaysOfWeek> = emptyList()
