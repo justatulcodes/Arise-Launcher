@@ -3,7 +3,7 @@ package com.expeknow.ariselauncher.ui.navigation
 sealed class Screen(val route: String) {
     data object Settings : Screen("settings")
     data object Focus : Screen("focus")
-    data object Points : Screen("points")
+//    data object Points : Screen("points")
     data object Drive : Screen("drive")
     data object Ctrl : Screen("ctrl")
     data object TaskHistory : Screen("task_history")
