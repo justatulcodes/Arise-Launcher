@@ -61,17 +61,17 @@ fun AppBottomNavigationBar(navController: NavController) {
                     }
                 }
             )
-            NavBarItem(
-                icon = Icons.Filled.EmojiEvents,
-                label = "POINTS",
-                isSelected = currentRoute == Screen.Points.route,
-                onClick = {
-                    navController.navigate(Screen.Points.route) {
-                        popUpTo(Screen.Focus.route)
-                        launchSingleTop = true
-                    }
-                }
-            )
+//            NavBarItem(
+//                icon = Icons.Filled.EmojiEvents,
+//                label = "POINTS",
+//                isSelected = currentRoute == Screen.Points.route,
+//                onClick = {
+//                    navController.navigate(Screen.Points.route) {
+//                        popUpTo(Screen.Focus.route)
+//                        launchSingleTop = true
+//                    }
+//                }
+//            )
             NavBarItem(
                 icon = Icons.Filled.Dashboard,
                 label = "DRIVE",

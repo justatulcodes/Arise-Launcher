@@ -56,7 +56,7 @@ fun AppNavigation(navController: NavHostController) {
 
     val bottomNavRoutes = setOf(
         Screen.Focus.route,
-        Screen.Points.route,
+//        Screen.Points.route,
         Screen.Drive.route,
         Screen.Ctrl.route
     )
@@ -93,10 +93,10 @@ fun AppNavigation(navController: NavHostController) {
 
                 HomeScreen(navController, viewModel, appDrawerViewModel, state)
             }
-            composable(Screen.Points.route) {
-                val pointsViewModel = it.sharedViewModel<PointsViewModel>(navController)
-                PointsScreen(navController, pointsViewModel)
-            }
+//            composable(Screen.Points.route) {
+//                val pointsViewModel = it.sharedViewModel<PointsViewModel>(navController)
+//                PointsScreen(navController, pointsViewModel)
+//            }
             composable(Screen.Drive.route) {
                 DriveScreen(navController)
             }
