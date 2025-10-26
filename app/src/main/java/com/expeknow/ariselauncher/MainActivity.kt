@@ -109,11 +109,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun stopTimerForApp(context: Context, packageName: String) {
+    private fun stopTimerForApp(context: Context) {
         try {
             val intent = Intent(context, AppUsageTimerService::class.java).apply {
                 action = AppUsageTimerService.ACTION_STOP_TRACKING
-                putExtra(AppUsageTimerService.EXTRA_APP_PACKAGE, packageName)
             }
             context.startService(intent)
         }
@@ -124,6 +123,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
+        Log.d("AppUsageService", "onStop called")
         val (packageName, appName) = getForegroundAppInfo(this)
             ?: return
         startTimerForApp(this, packageName, appName)
@@ -131,7 +131,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        stopTimerForApp(this, packageName)
+        Log.d("AppUsageService", "onStart called")
+        stopTimerForApp(this)
     }
 
 }
