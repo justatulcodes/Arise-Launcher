@@ -48,8 +48,6 @@ data class RankColors(
 data class TaskStats(
     val totalTasks: Int,
     val completedTasks: Int,
-    val urgentTasks: Int,
-    val workTasks: Int,
     val personalTasks: Int,
     val completionRatio: Float,
     val todayCompleted: Int,

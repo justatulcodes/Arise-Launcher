@@ -106,10 +106,7 @@ fun HomeScreen(
                         HomeMode.SIMPLE -> {
                             val simpleTasks = filteredTasks.filter { task ->
                                 task.category in listOf(
-                                    TaskCategory.URGENT,
-                                    TaskCategory.IMPORTANT,
                                     TaskCategory.PERSONAL,
-                                    TaskCategory.WORK
                                 )
                             }
 
@@ -269,10 +266,10 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category, isRepeatable, daysOfWeek))
             },
             showCategorySelector = state.mode == HomeMode.FOCUSED,
-            initialCategory = if (state.mode == HomeMode.FOCUSED) TaskCategory.INTELLIGENCE else TaskCategory.PERSONAL,
+            initialCategory = if (state.mode == HomeMode.FOCUSED) TaskCategory.PEOPLE else TaskCategory.PERSONAL,
             availableCategories = if (state.mode == HomeMode.FOCUSED)
-                listOf(TaskCategory.INTELLIGENCE, TaskCategory.PHYSICAL, TaskCategory.WEALTH)
-                else listOf(TaskCategory.PERSONAL, TaskCategory.WORK, TaskCategory.URGENT, TaskCategory.IMPORTANT)
+                listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS)
+                else listOf(TaskCategory.PERSONAL)
         )
     }
 }
