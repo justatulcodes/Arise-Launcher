@@ -182,12 +182,12 @@ fun TasksContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                TaskStatCard(
-                    modifier = Modifier.weight(1f),
-                    title = taskStats.urgentTasks.toString(),
-                    subtitle = "URGENT TASKS",
-                    currentRank = currentRank
-                )
+//                TaskStatCard(
+//                    modifier = Modifier.weight(1f),
+//                    title = taskStats.urgentTasks.toString(),
+//                    subtitle = "URGENT TASKS",
+//                    currentRank = currentRank
+//                )
 
                 TaskStatCard(
                     modifier = Modifier.weight(1f),
@@ -215,12 +215,12 @@ fun TasksContent(
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                TaskBreakdownItem(
-                    label = "Work Tasks",
-                    count = taskStats.workTasks,
-                    total = taskStats.totalTasks,
-                    color = Color(0xFF60A5FA)
-                )
+//                TaskBreakdownItem(
+//                    label = "Work Tasks",
+//                    count = taskStats.workTasks,
+//                    total = taskStats.totalTasks,
+//                    color = Color(0xFF60A5FA)
+//                )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -233,12 +233,12 @@ fun TasksContent(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                TaskBreakdownItem(
-                    label = "Urgent Tasks",
-                    count = taskStats.urgentTasks,
-                    total = taskStats.totalTasks,
-                    color = Color(0xFFF87171)
-                )
+//                TaskBreakdownItem(
+//                    label = "Urgent Tasks",
+//                    count = taskStats.urgentTasks,
+//                    total = taskStats.totalTasks,
+//                    color = Color(0xFFF87171)
+//                )
             }
         }
 
@@ -565,8 +565,6 @@ fun TasksContentPreview() {
             completedTasks = 20,
             totalTasks = 40,
             todayCompleted = 5,
-            urgentTasks = 10,
-            workTasks = 15,
             personalTasks = 10,
             weeklyAverage = 20f
         ),

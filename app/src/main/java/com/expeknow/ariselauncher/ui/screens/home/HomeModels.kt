@@ -80,39 +80,39 @@ sealed class HomeEvent {
 
 data class HomeTheme(
     val background: Color = Color.Black,
-    val surface: Color = androidx.compose.ui.graphics.Color(0xFF1F1F1F),
+    val surface: Color = Color(0xFF1F1F1F),
     val accent: Color = Color.White,
     val textPrimary: Color = Color.White,
-    val textSecondary: Color = androidx.compose.ui.graphics.Color(
+    val textSecondary: Color = Color(
         0xFF9CA3AF
     ),
-    val border: Color = androidx.compose.ui.graphics.Color(0xFF374151),
-    val bg: Color = androidx.compose.ui.graphics.Color(0xFF1F1F1F)
+    val border: Color = Color(0xFF374151),
+    val bg: Color = Color(0xFF1F1F1F)
 )
 
 private fun getDefaultFocusCategories(): List<FocusCategory> = listOf(
     FocusCategory(
-        id = TaskCategory.INTELLIGENCE,
-        name = "Becoming Incredibly Intelligent",
-        icon = Icons.Filled.Psychology,
-        color = androidx.compose.ui.graphics.Color(0xFF60A5FA),
-        bgColor = androidx.compose.ui.graphics.Color(0xFF60A5FA).copy(alpha = 0.1f),
-        borderColor = androidx.compose.ui.graphics.Color(0xFF60A5FA).copy(alpha = 0.3f)
+        id = TaskCategory.PEOPLE,
+        name = "Improving People Interactions",
+        icon = Icons.Filled.Groups,
+        color = Color(0xFF60A5FA),
+        bgColor = Color(0xFF60A5FA).copy(alpha = 0.1f),
+        borderColor = Color(0xFF60A5FA).copy(alpha = 0.3f)
     ),
     FocusCategory(
-        id = TaskCategory.PHYSICAL,
-        name = "Becoming Incredibly Muscular",
-        icon = Icons.Filled.FitnessCenter,
-        color = androidx.compose.ui.graphics.Color(0xFFFB923C),
-        bgColor = androidx.compose.ui.graphics.Color(0xFFFB923C).copy(alpha = 0.1f),
-        borderColor = androidx.compose.ui.graphics.Color(0xFFFB923C).copy(alpha = 0.3f)
+        id = TaskCategory.OPPORTUNITY,
+        name = "Identifying and Creating Opportunities",
+        icon = Icons.Filled.Lightbulb,
+        color = Color(0xFFFB923C),
+        bgColor = Color(0xFFFB923C).copy(alpha = 0.1f),
+        borderColor = Color(0xFFFB923C).copy(alpha = 0.3f)
     ),
     FocusCategory(
-        id = TaskCategory.WEALTH,
-        name = "Becoming Incredibly Rich",
+        id = TaskCategory.SKILLS,
+        name = "Becoming Highly Skilled",
         icon = Icons.Filled.AttachMoney,
-        color = androidx.compose.ui.graphics.Color(0xFF4ADE80),
-        bgColor = androidx.compose.ui.graphics.Color(0xFF4ADE80).copy(alpha = 0.1f),
-        borderColor = androidx.compose.ui.graphics.Color(0xFF4ADE80).copy(alpha = 0.3f)
+        color = Color(0xFF4ADE80),
+        bgColor = Color(0xFF4ADE80).copy(alpha = 0.1f),
+        borderColor = Color(0xFF4ADE80).copy(alpha = 0.3f)
     )
 )

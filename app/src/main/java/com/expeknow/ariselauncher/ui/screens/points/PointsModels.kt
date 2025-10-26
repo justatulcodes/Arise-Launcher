@@ -16,8 +16,6 @@ data class PointsState(
     val taskStats: TaskStats = TaskStats(
         totalTasks = 0,
         completedTasks = 0,
-        urgentTasks = 0,
-        workTasks = 0,
         personalTasks = 0,
         completionRatio = 0f,
         todayCompleted = 0,

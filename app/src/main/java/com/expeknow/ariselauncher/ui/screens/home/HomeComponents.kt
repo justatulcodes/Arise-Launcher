@@ -102,23 +102,36 @@ fun EnhancedPointsHeader(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val trendColor = if (pointsTrend == PointsTrend.INCREASING)
-                        Color(0xFF4ADE80) else Color(0xFFEF4444)
-                    val trendIcon = if (pointsTrend == PointsTrend.INCREASING)
-                        Icons.Filled.TrendingUp else Icons.Filled.TrendingDown
-
-                    Icon(
-                        trendIcon,
-                        contentDescription = null,
-                        tint = trendColor,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        if (pointsTrend == PointsTrend.INCREASING) "+$pointChange" else "-$pointChange",
-                        color = trendColor,
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    val trendColor: Color
+                    val trendIcon : ImageVector
+                    when(pointsTrend) {
+                        PointsTrend.INCREASING -> {
+                            trendColor = Color(0xFF4ADE80)
+                            trendIcon = Icons.Filled.TrendingUp
+                        }
+                        PointsTrend.DECREASING -> {
+                            trendColor = Color(0xFFEF4444)
+                            trendIcon = Icons.Filled.TrendingDown
+                        }
+                        PointsTrend.STABLE -> {
+                            trendColor = Color(0xFFF59E0B)
+                            trendIcon = Icons.Filled.TrendingFlat
+                        }
+                    }
+                    if(pointsTrend != PointsTrend.STABLE) {
+                        Icon(
+                            trendIcon,
+                            contentDescription = null,
+                            tint = trendColor,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            if (pointsTrend == PointsTrend.INCREASING) "+$pointChange" else "-$pointChange",
+                            color = trendColor,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
             }
 

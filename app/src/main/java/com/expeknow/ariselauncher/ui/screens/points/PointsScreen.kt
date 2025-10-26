@@ -41,13 +41,6 @@ fun PointsScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        /*
-        PointsHeader(
-            selectedTabIndex = state.selectedTabIndex,
-            onTabSelect = { index: Int -> viewModel.onEvent(PointsEvent.SelectTab(index)) },
-            currentRank = currentRank
-        )
-        */
 
         LazyColumn(
             modifier = Modifier
@@ -76,72 +69,11 @@ fun PointsScreen(
                 )
             }
 
-//            item {
-//                RecentActivityCard(
-//                    activities = state.activities,
-//                    currentRank = currentRank
-//                )
-//            }
-//
-//
-//
-//            item {
-//                PointsGrowthChart(
-//                    pointsHistory = state.pointsHistory,
-//                    currentRank = currentRank
-//                )
-//            }
-
-//            item {
-//                PointSystemCard(currentRank = currentRank)
-//            }
-
             item { Spacer(Modifier.height(24.dp)) }
         }
     }
 }
 
-// Keep the original OverviewTabContent commented out for reference
-/*
-@Composable
-private fun OverviewTabContent(
-    currentPoints: Int,
-    currentRank: Rank,
-    nextRank: Rank?,
-    progressToNext: Float,
-    pointsHistory: List<PointsHistory>,
-    totalEarned: Int,
-    totalBurned: Int,
-    activities: List<PointActivity>
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-        CurrentStatusCard(
-            currentPoints = currentPoints,
-            currentRank = currentRank,
-            nextRank = nextRank,
-            progressToNext = progressToNext
-        )
-
-        PointsGrowthChart(
-            pointsHistory = pointsHistory,
-            currentRank = currentRank
-        )
-
-        StatsGrid(
-            totalEarned = totalEarned,
-            totalBurned = totalBurned,
-            currentRank = currentRank
-        )
-
-        PointSystemCard(currentRank = currentRank)
-
-        RecentActivityCard(
-            activities = activities,
-            currentRank = currentRank
-        )
-    }
-}
-*/
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
