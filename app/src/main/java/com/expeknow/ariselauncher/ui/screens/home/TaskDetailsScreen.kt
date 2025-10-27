@@ -21,6 +21,8 @@ import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskLink
 import com.expeknow.ariselauncher.data.model.TaskLinkType
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
+import com.expeknow.ariselauncher.ui.screens.settings.ConfirmationDialog
+import com.expeknow.ariselauncher.ui.screens.settings.SettingsTheme
 
 @Composable
 fun TaskDetailsScreen(
@@ -66,8 +68,7 @@ fun TaskDetailsScreen(
                         },
                         theme = theme,
                         onDeleteTask = {
-                            viewModel.onEvent(TaskDetailsEvent.DeleteTask(task.id))
-                            navController.popBackStack()
+                            viewModel.onEvent(TaskDetailsEvent.ShowDeleteConfirmation)
                         }
                     )
 
@@ -206,15 +207,24 @@ fun TaskDetailsScreen(
         },
         theme = theme
     )
-}
 
-//@Preview(showBackground = true, backgroundColor = 0xFF000000)
-//@Composable
-//private fun TaskDetailsScreenPreview() {
-//    TaskDetailsScreen(
-//        navController = androidx.navigation.compose.rememberNavController(),
-//        id = "preview-task-id",
-//        viewModel = viewModel,
-//        state = state
-//    )
-//}
+    if (state.showDeleteConfirmation) {
+        state.task?.let { task ->
+            ConfirmationDialog(
+                title = "DELETE TASK",
+                message = "Are you sure you want to delete this task? This action cannot be undone.",
+                confirmText = "DELETE",
+                cancelText = "CANCEL",
+                onConfirm = {
+                    viewModel.onEvent(TaskDetailsEvent.DeleteTask(task.id))
+                    navController.popBackStack()
+                },
+                onDismiss = {
+                    viewModel.onEvent(TaskDetailsEvent.DismissDeleteConfirmation)
+                },
+                theme = SettingsTheme(),
+                isDestructive = true
+            )
+        }
+    }
+}
