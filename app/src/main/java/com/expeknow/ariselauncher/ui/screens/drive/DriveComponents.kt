@@ -56,6 +56,7 @@ fun DriveItemCard(
                             DriveItemType.QUOTE -> Icons.Default.FormatQuote
                             DriveItemType.IMAGE -> Icons.Default.Image
                             DriveItemType.VIDEO -> Icons.Default.PlayCircle
+                            DriveItemType.TODO -> Icons.Default.AutoAwesome
                         },
                         contentDescription = null,
                         tint = AccentGreen,
@@ -212,6 +213,11 @@ fun DriveItemCard(
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
+                }
+
+                DriveItemType.TODO -> {
+
+
                 }
             }
         }
@@ -442,6 +448,11 @@ fun AddDriveItemDialog(
                                 cursorColor = AccentGreen
                             )
                         )
+                    }
+
+                    DriveItemType.TODO -> {
+
+
                     }
                 }
 

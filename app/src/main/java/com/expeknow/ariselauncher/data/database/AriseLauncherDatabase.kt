@@ -1,11 +1,13 @@
 package com.expeknow.ariselauncher.data.database
 
 import android.content.Context
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.expeknow.ariselauncher.data.database.AriseDatabaseMigrations.MIGRATION_2_3
 import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
 import com.expeknow.ariselauncher.data.database.dao.DriveItemDao
 import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
@@ -13,17 +15,17 @@ import com.expeknow.ariselauncher.data.database.dao.TaskDao
 import com.expeknow.ariselauncher.data.database.dao.TaskLinkDao
 import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.model.DriveItem
+import com.expeknow.ariselauncher.data.model.ModelTypeConverters
 import com.expeknow.ariselauncher.data.model.PointsLog
 import com.expeknow.ariselauncher.data.model.Task
-import com.expeknow.ariselauncher.data.model.TaskConverters
 import com.expeknow.ariselauncher.data.model.TaskLink
 
 @Database(
     entities = [Task::class, TaskLink::class, PointsLog::class, AppInfo::class, DriveItem::class],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
-@TypeConverters(TaskConverters::class)
+@TypeConverters(ModelTypeConverters::class)
 abstract class AriseLauncherDatabase : RoomDatabase() {
 
     abstract fun taskDao(): TaskDao
@@ -43,7 +45,7 @@ abstract class AriseLauncherDatabase : RoomDatabase() {
                     AriseLauncherDatabase::class.java,
                     "arise_launcher_database"
                 )
-                    .fallbackToDestructiveMigration(false)
+                    .addMigrations(MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance
