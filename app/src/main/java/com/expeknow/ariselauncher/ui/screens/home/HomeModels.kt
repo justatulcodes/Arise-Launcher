@@ -48,7 +48,8 @@ data class HomeState(
     val focusCategories: List<FocusCategory> = getDefaultFocusCategories(),
     val editingCategoryId: TaskCategory? = null,
     val editingCategoryName: String = "",
-    val expandedLinkId: String? = null
+    val expandedLinkId: String? = null,
+    val currentPage: Int = 1 // 0 = blank, 1 = main tasks, 2 = alternate (focused mode only)
 )
 
 sealed class HomeEvent {
@@ -76,6 +77,7 @@ sealed class HomeEvent {
     data object CancelEditingCategory : HomeEvent()
     data class UpdateEditingCategoryName(val name: String) : HomeEvent()
     data class ExpandLink(val linkId: String?) : HomeEvent()
+    data class UpdateCurrentPage(val page: Int) : HomeEvent()
 }
 
 data class HomeTheme(
