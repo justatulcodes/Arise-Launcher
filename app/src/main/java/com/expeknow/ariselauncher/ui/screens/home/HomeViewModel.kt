@@ -189,6 +189,10 @@ class HomeViewModel @Inject constructor(
                     appRepositoryImpl.launchApp(event.app.packageName)
                 }
             }
+
+            is HomeEvent.UpdateCurrentPage -> {
+                _state.value = _state.value.copy(currentPage = event.page)
+            }
         }
     }
 
