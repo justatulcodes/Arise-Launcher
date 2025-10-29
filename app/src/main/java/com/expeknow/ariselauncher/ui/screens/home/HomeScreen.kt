@@ -1,6 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,10 +16,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.expeknow.ariselauncher.R
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
@@ -79,26 +83,7 @@ fun HomeScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Header with Points and Progress
-            EnhancedPointsHeader(
-                currentPoints = state.currentPoints,
-                pointChange = state.pointChange,
-                pointsTrend = state.pointsTrend,
-                completed = state.completedTasks,
-                total = state.totalTasks,
-                onPointsClick = { /* Navigate to points page */ },
-                theme = theme
-            )
-
-            // Progress Bar
-            EnhancedProgressBar(
-                completed = state.completedTasks,
-                total = state.totalTasks,
-                theme = theme
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
+            // HorizontalPager for multi-window swipe
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
@@ -121,7 +106,10 @@ fun HomeScreen(
                             navController = navController,
                             viewModel = viewModel,
                             context = context,
-                            theme = theme
+                            theme = theme,
+                            currentPoints = state.currentPoints,
+                            pointChange = state.pointChange,
+                            pointsTrend = state.pointsTrend
                         )
                     }
                     2 -> {
@@ -132,7 +120,12 @@ fun HomeScreen(
                                 navController = navController,
                                 viewModel = viewModel,
                                 context = context,
-                                theme = theme
+                                theme = theme,
+                                currentPoints = state.currentPoints,
+                                pointChange = state.pointChange,
+                                pointsTrend = state.pointsTrend,
+                                completedTasks = state.completedTasks,
+                                totalTasks = state.totalTasks
                             )
                         }
                     }
@@ -263,15 +256,13 @@ private fun BoxScope.AddTaskButton(viewModel: HomeViewModel) {
 @Composable
 fun BlankScreen(theme: HomeTheme) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black),
-        contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "Swipe to navigate",
-            color = Color.White.copy(alpha = 0.5f),
-            style = MaterialTheme.typography.bodyLarge
+        Image(
+            painter = painterResource(id = R.drawable.wallpaper_4),
+            contentDescription = "Wallpaper",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
     }
 }
@@ -290,28 +281,47 @@ fun MainTaskContentScreen(
     navController: NavController,
     viewModel: HomeViewModel,
     context: android.content.Context,
-    theme: HomeTheme
+    theme: HomeTheme,
+    currentPoints: Int,
+    pointChange: Int,
+    pointsTrend: PointsTrend
 ) {
-    // Task content implementation based on mode (SIMPLE or FOCUSED)
-    if (allTasksCompleted) {
-        Box {
-            TasksCompletedCelebration(
-                completedCount = completedTasks,
-                pointsEarned = pointsEarned,
-                theme = theme
-            )
-            AddTaskButton(viewModel)
-        }
-    } else {
-        when (mode) {
-            HomeMode.SIMPLE -> {
-                val simpleTasks = filteredTasks.filter { task ->
-                    task.category in listOf(
-                        TaskCategory.PERSONAL,
-                    )
-                }
+    Column(modifier = Modifier.fillMaxSize()) {
+        EnhancedPointsHeader(
+            currentPoints = currentPoints,
+            pointChange = pointChange,
+            pointsTrend = pointsTrend,
+            completed = completedTasks,
+            total = completedTasks + (filteredTasks.size - completedTasks),
+            onPointsClick = { /* Navigate to points page */ },
+            theme = theme
+        )
 
-                Column {
+        EnhancedProgressBar(
+            completed = completedTasks,
+            total = completedTasks + (filteredTasks.size - completedTasks),
+            theme = theme
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (allTasksCompleted) {
+            Box {
+                TasksCompletedCelebration(
+                    completedCount = completedTasks,
+                    pointsEarned = pointsEarned,
+                    theme = theme
+                )
+                AddTaskButton(viewModel)
+            }
+        } else {
+            when (mode) {
+                HomeMode.SIMPLE -> {
+                    val simpleTasks = filteredTasks.filter { task ->
+                        task.category in listOf(
+                            TaskCategory.PERSONAL,
+                        )
+                    }
 
                     Box {
                         LazyColumn(
@@ -343,40 +353,36 @@ fun MainTaskContentScreen(
                             }
                         }
                         AddTaskButton(viewModel)
-
                     }
-
-
-
                 }
-            }
 
-            HomeMode.FOCUSED -> {
-                FocusedTaskList(
-                    categories = focusCategories,
-                    tasks = recurringTasks,
-                    onTaskClick = { taskId ->
-                        navController.navigate(Screen.TaskDetails.routeFor(taskId))
-                    },
-                    onToggleTask = { task ->
-                        viewModel.onEvent(HomeEvent.ToggleTask(task))
-                    },
-                    onEditCategory = { categoryId ->
-                        viewModel.onEvent(HomeEvent.StartEditingCategory(categoryId))
-                    },
-                    editingCategoryId = editingCategoryId,
-                    editingCategoryName = editingCategoryName,
-                    onSaveEdit = {
-                        viewModel.onEvent(HomeEvent.SaveEditingCategory(editingCategoryName))
-                    },
-                    onCancelEdit = {
-                        viewModel.onEvent(HomeEvent.CancelEditingCategory)
-                    },
-                    onEditingNameChange = { name ->
-                        viewModel.onEvent(HomeEvent.UpdateEditingCategoryName(name))
-                    },
-                    theme = theme
-                )
+                HomeMode.FOCUSED -> {
+                    FocusedTaskList(
+                        categories = focusCategories,
+                        tasks = recurringTasks,
+                        onTaskClick = { taskId ->
+                            navController.navigate(Screen.TaskDetails.routeFor(taskId))
+                        },
+                        onToggleTask = { task ->
+                            viewModel.onEvent(HomeEvent.ToggleTask(task))
+                        },
+                        onEditCategory = { categoryId ->
+                            viewModel.onEvent(HomeEvent.StartEditingCategory(categoryId))
+                        },
+                        editingCategoryId = editingCategoryId,
+                        editingCategoryName = editingCategoryName,
+                        onSaveEdit = {
+                            viewModel.onEvent(HomeEvent.SaveEditingCategory(editingCategoryName))
+                        },
+                        onCancelEdit = {
+                            viewModel.onEvent(HomeEvent.CancelEditingCategory)
+                        },
+                        onEditingNameChange = { name ->
+                            viewModel.onEvent(HomeEvent.UpdateEditingCategoryName(name))
+                        },
+                        theme = theme
+                    )
+                }
             }
         }
     }
@@ -389,7 +395,12 @@ fun AlternateTasksScreen(
     navController: NavController,
     viewModel: HomeViewModel,
     context: android.content.Context,
-    theme: HomeTheme
+    theme: HomeTheme,
+    currentPoints: Int,
+    pointChange: Int,
+    pointsTrend: PointsTrend,
+    completedTasks: Int,
+    totalTasks: Int
 ) {
     val simpleTasks = allTasks.filter { task ->
         task.category in listOf(
@@ -397,7 +408,24 @@ fun AlternateTasksScreen(
         )
     }
 
-    Column {
+    Column(modifier = Modifier.fillMaxSize()) {
+        EnhancedPointsHeader(
+            currentPoints = currentPoints,
+            pointChange = pointChange,
+            pointsTrend = pointsTrend,
+            completed = completedTasks,
+            total = totalTasks,
+            onPointsClick = { /* Navigate to points page */ },
+            theme = theme
+        )
+
+        EnhancedProgressBar(
+            completed = completedTasks,
+            total = totalTasks,
+            theme = theme
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Box {
             LazyColumn(
@@ -429,10 +457,6 @@ fun AlternateTasksScreen(
                 }
             }
             AddTaskButton(viewModel)
-
         }
-
-
-
     }
 }
