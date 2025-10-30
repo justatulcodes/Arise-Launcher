@@ -92,6 +92,11 @@ class SettingsViewModel @Inject constructor(
                 settingsRepository.setShouldTriggerKeyboardInAppDrawer(event.enabled)
             }
 
+            is SettingsEvent.ToggleWeeklySchedule -> {
+                _state.value = _state.value.copy(showWeeklyScheduleEnabled = event.enabled)
+                settingsRepository.setShowEntireWeekSchedule(event.enabled)
+            }
+
             is SettingsEvent.SetDefaultLauncher -> {
                 appRepositoryImpl.openDefaultLauncherSettings()
             }

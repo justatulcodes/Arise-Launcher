@@ -34,6 +34,7 @@ data class SettingsState(
     val pointThreshold: Float = 50f,
     val warningsEnabled: Boolean = true,
     val keyboardTriggerEnabled: Boolean = false,
+    val showWeeklyScheduleEnabled: Boolean = false,
     val isDefaultLauncher: Boolean = false,
     val apps: List<SettingsAppInfo> = getDefaultApps(),
     val showResetPointsDialog: Boolean = false,
@@ -56,6 +57,7 @@ sealed class SettingsEvent {
     data class UpdatePointThreshold(val threshold: Float) : SettingsEvent()
     data class ToggleWarnings(val enabled: Boolean) : SettingsEvent()
     data class ToggleKeyboardTrigger(val enabled: Boolean) : SettingsEvent()
+    data class ToggleWeeklySchedule(val enabled: Boolean) : SettingsEvent()
     data class ToggleAppEssential(val appId: String) : SettingsEvent()
     data object ShowResetPointsDialog : SettingsEvent()
     data object HideResetPointsDialog : SettingsEvent()
