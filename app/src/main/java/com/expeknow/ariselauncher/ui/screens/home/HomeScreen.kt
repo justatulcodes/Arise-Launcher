@@ -50,13 +50,12 @@ fun HomeScreen(
     var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    // Determine page count based on mode
     val pageCount = if (state.mode == HomeMode.FOCUSED) 3 else 2
     val pagerState = rememberPagerState(
         initialPage = 1,
         pageCount = { pageCount }
     )
-    val coroutineScope = rememberCoroutineScope()
+    val shouldShowTaskCategory = state.mode == HomeMode.FOCUSED && pagerState.currentPage == 1
 
     LaunchedEffect(pagerState.currentPage) {
         viewModel.onEvent(HomeEvent.UpdateCurrentPage(pagerState.currentPage))
@@ -71,19 +70,15 @@ fun HomeScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Calculated values for the entire screen
-        val allTasksCompleted = state.totalTasks > 0 && state.completedTasks == state.totalTasks
-        val filteredTasks = if (state.hideCompletedTasks) {
-            state.allTasks.filter { !it.isCompleted }
-        } else {
-            state.allTasks
-        }
-        val pointsEarned = state.allTasks.filter { it.isCompleted }.sumOf { it.points }
+        val allNormalTasksCompleted =
+            state.normalTotalTasks > 0 && state.normalCompletedTasks == state.normalTotalTasks
+
+        val combinedTasks = state.normalTasks + state.focusedTasks
+        val pointsEarned = combinedTasks.filter { it.isCompleted }.sumOf { it.points }
 
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // HorizontalPager for multi-window swipe
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
@@ -95,11 +90,11 @@ fun HomeScreen(
                     1 -> {
                         MainTaskContentScreen(
                             mode = state.mode,
-                            allTasksCompleted = allTasksCompleted,
-                            completedTasks = state.completedTasks,
+                            allTasksCompleted = allNormalTasksCompleted,
+                            completedTasks = state.normalCompletedTasks,
                             pointsEarned = pointsEarned,
-                            filteredTasks = filteredTasks,
-                            recurringTasks = state.recurringTasks,
+                            normalTasks = state.normalTasks,
+                            focusedTasks = state.focusedTasks,
                             focusCategories = state.focusCategories,
                             editingCategoryId = state.editingCategoryId,
                             editingCategoryName = state.editingCategoryName,
@@ -115,7 +110,7 @@ fun HomeScreen(
                     2 -> {
                         if (state.mode == HomeMode.FOCUSED) {
                             AlternateTasksScreen(
-                                allTasks = state.allTasks,
+                                allNormalTasks = state.normalTasks,
                                 hideCompletedTasks = state.hideCompletedTasks,
                                 navController = navController,
                                 viewModel = viewModel,
@@ -124,8 +119,8 @@ fun HomeScreen(
                                 currentPoints = state.currentPoints,
                                 pointChange = state.pointChange,
                                 pointsTrend = state.pointsTrend,
-                                completedTasks = state.completedTasks,
-                                totalTasks = state.totalTasks
+                                completedTasks = state.normalCompletedTasks,
+                                totalTasks = state.normalTotalTasks
                             )
                         }
                     }
@@ -146,7 +141,7 @@ fun HomeScreen(
 
         }
 
-        if (state.mode == HomeMode.FOCUSED && !allTasksCompleted && pagerState.currentPage == 1) {
+        if (state.mode == HomeMode.FOCUSED && pagerState.currentPage == 1) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
@@ -215,9 +210,9 @@ fun HomeScreen(
             onTaskAdded = { title: String, desc: String, pts: Int, category: TaskCategory, isRepeatable : Boolean, daysOfWeek : List<DaysOfWeek> ->
                 viewModel.onEvent(HomeEvent.AddTask(title, desc, pts, category, isRepeatable, daysOfWeek))
             },
-            showCategorySelector = state.mode == HomeMode.FOCUSED,
-            initialCategory = if (state.mode == HomeMode.FOCUSED) TaskCategory.PEOPLE else TaskCategory.PERSONAL,
-            availableCategories = if (state.mode == HomeMode.FOCUSED)
+            showCategorySelector = shouldShowTaskCategory,
+            initialCategory = if (shouldShowTaskCategory) TaskCategory.PEOPLE else TaskCategory.PERSONAL,
+            availableCategories = if (shouldShowTaskCategory)
                 listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS)
                 else listOf(TaskCategory.PERSONAL)
         )
@@ -273,8 +268,8 @@ fun MainTaskContentScreen(
     allTasksCompleted: Boolean,
     completedTasks: Int,
     pointsEarned: Int,
-    filteredTasks: List<Task>,
-    recurringTasks: List<Task>,
+    normalTasks: List<Task>,
+    focusedTasks: List<Task>,
     focusCategories: List<FocusCategory>,
     editingCategoryId: TaskCategory?,
     editingCategoryName: String,
@@ -292,74 +287,78 @@ fun MainTaskContentScreen(
             pointChange = pointChange,
             pointsTrend = pointsTrend,
             completed = completedTasks,
-            total = completedTasks + (filteredTasks.size - completedTasks),
+            total =
+            if(mode == HomeMode.SIMPLE) normalTasks.size else focusedTasks.size,
             onPointsClick = { /* Navigate to points page */ },
             theme = theme
         )
 
         EnhancedProgressBar(
             completed = completedTasks,
-            total = completedTasks + (filteredTasks.size - completedTasks),
+            total = completedTasks + (normalTasks.size - completedTasks),
             theme = theme
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (allTasksCompleted) {
-            Box {
-                TasksCompletedCelebration(
-                    completedCount = completedTasks,
-                    pointsEarned = pointsEarned,
-                    theme = theme
-                )
-                AddTaskButton(viewModel)
-            }
-        } else {
-            when (mode) {
+        when (mode) {
                 HomeMode.SIMPLE -> {
-                    val simpleTasks = filteredTasks.filter { task ->
+                    val simpleTasks = normalTasks.filter { task ->
                         task.category in listOf(
                             TaskCategory.PERSONAL,
                         )
                     }
 
-                    Box {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            items(simpleTasks) { task ->
-                                SimpleTaskItem(
-                                    task = task,
-                                    onTaskClick = {
-                                        navController.navigate(Screen.TaskDetails.routeFor(task.id))
-                                    },
-                                    onToggleTask = {
-                                        viewModel.onEvent(HomeEvent.ToggleTask(task))
-                                    },
-                                    theme = theme,
-                                    onTaskLinkClick = { taskLink ->
-                                        openLink(context = context,
-                                            url = taskLink.url,
-                                            linkType = taskLink.type)
-                                    }
-                                )
-                            }
-
-                            item {
-                                Spacer(modifier = Modifier.height(56.dp))
-                            }
+                    if (allTasksCompleted) {
+                        Box {
+                            TasksCompletedCelebration(
+                                completedCount = completedTasks,
+                                pointsEarned = pointsEarned,
+                                theme = theme
+                            )
+                            AddTaskButton(viewModel)
                         }
-                        AddTaskButton(viewModel)
                     }
+                    else {
+                        Box {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(simpleTasks) { task ->
+                                    SimpleTaskItem(
+                                        task = task,
+                                        onTaskClick = {
+                                            navController.navigate(Screen.TaskDetails.routeFor(task.id))
+                                        },
+                                        onToggleTask = {
+                                            viewModel.onEvent(HomeEvent.ToggleTask(task))
+                                        },
+                                        theme = theme,
+                                        onTaskLinkClick = { taskLink ->
+                                            openLink(context = context,
+                                                url = taskLink.url,
+                                                linkType = taskLink.type)
+                                        }
+                                    )
+                                }
+
+                                item {
+                                    Spacer(modifier = Modifier.height(56.dp))
+                                }
+                            }
+                            AddTaskButton(viewModel)
+                        }
+                    }
+
                 }
 
                 HomeMode.FOCUSED -> {
                     FocusedTaskList(
                         categories = focusCategories,
-                        tasks = recurringTasks,
+                        tasks = focusedTasks,
                         onTaskClick = { taskId ->
                             navController.navigate(Screen.TaskDetails.routeFor(taskId))
                         },
@@ -384,13 +383,13 @@ fun MainTaskContentScreen(
                     )
                 }
             }
-        }
+
     }
 }
 
 @Composable
 fun AlternateTasksScreen(
-    allTasks: List<Task>,
+    allNormalTasks: List<Task>,
     hideCompletedTasks: Boolean,
     navController: NavController,
     viewModel: HomeViewModel,
@@ -402,10 +401,8 @@ fun AlternateTasksScreen(
     completedTasks: Int,
     totalTasks: Int
 ) {
-    val simpleTasks = allTasks.filter { task ->
-        task.category in listOf(
-            TaskCategory.PERSONAL,
-        )
+    if(hideCompletedTasks) {
+       allNormalTasks.filter { !it.isCompleted }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -434,7 +431,7 @@ fun AlternateTasksScreen(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(simpleTasks) { task ->
+                items(allNormalTasks) { task ->
                     SimpleTaskItem(
                         task = task,
                         onTaskClick = {
