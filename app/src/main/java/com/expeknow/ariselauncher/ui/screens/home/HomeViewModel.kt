@@ -1,7 +1,6 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
 import android.util.Log
-import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -208,8 +207,8 @@ class HomeViewModel @Inject constructor(
             taskRepositoryImpl.getAllTasks().collect { tasks ->
                 markCompletedRecurringTasksAsIncomplete(tasks)
 
-                val filteredTasks = getTasksCreatedTodayOrTasksNotYetCompleted(tasks)
-                _state.value = _state.value.copy(allTasks = tasks)
+                val filteredTasks = getNormalModeTasksCreatedTodayOrTasksNotYetCompleted(tasks)
+                _state.value = _state.value.copy(normalTasks = filteredTasks)
                 updateTaskStats(filteredTasks)
             }
         }
@@ -218,7 +217,7 @@ class HomeViewModel @Inject constructor(
                 markCompletedRecurringTasksAsIncomplete(tasks)
 
                 val tasksForToday = getTasksRecurringToday(tasks)
-                _state.value = _state.value.copy(recurringTasks = tasksForToday)
+                _state.value = _state.value.copy(focusedTasks = tasksForToday)
             }
         }
     }
@@ -250,15 +249,16 @@ class HomeViewModel @Inject constructor(
         return tasksRecurringToday
     }
 
-    private fun getTasksCreatedTodayOrTasksNotYetCompleted(tasks: List<Task>): List<Task> {
+    private fun getNormalModeTasksCreatedTodayOrTasksNotYetCompleted(tasks: List<Task>): List<Task> {
         val todayStart = getTodayStartTime()
         val todayEnd = getTodayEndTime()
 
-        return tasks.filter { task ->
+        val filteredTasks = tasks.filter { task ->
             val taskTime = task.createdAt
             val isToday = taskTime in todayStart..todayEnd
-            isToday || !task.isCompleted
+            (isToday || !task.isCompleted) && task.category == TaskCategory.PERSONAL
         }
+        return filteredTasks
     }
 
 
@@ -273,25 +273,37 @@ class HomeViewModel @Inject constructor(
                 }.size
                 val totalPoints = personalTasks.sumOf { it.points }
                 _state.value = _state.value.copy(
-                    completedTasks = completedCount,
-                    totalTasks = totalCount,
+                    normalCompletedTasks = completedCount,
+                    normalTotalTasks = totalCount,
                     earnedPoints = totalPoints
                 )
 
             }
 
             HomeMode.FOCUSED -> {
+                //setup focused task related details
                 val focusedTasks = tasks.filter { it.category in
                         listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS)}
-                val completedCount = focusedTasks.count { it.isCompleted }
-                val totalCount = focusedTasks.filter {
+                val completedCountFocusedTask = focusedTasks.count { it.isCompleted }
+                val totalCountFocusedTask = focusedTasks.filter {
                     !it.isRepeated || it.repeatDays.contains(getTodaysDayOfWeek()) || it.repeatDays.isEmpty()
                 }.size
                 val totalPoints = focusedTasks.sumOf { it.points }
                 _state.value = _state.value.copy(
-                    completedTasks = completedCount,
-                    totalTasks = totalCount,
+                    focusedCompletedTasks = completedCountFocusedTask,
+                    focusedTotalTasks = totalCountFocusedTask,
                     earnedPoints = totalPoints
+                )
+
+                //setup personal tasks related details
+                val personalTasks = tasks.filter { it.category == TaskCategory.PERSONAL }
+                val completedCountPersonalTasks = personalTasks.count { it.isCompleted }
+                val totalCountPersonalTasks = personalTasks.filter {
+                    !it.isRepeated || it.repeatDays.contains(getTodaysDayOfWeek())
+                }.size
+                _state.value = _state.value.copy(
+                    normalCompletedTasks = completedCountPersonalTasks,
+                    normalTotalTasks = totalCountPersonalTasks,
                 )
 
             }
