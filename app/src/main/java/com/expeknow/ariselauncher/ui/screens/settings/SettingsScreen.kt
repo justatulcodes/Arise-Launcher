@@ -53,18 +53,26 @@ fun SettingsScreen(
                 theme = theme
             )
 
-            TaskCompletionSection(
-                hideCompletedTasks = state.hideCompletedTasks,
-                onToggle = { hide: Boolean ->
-                    viewModel.onEvent(SettingsEvent.ToggleCompletedTasks(hide))
-                },
-                theme = theme
-            )
-
             TunnelVisionSection(
                 tunnelVisionMode = state.tunnelVisionMode,
                 onToggle = { enabled: Boolean ->
                     viewModel.onEvent(SettingsEvent.ToggleTunnelVision(enabled))
+                },
+                theme = theme
+            )
+
+            ShowWeeklyScheduleSection(
+                isShowWeeklyScheduleEnabled = state.showWeeklyScheduleEnabled,
+                onToggle = { enabled: Boolean ->
+                    viewModel.onEvent(SettingsEvent.ToggleWeeklySchedule(enabled))
+                },
+                theme = theme
+            )
+
+            TaskCompletionSection(
+                hideCompletedTasks = state.hideCompletedTasks,
+                onToggle = { hide: Boolean ->
+                    viewModel.onEvent(SettingsEvent.ToggleCompletedTasks(hide))
                 },
                 theme = theme
             )

@@ -22,5 +22,8 @@ interface SettingsRepository {
     fun getShouldTriggerKeyboardInAppDrawer(): Boolean
     fun setShouldTriggerKeyboardInAppDrawer(shouldTrigger: Boolean)
 
+    fun getShowEntireWeekSchedule(): Boolean
+    fun setShowEntireWeekSchedule(enabled: Boolean)
+
     fun resetAllSettings()
 }
