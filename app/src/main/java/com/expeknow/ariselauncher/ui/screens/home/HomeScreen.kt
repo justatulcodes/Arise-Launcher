@@ -73,7 +73,7 @@ fun HomeScreen(
         val allNormalTasksCompleted =
             state.normalTotalTasks > 0 && state.normalCompletedTasks == state.normalTotalTasks
 
-        val combinedTasks = state.normalTasks + state.focusedTasks
+        val combinedTasks = state.normalTasks + state.todayFocusedTasks
         val pointsEarned = combinedTasks.filter { it.isCompleted }.sumOf { it.points }
 
         Column(
@@ -94,7 +94,7 @@ fun HomeScreen(
                             completedTasks = state.normalCompletedTasks,
                             pointsEarned = pointsEarned,
                             normalTasks = state.normalTasks,
-                            focusedTasks = state.focusedTasks,
+                            focusedTasks = state.todayFocusedTasks,
                             focusCategories = state.focusCategories,
                             editingCategoryId = state.editingCategoryId,
                             editingCategoryName = state.editingCategoryName,
@@ -104,7 +104,9 @@ fun HomeScreen(
                             theme = theme,
                             currentPoints = state.currentPoints,
                             pointChange = state.pointChange,
-                            pointsTrend = state.pointsTrend
+                            pointsTrend = state.pointsTrend,
+                            showWeeklySchedule = state.showWeeklySchedule,
+                            allFocusedTasks = state.allFocusedTasks
                         )
                     }
                     2 -> {
@@ -279,7 +281,9 @@ fun MainTaskContentScreen(
     theme: HomeTheme,
     currentPoints: Int,
     pointChange: Int,
-    pointsTrend: PointsTrend
+    pointsTrend: PointsTrend,
+    showWeeklySchedule: Boolean,
+    allFocusedTasks: List<Task>
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         EnhancedPointsHeader(
@@ -356,31 +360,45 @@ fun MainTaskContentScreen(
                 }
 
                 HomeMode.FOCUSED -> {
-                    FocusedTaskList(
-                        categories = focusCategories,
-                        tasks = focusedTasks,
-                        onTaskClick = { taskId ->
-                            navController.navigate(Screen.TaskDetails.routeFor(taskId))
-                        },
-                        onToggleTask = { task ->
-                            viewModel.onEvent(HomeEvent.ToggleTask(task))
-                        },
-                        onEditCategory = { categoryId ->
-                            viewModel.onEvent(HomeEvent.StartEditingCategory(categoryId))
-                        },
-                        editingCategoryId = editingCategoryId,
-                        editingCategoryName = editingCategoryName,
-                        onSaveEdit = {
-                            viewModel.onEvent(HomeEvent.SaveEditingCategory(editingCategoryName))
-                        },
-                        onCancelEdit = {
-                            viewModel.onEvent(HomeEvent.CancelEditingCategory)
-                        },
-                        onEditingNameChange = { name ->
-                            viewModel.onEvent(HomeEvent.UpdateEditingCategoryName(name))
-                        },
-                        theme = theme
-                    )
+                    // Check if weekly schedule view is enabled
+                    if (showWeeklySchedule) {
+                        WeeklyScheduleTaskList(
+                            allFocusedTasks = allFocusedTasks,
+                            onTaskClick = { taskId ->
+                                navController.navigate(Screen.TaskDetails.routeFor(taskId))
+                            },
+                            onToggleTask = { task ->
+                                viewModel.onEvent(HomeEvent.ToggleTask(task))
+                            },
+                            theme = theme
+                        )
+                    } else {
+                        FocusedTaskList(
+                            categories = focusCategories,
+                            tasks = focusedTasks,
+                            onTaskClick = { taskId ->
+                                navController.navigate(Screen.TaskDetails.routeFor(taskId))
+                            },
+                            onToggleTask = { task ->
+                                viewModel.onEvent(HomeEvent.ToggleTask(task))
+                            },
+                            onEditCategory = { categoryId ->
+                                viewModel.onEvent(HomeEvent.StartEditingCategory(categoryId))
+                            },
+                            editingCategoryId = editingCategoryId,
+                            editingCategoryName = editingCategoryName,
+                            onSaveEdit = {
+                                viewModel.onEvent(HomeEvent.SaveEditingCategory(editingCategoryName))
+                            },
+                            onCancelEdit = {
+                                viewModel.onEvent(HomeEvent.CancelEditingCategory)
+                            },
+                            onEditingNameChange = { name ->
+                                viewModel.onEvent(HomeEvent.UpdateEditingCategoryName(name))
+                            },
+                            theme = theme
+                        )
+                    }
                 }
             }
 

@@ -1334,3 +1334,318 @@ private fun FloatingAddButtonPreview() {
         theme = HomeTheme()
     )
 }
+
+@Composable
+fun WeeklyScheduleTaskList(
+    allFocusedTasks: List<Task>,
+    onTaskClick: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
+    theme: HomeTheme
+) {
+    // Group tasks by day of the week
+    val tasksByDay = allFocusedTasks.groupBy { task ->
+        if (task.repeatDays.isEmpty()) null else task.repeatDays
+    }
+
+    // Separate tasks with no days assigned
+    val tasksWithoutDays = tasksByDay[null] ?: emptyList()
+    val tasksWithDays = tasksByDay.filterKeys { it != null }
+
+    // Order of days
+    val daysOrder = listOf(
+        DaysOfWeek.MONDAY,
+        DaysOfWeek.TUESDAY,
+        DaysOfWeek.WEDNESDAY,
+        DaysOfWeek.THURSDAY,
+        DaysOfWeek.FRIDAY,
+        DaysOfWeek.SATURDAY,
+        DaysOfWeek.SUNDAY
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Display tasks for each day
+        daysOrder.forEach { day ->
+            val tasksForDay = tasksWithDays.entries
+                .filter { (days, _) -> days?.contains(day) == true }
+                .flatMap { it.value }
+
+            if (tasksForDay.isNotEmpty()) {
+                item {
+                    WeeklyDaySection(
+                        day = day,
+                        tasks = tasksForDay,
+                        onTaskClick = onTaskClick,
+                        onToggleTask = onToggleTask,
+                        theme = theme
+                    )
+                }
+            }
+        }
+
+        // Display tasks without any day assigned at the bottom
+        if (tasksWithoutDays.isNotEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                WeeklyUnassignedSection(
+                    tasks = tasksWithoutDays,
+                    onTaskClick = onTaskClick,
+                    onToggleTask = onToggleTask,
+                    theme = theme
+                )
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
+}
+
+@Composable
+private fun WeeklyDaySection(
+    day: DaysOfWeek,
+    tasks: List<Task>,
+    onTaskClick: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
+    theme: HomeTheme
+) {
+    val dayName = when (day) {
+        DaysOfWeek.MONDAY -> "Monday"
+        DaysOfWeek.TUESDAY -> "Tuesday"
+        DaysOfWeek.WEDNESDAY -> "Wednesday"
+        DaysOfWeek.THURSDAY -> "Thursday"
+        DaysOfWeek.FRIDAY -> "Friday"
+        DaysOfWeek.SATURDAY -> "Saturday"
+        DaysOfWeek.SUNDAY -> "Sunday"
+    }
+
+    val dayColor = when (day) {
+        DaysOfWeek.MONDAY -> Color(0xFF60A5FA)
+        DaysOfWeek.TUESDAY -> Color(0xFFFB923C)
+        DaysOfWeek.WEDNESDAY -> Color(0xFF4ADE80)
+        DaysOfWeek.THURSDAY -> Color(0xFFF59E0B)
+        DaysOfWeek.FRIDAY -> Color(0xFFEC4899)
+        DaysOfWeek.SATURDAY -> Color(0xFF8B5CF6)
+        DaysOfWeek.SUNDAY -> Color(0xFFEF4444)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                dayColor.copy(alpha = 0.05f),
+                RoundedCornerShape(12.dp)
+            )
+            .border(
+                1.5.dp,
+                dayColor.copy(alpha = 0.3f),
+                RoundedCornerShape(12.dp)
+            )
+            .padding(16.dp)
+    ) {
+        // Day header
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .background(dayColor, CircleShape)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                dayName.uppercase(),
+                style = MaterialTheme.typography.titleSmall,
+                color = dayColor,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                "${tasks.count { it.isCompleted }}/${tasks.size}",
+                style = MaterialTheme.typography.labelSmall,
+                color = theme.textSecondary,
+                fontSize = 11.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Tasks for this day
+        tasks.forEachIndexed { index, task ->
+            WeeklyTaskItem(
+                task = task,
+                onTaskClick = onTaskClick,
+                onToggleTask = onToggleTask,
+                theme = theme,
+                accentColor = dayColor
+            )
+
+            if (index < tasks.size - 1) {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeeklyUnassignedSection(
+    tasks: List<Task>,
+    onTaskClick: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
+    theme: HomeTheme
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color.White.copy(alpha = 0.05f),
+                RoundedCornerShape(12.dp)
+            )
+            .border(
+                1.5.dp,
+                Color.White.copy(alpha = 0.2f),
+                RoundedCornerShape(12.dp)
+            )
+            .padding(16.dp)
+    ) {
+        // Header
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                Icons.Filled.CalendarToday,
+                contentDescription = null,
+                tint = theme.textSecondary,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                "NO DAY ASSIGNED",
+                style = MaterialTheme.typography.titleSmall,
+                color = theme.textSecondary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                "${tasks.count { it.isCompleted }}/${tasks.size}",
+                style = MaterialTheme.typography.labelSmall,
+                color = theme.textSecondary,
+                fontSize = 11.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Tasks without day assignment
+        tasks.forEachIndexed { index, task ->
+            WeeklyTaskItem(
+                task = task,
+                onTaskClick = onTaskClick,
+                onToggleTask = onToggleTask,
+                theme = theme,
+                accentColor = theme.textSecondary
+            )
+
+            if (index < tasks.size - 1) {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeeklyTaskItem(
+    task: Task,
+    onTaskClick: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
+    theme: HomeTheme,
+    accentColor: Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                theme.bg.copy(alpha = 0.5f),
+                RoundedCornerShape(8.dp)
+            )
+            .border(
+                1.dp,
+                theme.border,
+                RoundedCornerShape(8.dp)
+            )
+            .clickable { onTaskClick(task.id) }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = task.isCompleted,
+            onCheckedChange = null,
+            colors = CheckboxDefaults.colors(
+                checkedColor = accentColor,
+                uncheckedColor = Color.White.copy(alpha = 0.4f),
+                checkmarkColor = Color.Black
+            ),
+            modifier = Modifier
+                .size(20.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            onToggleTask(task)
+                        }
+                    )
+                }
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = task.title,
+                color = if (task.isCompleted) Color.White.copy(alpha = 0.5f) else Color.White,
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 14.sp,
+                textDecoration = if (task.isCompleted) LineThrough else null
+            )
+
+            if (task.description.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = task.description,
+                    color = Color.White.copy(alpha = 0.4f),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            "+${task.points}",
+            color = accentColor,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Icon(
+            Icons.Filled.ChevronRight,
+            contentDescription = null,
+            tint = Color.White.copy(alpha = 0.3f),
+            modifier = Modifier.size(16.dp)
+        )
+    }
+}
