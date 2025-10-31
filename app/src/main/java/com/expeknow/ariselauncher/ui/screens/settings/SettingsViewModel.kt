@@ -44,7 +44,8 @@ class SettingsViewModel @Inject constructor(
             distractionAppsDelay = settingsRepository.getDistractionAppsDelay(),
             pointThreshold = settingsRepository.getPointThreshold(),
             warningsEnabled = settingsRepository.getWarningsEnabled(),
-            keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer()
+            keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer(),
+            showWeeklyScheduleEnabled = settingsRepository.getShowEntireWeekSchedule()
         )
     }
 

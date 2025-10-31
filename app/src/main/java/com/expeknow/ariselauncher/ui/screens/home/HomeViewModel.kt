@@ -1,6 +1,5 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,9 +38,11 @@ class HomeViewModel @Inject constructor(
     private fun updateModeFromSettings() {
         val tunnelVisionEnabled = settingsRepository.getTunnelVisionMode()
         val shouldHideCompletedTasks = settingsRepository.getHideCompletedTasks()
+        val showWeeklySchedule = settingsRepository.getShowEntireWeekSchedule()
         _state.value = _state.value.copy(
             mode = if (tunnelVisionEnabled) HomeMode.FOCUSED else HomeMode.SIMPLE,
-            hideCompletedTasks = shouldHideCompletedTasks
+            hideCompletedTasks = shouldHideCompletedTasks,
+            showWeeklySchedule = showWeeklySchedule
         )
 
     }
@@ -217,9 +218,15 @@ class HomeViewModel @Inject constructor(
                 markCompletedRecurringTasksAsIncomplete(tasks)
 
                 val tasksForToday = getTasksRecurringToday(tasks)
-                _state.value = _state.value.copy(focusedTasks = tasksForToday)
+                updateAllFocusedTasks(tasks)
+                _state.value = _state.value.copy(todayFocusedTasks = tasksForToday)
             }
         }
+    }
+
+    private fun updateAllFocusedTasks(tasks: List<Task>) {
+        val focusedTasks = tasks.filter { it.category in listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS) }
+        _state.value = _state.value.copy(allFocusedTasks = focusedTasks)
     }
 
     private suspend fun markCompletedRecurringTasksAsIncomplete(tasks: List<Task>) {
