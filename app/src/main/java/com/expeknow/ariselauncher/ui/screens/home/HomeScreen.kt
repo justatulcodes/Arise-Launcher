@@ -35,7 +35,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
-import kotlin.text.format
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +53,7 @@ fun HomeScreen(
     )
     var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     val pageCount = if (state.mode == HomeMode.FOCUSED) 3 else 2
     val pagerState = rememberPagerState(
@@ -66,7 +67,11 @@ fun HomeScreen(
     }
 
     BackHandler {
-        // do nothing to disable back navigation
+        if (pagerState.currentPage != 0) {
+            coroutineScope.launch {
+                pagerState.animateScrollToPage(0)
+            }
+        }
     }
 
     Box(
