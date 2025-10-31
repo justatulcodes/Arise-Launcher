@@ -20,7 +20,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight.Companion.ExtraBold
+import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.R
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
@@ -32,6 +35,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
+import kotlin.text.format
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -252,6 +256,29 @@ private fun BoxScope.AddTaskButton(viewModel: HomeViewModel) {
 
 @Composable
 fun BlankScreen(theme: HomeTheme) {
+    val currentTime by remember {
+        mutableStateOf(java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()))
+    }
+    val currentDay by remember {
+        mutableStateOf(java.text.SimpleDateFormat("EEEE", java.util.Locale.getDefault()))
+    }
+    val currentDate by remember {
+        mutableStateOf(java.text.SimpleDateFormat("MMMM dd", java.util.Locale.getDefault()))
+    }
+
+    var time by remember { mutableStateOf(currentTime.format(java.util.Date())) }
+    var day by remember { mutableStateOf(currentDay.format(java.util.Date())) }
+    var date by remember { mutableStateOf(currentDate.format(java.util.Date())) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            time = currentTime.format(java.util.Date())
+            day = currentDay.format(java.util.Date())
+            date = currentDate.format(java.util.Date())
+            kotlinx.coroutines.delay(1000)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -261,8 +288,42 @@ fun BlankScreen(theme: HomeTheme) {
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = time,
+                style = MaterialTheme.typography.displayLarge,
+                color = Color.White,
+                fontSize = 64.sp,
+                fontWeight = ExtraBold
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = day,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = getDayColor(day),
+                    fontSize = 16.sp,
+                    fontWeight = SemiBold
+                )
+                Text(
+                    text = ", $date",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 16.sp
+                )
+            }
+
+        }
     }
 }
+
 
 @Composable
 fun MainTaskContentScreen(
@@ -360,7 +421,6 @@ fun MainTaskContentScreen(
                 }
 
                 HomeMode.FOCUSED -> {
-                    // Check if weekly schedule view is enabled
                     if (showWeeklySchedule) {
                         WeeklyScheduleTaskList(
                             allFocusedTasks = allFocusedTasks,

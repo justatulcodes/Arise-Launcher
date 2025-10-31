@@ -48,6 +48,20 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
+// Utility function to get color for a day name
+fun getDayColor(dayName: String): Color {
+    return when (dayName.uppercase()) {
+        "MONDAY" -> Color(0xFF60A5FA)
+        "TUESDAY" -> Color(0xFFFB923C)
+        "WEDNESDAY" -> Color(0xFF4ADE80)
+        "THURSDAY" -> Color(0xFFF59E0B)
+        "FRIDAY" -> Color(0xFFEC4899)
+        "SATURDAY" -> Color(0xFF8B5CF6)
+        "SUNDAY" -> Color(0xFFEF4444)
+        else -> Color.White
+    }
+}
+
 @Composable
 fun EnhancedPointsHeader(
     currentPoints: Int,
@@ -1342,16 +1356,13 @@ fun WeeklyScheduleTaskList(
     onToggleTask: (Task) -> Unit,
     theme: HomeTheme
 ) {
-    // Group tasks by day of the week
     val tasksByDay = allFocusedTasks.groupBy { task ->
-        if (task.repeatDays.isEmpty()) null else task.repeatDays
+        task.repeatDays.ifEmpty { null }
     }
 
-    // Separate tasks with no days assigned
     val tasksWithoutDays = tasksByDay[null] ?: emptyList()
     val tasksWithDays = tasksByDay.filterKeys { it != null }
 
-    // Order of days
     val daysOrder = listOf(
         DaysOfWeek.MONDAY,
         DaysOfWeek.TUESDAY,
@@ -1368,7 +1379,6 @@ fun WeeklyScheduleTaskList(
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Display tasks for each day
         daysOrder.forEach { day ->
             val tasksForDay = tasksWithDays.entries
                 .filter { (days, _) -> days?.contains(day) == true }
@@ -1387,7 +1397,6 @@ fun WeeklyScheduleTaskList(
             }
         }
 
-        // Display tasks without any day assigned at the bottom
         if (tasksWithoutDays.isNotEmpty()) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1424,15 +1433,7 @@ private fun WeeklyDaySection(
         DaysOfWeek.SUNDAY -> "Sunday"
     }
 
-    val dayColor = when (day) {
-        DaysOfWeek.MONDAY -> Color(0xFF60A5FA)
-        DaysOfWeek.TUESDAY -> Color(0xFFFB923C)
-        DaysOfWeek.WEDNESDAY -> Color(0xFF4ADE80)
-        DaysOfWeek.THURSDAY -> Color(0xFFF59E0B)
-        DaysOfWeek.FRIDAY -> Color(0xFFEC4899)
-        DaysOfWeek.SATURDAY -> Color(0xFF8B5CF6)
-        DaysOfWeek.SUNDAY -> Color(0xFFEF4444)
-    }
+    val dayColor = getDayColor(dayName)
 
     Column(
         modifier = Modifier
