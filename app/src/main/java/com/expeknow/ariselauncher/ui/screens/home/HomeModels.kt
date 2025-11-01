@@ -44,7 +44,6 @@ data class HomeState(
     val allFocusedTasks: List<Task> = emptyList(),
     val todayFocusedTasks : List<Task> = emptyList(),
     val showAddTaskDialog: Boolean = false,
-    val showEssentialAppsSheet: Boolean = false,
     val tunnelVisionMode: Boolean = true,
     val mode: HomeMode = HomeMode.SIMPLE,
     val hideCompletedTasks: Boolean = true,
@@ -71,11 +70,8 @@ sealed class HomeEvent {
     ) : HomeEvent()
     data object ShowAddTaskDialog : HomeEvent()
     data object HideAddTaskDialog : HomeEvent()
-    data object ShowEssentialAppsSheet : HomeEvent()
-    data object HideEssentialAppsSheet : HomeEvent()
     data class NavigateToTaskDetails(val taskId: String) : HomeEvent()
     data class LaunchApp(val app: AppDrawerApp) : HomeEvent()
-    data object ToggleMode : HomeEvent()
     data class StartEditingCategory(val categoryId: TaskCategory) : HomeEvent()
     data class SaveEditingCategory(val name: String) : HomeEvent()
     data object CancelEditingCategory : HomeEvent()
