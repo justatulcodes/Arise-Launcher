@@ -1,8 +1,15 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,10 +19,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -31,6 +40,7 @@ import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
@@ -94,7 +104,17 @@ fun HomeScreen(
             ) { page ->
                 when (page) {
                     0 -> {
-                        BlankScreen(theme = theme)
+                        BlankScreen(
+                            theme = theme,
+                            appsList = state.apps,
+                            onAppClick = { appName ->
+                                viewModel.onEvent(HomeEvent.LaunchApp(appName))
+                            },
+                            onOpenFullApps = {
+                                appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
+                                showAppDrawerBottomSheet = true
+                            }
+                        )
                     }
                     1 -> {
                         MainTaskContentScreen(
@@ -138,25 +158,13 @@ fun HomeScreen(
                 }
             }
 
-            EssentialAppsBar(
-                appsList = state.apps,
-                onAppClick = { appName ->
-                    viewModel.onEvent(HomeEvent.LaunchApp(appName))
-                },
-                onOpenFullApps = {
-                    appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
-                    showAppDrawerBottomSheet = true
-                },
-                theme = theme
-            )
-
         }
 
         if (state.mode == HomeMode.FOCUSED && pagerState.currentPage == 1) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 24.dp, bottom = 100.dp)
+                    .padding(end = 24.dp, bottom = 24.dp)
             ) {
                 FloatingAddButton(
                     onClick = { viewModel.onEvent(HomeEvent.ShowAddTaskDialog) },
@@ -166,21 +174,6 @@ fun HomeScreen(
         }
     }
 
-    // Essential Apps Drawer
-    if (state.showEssentialAppsSheet) {
-        EssentialAppsDrawer(
-            onClose = {
-                viewModel.onEvent(HomeEvent.HideEssentialAppsSheet)
-            },
-            onOpenFullApps = {
-                viewModel.onEvent(HomeEvent.HideEssentialAppsSheet)
-                showAppDrawerBottomSheet = true
-            },
-            theme = theme
-        )
-    }
-
-    // App Drawer Bottom Sheet
     if (showAppDrawerBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = {
@@ -212,7 +205,6 @@ fun HomeScreen(
         }
     }
 
-    // Add Task Dialog
     if (state.showAddTaskDialog) {
         TaskDialog(
             onDismiss = {
@@ -260,7 +252,7 @@ private fun BoxScope.AddTaskButton(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun BlankScreen(theme: HomeTheme) {
+fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (AppDrawerApp) -> Unit, onOpenFullApps: () -> Unit) {
     val currentTime by remember {
         mutableStateOf(java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()))
     }
@@ -274,6 +266,22 @@ fun BlankScreen(theme: HomeTheme) {
     var time by remember { mutableStateOf(currentTime.format(java.util.Date())) }
     var day by remember { mutableStateOf(currentDay.format(java.util.Date())) }
     var date by remember { mutableStateOf(currentDate.format(java.util.Date())) }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "swipe_animation")
+    var totalDrag by remember { mutableStateOf(0f) }
+    var hasTriggered by remember { mutableStateOf(false) }
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -8f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1000,
+                easing = FastOutLinearInEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "offset_animation"
+    )
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -295,36 +303,69 @@ fun BlankScreen(theme: HomeTheme) {
         )
 
         Column(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize()
+                .pointerInput(Unit) {
+                    detectVerticalDragGestures(
+                        onDragStart = {
+                            totalDrag = 0f
+                            hasTriggered = false
+                        },
+                        onVerticalDrag = { change, dragAmount ->
+                            change.consume()
+
+                            totalDrag += dragAmount
+                            if (totalDrag < -50f && !hasTriggered) {
+                                hasTriggered = true
+                                onOpenFullApps()
+                            }
+                        },
+                        onDragEnd = {
+                            totalDrag = 0f
+                            hasTriggered = false
+                        }
+                    )
+                }
+
         ) {
-            Text(
-                text = time,
-                style = MaterialTheme.typography.displayLarge,
-                color = Color.White,
-                fontSize = 64.sp,
-                fontWeight = ExtraBold
-            )
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(top = 48.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = day,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = getDayColor(day),
-                    fontSize = 16.sp,
-                    fontWeight = SemiBold
+                    text = time,
+                    style = MaterialTheme.typography.displayLarge,
+                    color = Color.White,
+                    fontSize = 64.sp,
+                    fontWeight = ExtraBold
                 )
-                Text(
-                    text = ", $date",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 16.sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = day,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = getDayColor(day),
+                        fontSize = 16.sp,
+                        fontWeight = SemiBold
+                    )
+                    Text(
+                        text = ", $date",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 16.sp
+                    )
+                }
             }
 
+            EssentialAppsBar(
+                appsList = appsList,
+                onAppClick = onAppClick,
+                onOpenFullApps = onOpenFullApps,
+                theme = theme
+            )
         }
     }
 }

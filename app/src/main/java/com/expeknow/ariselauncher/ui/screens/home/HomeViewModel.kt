@@ -122,22 +122,6 @@ class HomeViewModel @Inject constructor(
                 _state.value = _state.value.copy(showAddTaskDialog = false)
             }
 
-            is HomeEvent.ShowEssentialAppsSheet -> {
-                _state.value = _state.value.copy(showEssentialAppsSheet = true)
-            }
-
-            is HomeEvent.HideEssentialAppsSheet -> {
-                _state.value = _state.value.copy(showEssentialAppsSheet = false)
-            }
-
-            is HomeEvent.ToggleMode -> {
-                // This is no longer needed as mode is controlled by settings
-                // But we'll keep it for backward compatibility
-                val tunnelVisionEnabled = !settingsRepository.getTunnelVisionMode()
-                settingsRepository.setTunnelVisionMode(tunnelVisionEnabled)
-                updateModeFromSettings()
-            }
-
             is HomeEvent.StartEditingCategory -> {
                 val category = _state.value.focusCategories.find { it.id == event.categoryId }
                 _state.value = _state.value.copy(
@@ -183,11 +167,7 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.LaunchApp -> {
-                if (event.app.name == "Apps") {
-                    _state.value = _state.value.copy(showEssentialAppsSheet = true)
-                }else {
-                    appRepositoryImpl.launchApp(event.app.packageName)
-                }
+                appRepositoryImpl.launchApp(event.app.packageName)
             }
 
             is HomeEvent.UpdateCurrentPage -> {
