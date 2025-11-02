@@ -271,6 +271,7 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
     val infiniteTransition = rememberInfiniteTransition(label = "swipe_animation")
     var totalDrag by remember { mutableStateOf(0f) }
     var hasTriggered by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     val offsetY by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -8f,
@@ -318,6 +319,17 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
                             if (totalDrag < -50f && !hasTriggered) {
                                 hasTriggered = true
                                 onOpenFullApps()
+                            }
+                            else if (totalDrag > 50f && !hasTriggered) {
+                                hasTriggered = true
+                                try {
+                                    val service = context.getSystemService("statusbar")
+                                    val statusBarClass = Class.forName("android.app.StatusBarManager")
+                                    val expandNotifications = statusBarClass.getMethod("expandNotificationsPanel")
+                                    expandNotifications.invoke(service)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                         },
                         onDragEnd = {
