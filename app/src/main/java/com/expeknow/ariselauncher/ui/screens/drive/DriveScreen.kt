@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -187,6 +188,7 @@ private fun DriveFilterChips(
                                 DriveItemType.QUOTE -> "Quotes"
                                 DriveItemType.IMAGE -> "Images"
                                 DriveItemType.VIDEO -> "Videos"
+                                DriveItemType.TODO -> "Bucket List"
                             }
                         )
                     },
@@ -248,7 +250,8 @@ private fun EmptyDriveState(hasFilter: Boolean = false) {
             Text(
                 text = if (hasFilter) "No items in this category" else "No motivational content yet",
                 style = MaterialTheme.typography.titleMedium,
-                color = TaskTitle
+                color = TaskTitle,
+                textAlign = TextAlign.Center
             )
             Text(
                 text = if (hasFilter) {
@@ -258,7 +261,8 @@ private fun EmptyDriveState(hasFilter: Boolean = false) {
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = BannerTextGray,
-                modifier = Modifier.padding(horizontal = 24.dp)
+                modifier = Modifier.padding(horizontal = 24.dp),
+                textAlign = TextAlign.Center
             )
         }
     }

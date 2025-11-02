@@ -98,6 +98,42 @@ fun KeyboardTriggerSection(
 }
 
 @Composable
+fun ShowCategorizedApps(
+    categorizedAppsEnabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+    theme: SettingsTheme
+) {
+    SettingsCard(theme) {
+        SettingsToggleItem(
+            title = "SHOW CATEGORIZED APPS",
+            subtitle = "Display apps grouped by categories in app drawer",
+            description = "Helps in quickly locating apps based on their type or usage",
+            checked = categorizedAppsEnabled,
+            onCheckedChange = onToggle,
+            theme = theme
+        )
+    }
+}
+
+@Composable
+fun ShowWeeklyScheduleSection(
+    isShowWeeklyScheduleEnabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+    theme: SettingsTheme
+) {
+    SettingsCard(theme) {
+        SettingsToggleItem(
+            title = "SHOW WEEKLY SCHEDULE",
+            subtitle = "Display full week schedule in calendar view",
+            description = "To be used in focused mode when you need to see your full week schedule at a glance",
+            checked = isShowWeeklyScheduleEnabled,
+            onCheckedChange = onToggle,
+            theme = theme
+        )
+    }
+}
+
+@Composable
 fun AccessDelaysSection(
     appDrawerDelay: Float,
     distractionAppsDelay: Float,

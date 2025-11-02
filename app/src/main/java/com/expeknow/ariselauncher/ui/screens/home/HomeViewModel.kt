@@ -1,7 +1,5 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
-import android.util.Log
-import androidx.compose.ui.platform.LocalGraphicsContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,9 +38,13 @@ class HomeViewModel @Inject constructor(
     private fun updateModeFromSettings() {
         val tunnelVisionEnabled = settingsRepository.getTunnelVisionMode()
         val shouldHideCompletedTasks = settingsRepository.getHideCompletedTasks()
+        val showWeeklySchedule = settingsRepository.getShowEntireWeekSchedule()
+        val shouldShowCategorizedApps = settingsRepository.getShouldShowCategorizedApps()
         _state.value = _state.value.copy(
             mode = if (tunnelVisionEnabled) HomeMode.FOCUSED else HomeMode.SIMPLE,
-            hideCompletedTasks = shouldHideCompletedTasks
+            hideCompletedTasks = shouldHideCompletedTasks,
+            showWeeklySchedule = showWeeklySchedule,
+            showCategorizedApps = shouldShowCategorizedApps
         )
 
     }
@@ -122,22 +124,6 @@ class HomeViewModel @Inject constructor(
                 _state.value = _state.value.copy(showAddTaskDialog = false)
             }
 
-            is HomeEvent.ShowEssentialAppsSheet -> {
-                _state.value = _state.value.copy(showEssentialAppsSheet = true)
-            }
-
-            is HomeEvent.HideEssentialAppsSheet -> {
-                _state.value = _state.value.copy(showEssentialAppsSheet = false)
-            }
-
-            is HomeEvent.ToggleMode -> {
-                // This is no longer needed as mode is controlled by settings
-                // But we'll keep it for backward compatibility
-                val tunnelVisionEnabled = !settingsRepository.getTunnelVisionMode()
-                settingsRepository.setTunnelVisionMode(tunnelVisionEnabled)
-                updateModeFromSettings()
-            }
-
             is HomeEvent.StartEditingCategory -> {
                 val category = _state.value.focusCategories.find { it.id == event.categoryId }
                 _state.value = _state.value.copy(
@@ -183,11 +169,11 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.LaunchApp -> {
-                if (event.app.name == "Apps") {
-                    _state.value = _state.value.copy(showEssentialAppsSheet = true)
-                }else {
-                    appRepositoryImpl.launchApp(event.app.packageName)
-                }
+                appRepositoryImpl.launchApp(event.app.packageName)
+            }
+
+            is HomeEvent.UpdateCurrentPage -> {
+                _state.value = _state.value.copy(currentPage = event.page)
             }
         }
     }
@@ -204,8 +190,8 @@ class HomeViewModel @Inject constructor(
             taskRepositoryImpl.getAllTasks().collect { tasks ->
                 markCompletedRecurringTasksAsIncomplete(tasks)
 
-                val filteredTasks = getTasksCreatedTodayOrTasksNotYetCompleted(tasks)
-                _state.value = _state.value.copy(allTasks = tasks)
+                val filteredTasks = getNormalModeTasksCreatedTodayOrTasksNotYetCompleted(tasks)
+                _state.value = _state.value.copy(normalTasks = filteredTasks)
                 updateTaskStats(filteredTasks)
             }
         }
@@ -214,9 +200,15 @@ class HomeViewModel @Inject constructor(
                 markCompletedRecurringTasksAsIncomplete(tasks)
 
                 val tasksForToday = getTasksRecurringToday(tasks)
-                _state.value = _state.value.copy(recurringTasks = tasksForToday)
+                updateAllFocusedTasks(tasks)
+                _state.value = _state.value.copy(todayFocusedTasks = tasksForToday)
             }
         }
+    }
+
+    private fun updateAllFocusedTasks(tasks: List<Task>) {
+        val focusedTasks = tasks.filter { it.category in listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS) }
+        _state.value = _state.value.copy(allFocusedTasks = focusedTasks)
     }
 
     private suspend fun markCompletedRecurringTasksAsIncomplete(tasks: List<Task>) {
@@ -246,15 +238,16 @@ class HomeViewModel @Inject constructor(
         return tasksRecurringToday
     }
 
-    private fun getTasksCreatedTodayOrTasksNotYetCompleted(tasks: List<Task>): List<Task> {
+    private fun getNormalModeTasksCreatedTodayOrTasksNotYetCompleted(tasks: List<Task>): List<Task> {
         val todayStart = getTodayStartTime()
         val todayEnd = getTodayEndTime()
 
-        return tasks.filter { task ->
+        val filteredTasks = tasks.filter { task ->
             val taskTime = task.createdAt
             val isToday = taskTime in todayStart..todayEnd
-            isToday || !task.isCompleted
+            (isToday || !task.isCompleted) && task.category == TaskCategory.PERSONAL
         }
+        return filteredTasks
     }
 
 
@@ -269,25 +262,37 @@ class HomeViewModel @Inject constructor(
                 }.size
                 val totalPoints = personalTasks.sumOf { it.points }
                 _state.value = _state.value.copy(
-                    completedTasks = completedCount,
-                    totalTasks = totalCount,
+                    normalCompletedTasks = completedCount,
+                    normalTotalTasks = totalCount,
                     earnedPoints = totalPoints
                 )
 
             }
 
             HomeMode.FOCUSED -> {
+                //setup focused task related details
                 val focusedTasks = tasks.filter { it.category in
                         listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS)}
-                val completedCount = focusedTasks.count { it.isCompleted }
-                val totalCount = focusedTasks.filter {
+                val completedCountFocusedTask = focusedTasks.count { it.isCompleted }
+                val totalCountFocusedTask = focusedTasks.filter {
                     !it.isRepeated || it.repeatDays.contains(getTodaysDayOfWeek()) || it.repeatDays.isEmpty()
                 }.size
                 val totalPoints = focusedTasks.sumOf { it.points }
                 _state.value = _state.value.copy(
-                    completedTasks = completedCount,
-                    totalTasks = totalCount,
+                    focusedCompletedTasks = completedCountFocusedTask,
+                    focusedTotalTasks = totalCountFocusedTask,
                     earnedPoints = totalPoints
+                )
+
+                //setup personal tasks related details
+                val personalTasks = tasks.filter { it.category == TaskCategory.PERSONAL }
+                val completedCountPersonalTasks = personalTasks.count { it.isCompleted }
+                val totalCountPersonalTasks = personalTasks.filter {
+                    !it.isRepeated || it.repeatDays.contains(getTodaysDayOfWeek())
+                }.size
+                _state.value = _state.value.copy(
+                    normalCompletedTasks = completedCountPersonalTasks,
+                    normalTotalTasks = totalCountPersonalTasks,
                 )
 
             }

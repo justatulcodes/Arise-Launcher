@@ -7,6 +7,7 @@ import java.util.UUID
 enum class DriveItemType {
     QUOTE,
     IMAGE,
+    TODO,
     VIDEO
 }
 

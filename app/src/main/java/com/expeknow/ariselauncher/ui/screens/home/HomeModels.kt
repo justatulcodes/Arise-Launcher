@@ -34,21 +34,26 @@ data class HomeState(
     val currentPoints: Int = 0,
     val pointChange: Int = 0,
     val pointsTrend: PointsTrend = PointsTrend.STABLE,
-    val completedTasks: Int = 0,
-    val totalTasks: Int = 0,
+    val normalCompletedTasks: Int = 0,
+    val normalTotalTasks: Int = 0,
+    val focusedCompletedTasks: Int = 0,
+    val focusedTotalTasks: Int = 0,
     val earnedPoints: Int = 0,
     val apps: List<AppDrawerApp> =emptyList(),
-    val allTasks: List<Task> = emptyList(),
-    val recurringTasks : List<Task> = emptyList(),
+    val normalTasks: List<Task> = emptyList(),
+    val allFocusedTasks: List<Task> = emptyList(),
+    val todayFocusedTasks : List<Task> = emptyList(),
     val showAddTaskDialog: Boolean = false,
-    val showEssentialAppsSheet: Boolean = false,
     val tunnelVisionMode: Boolean = true,
     val mode: HomeMode = HomeMode.SIMPLE,
     val hideCompletedTasks: Boolean = true,
+    val showWeeklySchedule: Boolean = false,
+    val showCategorizedApps : Boolean = false,
     val focusCategories: List<FocusCategory> = getDefaultFocusCategories(),
     val editingCategoryId: TaskCategory? = null,
     val editingCategoryName: String = "",
-    val expandedLinkId: String? = null
+    val expandedLinkId: String? = null,
+    val currentPage: Int = 1 // 0 = blank, 1 = main tasks, 2 = alternate (focused mode only)
 )
 
 sealed class HomeEvent {
@@ -66,16 +71,14 @@ sealed class HomeEvent {
     ) : HomeEvent()
     data object ShowAddTaskDialog : HomeEvent()
     data object HideAddTaskDialog : HomeEvent()
-    data object ShowEssentialAppsSheet : HomeEvent()
-    data object HideEssentialAppsSheet : HomeEvent()
     data class NavigateToTaskDetails(val taskId: String) : HomeEvent()
     data class LaunchApp(val app: AppDrawerApp) : HomeEvent()
-    data object ToggleMode : HomeEvent()
     data class StartEditingCategory(val categoryId: TaskCategory) : HomeEvent()
     data class SaveEditingCategory(val name: String) : HomeEvent()
     data object CancelEditingCategory : HomeEvent()
     data class UpdateEditingCategoryName(val name: String) : HomeEvent()
     data class ExpandLink(val linkId: String?) : HomeEvent()
+    data class UpdateCurrentPage(val page: Int) : HomeEvent()
 }
 
 data class HomeTheme(
