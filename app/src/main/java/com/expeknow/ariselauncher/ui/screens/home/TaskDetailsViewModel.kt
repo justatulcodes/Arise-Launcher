@@ -34,6 +34,14 @@ class TaskDetailsViewModel @Inject constructor(
                 }
             }
 
+            is TaskDetailsEvent.ShowDeleteConfirmation -> {
+                _state.value = _state.value.copy(showDeleteConfirmation = true)
+            }
+
+            is TaskDetailsEvent.DismissDeleteConfirmation -> {
+                _state.value = _state.value.copy(showDeleteConfirmation = false)
+            }
+
             is TaskDetailsEvent.DeleteTask -> {
                 viewModelScope.launch {
                     taskRepositoryImpl.deleteTaskById(event.taskId)

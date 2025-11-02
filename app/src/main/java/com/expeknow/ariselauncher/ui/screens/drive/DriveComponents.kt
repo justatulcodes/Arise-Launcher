@@ -56,6 +56,7 @@ fun DriveItemCard(
                             DriveItemType.QUOTE -> Icons.Default.FormatQuote
                             DriveItemType.IMAGE -> Icons.Default.Image
                             DriveItemType.VIDEO -> Icons.Default.PlayCircle
+                            DriveItemType.TODO -> Icons.Default.AutoAwesome
                         },
                         contentDescription = null,
                         tint = AccentGreen,
@@ -213,6 +214,52 @@ fun DriveItemCard(
                         )
                     }
                 }
+
+                DriveItemType.TODO -> {
+                    if (item.title.isNotEmpty()) {
+                        Text(
+                            text = item.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = TaskTitle,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+                    if (item.description.isNotEmpty()) {
+                        Text(
+                            text = item.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = BannerTextGray,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                    }
+
+                    // Display content as additional notes if provided
+                    if (item.content.isNotEmpty()) {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color.Black.copy(alpha = 0.3f)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Icon(
+                                    Icons.Default.Flag,
+                                    contentDescription = null,
+                                    tint = AccentGreen,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    text = item.content,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White.copy(alpha = 0.8f)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -260,9 +307,9 @@ fun AddDriveItemDialog(
                     color = BannerTextGray,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                Row(
+                FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     DriveItemType.entries.forEach { type ->
                         FilterChip(
@@ -443,6 +490,35 @@ fun AddDriveItemDialog(
                             )
                         )
                     }
+
+                    DriveItemType.TODO -> {
+                        OutlinedTextField(
+                            value = title,
+                            onValueChange = { title = it },
+                            label = { Text("Bucket List Item") },
+                            placeholder = { Text("What do you want to accomplish?") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = description,
+                            onValueChange = { description = it },
+                            label = { Text("Description (optional)") },
+                            placeholder = { Text("Add more details about this goal...") },
+                            modifier = Modifier.fillMaxWidth(),
+                            minLines = 3,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AccentGreen,
+                                focusedLabelColor = AccentGreen,
+                                cursorColor = AccentGreen
+                            )
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -457,17 +533,23 @@ fun AddDriveItemDialog(
                         Text("Cancel", color = BannerTextGray)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
+
+                    val canSave = when (selectedType) {
+                        DriveItemType.QUOTE -> content.isNotEmpty()
+                        DriveItemType.IMAGE -> (useImageUrl && content.isNotEmpty()) || !useImageUrl
+                        DriveItemType.VIDEO -> content.isNotEmpty() && title.isNotEmpty()
+                        DriveItemType.TODO -> title.isNotEmpty()
+                    }
+
                     Button(
                         onClick = {
-                            if (content.isNotEmpty() || (selectedType == DriveItemType.IMAGE && !useImageUrl)) {
-                                onSave(selectedType, content, title, author, description)
-                            }
+                            onSave(selectedType, content, title, author, description)
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = AccentGreen,
                             contentColor = Color.Black
                         ),
-                        enabled = (content.isNotEmpty() || (selectedType == DriveItemType.IMAGE && !useImageUrl)) && !isSavingImage
+                        enabled = canSave && !isSavingImage
                     ) {
                         Text(if (editingItem != null) "Update" else "Save")
                     }

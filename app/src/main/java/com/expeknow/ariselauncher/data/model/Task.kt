@@ -25,7 +25,7 @@ enum class TaskCategory {
 }
 
 @Entity(tableName = "tasks")
-@TypeConverters(TaskConverters::class)
+@TypeConverters(ModelTypeConverters::class)
 data class Task(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),

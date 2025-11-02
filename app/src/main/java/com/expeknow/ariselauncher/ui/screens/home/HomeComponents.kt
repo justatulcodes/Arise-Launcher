@@ -48,6 +48,19 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
+fun getDayColor(dayName: String): Color {
+    return when (dayName.uppercase()) {
+        "MONDAY" -> Color(0xFF60A5FA)
+        "TUESDAY" -> Color(0xFFFB923C)
+        "WEDNESDAY" -> Color(0xFF4ADE80)
+        "THURSDAY" -> Color(0xFFF59E0B)
+        "FRIDAY" -> Color(0xFFEC4899)
+        "SATURDAY" -> Color(0xFF8B5CF6)
+        "SUNDAY" -> Color(0xFFEF4444)
+        else -> Color.White
+    }
+}
+
 @Composable
 fun EnhancedPointsHeader(
     currentPoints: Int,
@@ -158,269 +171,6 @@ fun EnhancedPointsHeader(
 }
 
 @Composable
-fun EssentialAppsDrawer(
-    onClose: () -> Unit,
-    onOpenFullApps: () -> Unit,
-    theme: HomeTheme
-) {
-    val essentialApps = listOf(
-        Triple("Phone", Icons.Filled.Phone, "Make and receive calls"),
-        Triple("Messages", Icons.Filled.Message, "Text messaging"),
-        Triple("Mail", Icons.Filled.Email, "Email communication"),
-        Triple("Calendar", Icons.Filled.CalendarToday, "Schedule and events"),
-        Triple("Contacts", Icons.Filled.Contacts, "Contact management"),
-        Triple("WhatsApp", Icons.Filled.Chat, "Instant messaging"),
-        Triple("Teams", Icons.Filled.VideoCall, "Work collaboration")
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.9f))
-            .clickable { onClose() }
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.8f)
-                .align(Alignment.BottomCenter)
-                .background(
-                    Color.Black,
-                    RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                )
-                .border(
-                    2.dp,
-                    theme.border,
-                    RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                )
-                .clickable(enabled = false) { }
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Header
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(
-                            width = 1.dp,
-                            color = theme.border,
-                            shape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp)
-                        )
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            "ESSENTIAL APPS",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = theme.accent,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            "Quick access to daily drivers",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White.copy(alpha = 0.6f)
-                        )
-                    }
-                    IconButton(
-                        onClick = onClose,
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            Icons.Filled.Close,
-                            contentDescription = "Close",
-                            tint = Color.White.copy(alpha = 0.6f)
-                        )
-                    }
-                }
-
-                // Apps Grid
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(essentialApps) { (name, icon, description) ->
-                        EssentialAppCard(
-                            name = name,
-                            icon = icon,
-                            description = description,
-                            theme = theme,
-                            onClick = { onClose() }
-                        )
-                    }
-                }
-
-                // Full Apps Access
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .background(
-                            theme.bg,
-                            RoundedCornerShape(8.dp)
-                        )
-                        .border(
-                            2.dp,
-                            theme.border,
-                            RoundedCornerShape(8.dp)
-                        )
-                        .clickable {
-                            onClose()
-                            onOpenFullApps()
-                        }
-                        .padding(16.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(
-                                    theme.bg,
-                                    RoundedCornerShape(8.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                Icons.Filled.GridView,
-                                contentDescription = null,
-                                tint = theme.accent,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(12.dp))
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "ALL APPS",
-                                style = MaterialTheme.typography.titleSmall,
-                                color = theme.accent,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                "Access full app drawer",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White.copy(alpha = 0.6f)
-                            )
-                        }
-
-                        Icon(
-                            Icons.Filled.ArrowForward,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.4f),
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                }
-
-                // Quick Stats
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Black.copy(alpha = 0.5f))
-                        .border(
-                            width = 1.dp,
-                            color = theme.border,
-                            shape = RoundedCornerShape(topStart = 0.dp, topEnd = 0.dp)
-                        )
-                        .padding(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            "${essentialApps.size} essential apps available",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White.copy(alpha = 0.6f)
-                        )
-                        Text(
-                            "No delays • Instant access",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = theme.accent,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EssentialAppCard(
-    name: String,
-    icon: ImageVector,
-    description: String,
-    theme: HomeTheme,
-    onClick: () -> Unit
-) {
-    val categoryColor = when (name) {
-        "Phone", "Messages", "Contacts" -> Color(0xFF4ADE80)
-        "Mail", "Calendar", "Teams" -> Color(0xFFFFD700)
-        else -> Color(0xFF60A5FA)
-    }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clickable { onClick() }
-            .background(
-                categoryColor.copy(alpha = 0.1f),
-                RoundedCornerShape(12.dp)
-            )
-            .border(
-                1.dp,
-                categoryColor.copy(alpha = 0.3f),
-                RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .background(
-                    theme.bg,
-                    RoundedCornerShape(8.dp)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                icon,
-                contentDescription = name,
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            name,
-            style = MaterialTheme.typography.labelMedium,
-            color = Color.White,
-            fontWeight = FontWeight.Medium
-        )
-
-        Text(
-            description,
-            style = MaterialTheme.typography.labelSmall,
-            color = Color.White.copy(alpha = 0.4f),
-            maxLines = 2
-        )
-    }
-}
-
-@Composable
 fun ModeToggle(
     mode: HomeMode,
     onModeToggle: () -> Unit,
@@ -488,32 +238,6 @@ fun EnhancedProgressBar(
                         RoundedCornerShape(4.dp)
                     )
                     .animateContentSize()
-            )
-        }
-    }
-}
-
-@Composable
-fun SimpleTaskList(
-    tasks: List<Task>,
-    onTaskClick: (String) -> Unit,
-    onToggleTask: (String) -> Unit,
-    onTaskLinkClick : (TaskLink) -> Unit,
-    theme: HomeTheme
-) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(tasks) { task ->
-            SimpleTaskItem(
-                task = task,
-                onTaskClick = onTaskClick,
-                onToggleTask = onToggleTask,
-                theme = theme,
-                onTaskLinkClick = onTaskLinkClick
             )
         }
     }
@@ -1141,28 +865,6 @@ fun EssentialAppsBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .pointerInput(Unit) {
-                        detectVerticalDragGestures(
-                            onDragStart = {
-                                totalDrag = 0f
-                                hasTriggered = false
-                            },
-                            onVerticalDrag = { change, dragAmount ->
-                                change.consume()
-
-                                totalDrag += dragAmount
-                                if (totalDrag < -50f && !hasTriggered) {
-                                    hasTriggered = true
-                                    onOpenFullApps()
-                                }
-                            },
-                            onDragEnd = {
-                                totalDrag = 0f
-                                hasTriggered = false
-                            }
-                        )
-                    }
-
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -1333,4 +1035,306 @@ private fun FloatingAddButtonPreview() {
         onClick = {},
         theme = HomeTheme()
     )
+}
+
+@Composable
+fun WeeklyScheduleTaskList(
+    allFocusedTasks: List<Task>,
+    onTaskClick: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
+    theme: HomeTheme
+) {
+    val tasksByDay = allFocusedTasks.groupBy { task ->
+        task.repeatDays.ifEmpty { null }
+    }
+
+    val tasksWithoutDays = tasksByDay[null] ?: emptyList()
+    val tasksWithDays = tasksByDay.filterKeys { it != null }
+
+    val daysOrder = listOf(
+        DaysOfWeek.MONDAY,
+        DaysOfWeek.TUESDAY,
+        DaysOfWeek.WEDNESDAY,
+        DaysOfWeek.THURSDAY,
+        DaysOfWeek.FRIDAY,
+        DaysOfWeek.SATURDAY,
+        DaysOfWeek.SUNDAY
+    )
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        daysOrder.forEach { day ->
+            val tasksForDay = tasksWithDays.entries
+                .filter { (days, _) -> days?.contains(day) == true }
+                .flatMap { it.value }
+
+            if (tasksForDay.isNotEmpty()) {
+                item {
+                    WeeklyDaySection(
+                        day = day,
+                        tasks = tasksForDay,
+                        onTaskClick = onTaskClick,
+                        onToggleTask = onToggleTask,
+                        theme = theme
+                    )
+                }
+            }
+        }
+
+        if (tasksWithoutDays.isNotEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                WeeklyUnassignedSection(
+                    tasks = tasksWithoutDays,
+                    onTaskClick = onTaskClick,
+                    onToggleTask = onToggleTask,
+                    theme = theme
+                )
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
+}
+
+@Composable
+private fun WeeklyDaySection(
+    day: DaysOfWeek,
+    tasks: List<Task>,
+    onTaskClick: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
+    theme: HomeTheme
+) {
+    val dayName = when (day) {
+        DaysOfWeek.MONDAY -> "Monday"
+        DaysOfWeek.TUESDAY -> "Tuesday"
+        DaysOfWeek.WEDNESDAY -> "Wednesday"
+        DaysOfWeek.THURSDAY -> "Thursday"
+        DaysOfWeek.FRIDAY -> "Friday"
+        DaysOfWeek.SATURDAY -> "Saturday"
+        DaysOfWeek.SUNDAY -> "Sunday"
+    }
+
+    val dayColor = getDayColor(dayName)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                dayColor.copy(alpha = 0.05f),
+                RoundedCornerShape(12.dp)
+            )
+            .border(
+                1.5.dp,
+                dayColor.copy(alpha = 0.3f),
+                RoundedCornerShape(12.dp)
+            )
+            .padding(16.dp)
+    ) {
+        // Day header
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .background(dayColor, CircleShape)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                dayName.uppercase(),
+                style = MaterialTheme.typography.titleSmall,
+                color = dayColor,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                "${tasks.count { it.isCompleted }}/${tasks.size}",
+                style = MaterialTheme.typography.labelSmall,
+                color = theme.textSecondary,
+                fontSize = 11.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Tasks for this day
+        tasks.forEachIndexed { index, task ->
+            WeeklyTaskItem(
+                task = task,
+                onTaskClick = onTaskClick,
+                onToggleTask = onToggleTask,
+                theme = theme,
+                accentColor = dayColor
+            )
+
+            if (index < tasks.size - 1) {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeeklyUnassignedSection(
+    tasks: List<Task>,
+    onTaskClick: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
+    theme: HomeTheme
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color.White.copy(alpha = 0.05f),
+                RoundedCornerShape(12.dp)
+            )
+            .border(
+                1.5.dp,
+                Color.White.copy(alpha = 0.2f),
+                RoundedCornerShape(12.dp)
+            )
+            .padding(16.dp)
+    ) {
+        // Header
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                Icons.Filled.CalendarToday,
+                contentDescription = null,
+                tint = theme.textSecondary,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                "NO DAY ASSIGNED",
+                style = MaterialTheme.typography.titleSmall,
+                color = theme.textSecondary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                "${tasks.count { it.isCompleted }}/${tasks.size}",
+                style = MaterialTheme.typography.labelSmall,
+                color = theme.textSecondary,
+                fontSize = 11.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Tasks without day assignment
+        tasks.forEachIndexed { index, task ->
+            WeeklyTaskItem(
+                task = task,
+                onTaskClick = onTaskClick,
+                onToggleTask = onToggleTask,
+                theme = theme,
+                accentColor = theme.textSecondary
+            )
+
+            if (index < tasks.size - 1) {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeeklyTaskItem(
+    task: Task,
+    onTaskClick: (String) -> Unit,
+    onToggleTask: (Task) -> Unit,
+    theme: HomeTheme,
+    accentColor: Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                theme.bg.copy(alpha = 0.5f),
+                RoundedCornerShape(8.dp)
+            )
+            .border(
+                1.dp,
+                theme.border,
+                RoundedCornerShape(8.dp)
+            )
+            .clickable { onTaskClick(task.id) }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = task.isCompleted,
+            onCheckedChange = null,
+            colors = CheckboxDefaults.colors(
+                checkedColor = accentColor,
+                uncheckedColor = Color.White.copy(alpha = 0.4f),
+                checkmarkColor = Color.Black
+            ),
+            modifier = Modifier
+                .size(20.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            onToggleTask(task)
+                        }
+                    )
+                }
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = task.title,
+                color = if (task.isCompleted) Color.White.copy(alpha = 0.5f) else Color.White,
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 14.sp,
+                textDecoration = if (task.isCompleted) LineThrough else null
+            )
+
+            if (task.description.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = task.description,
+                    color = Color.White.copy(alpha = 0.4f),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            "+${task.points}",
+            color = accentColor,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Icon(
+            Icons.Filled.ChevronRight,
+            contentDescription = null,
+            tint = Color.White.copy(alpha = 0.3f),
+            modifier = Modifier.size(16.dp)
+        )
+    }
 }

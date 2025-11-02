@@ -44,7 +44,9 @@ class SettingsViewModel @Inject constructor(
             distractionAppsDelay = settingsRepository.getDistractionAppsDelay(),
             pointThreshold = settingsRepository.getPointThreshold(),
             warningsEnabled = settingsRepository.getWarningsEnabled(),
-            keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer()
+            keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer(),
+            showWeeklyScheduleEnabled = settingsRepository.getShowEntireWeekSchedule(),
+            showCategorizedAppsEnabled = settingsRepository.getShouldShowCategorizedApps()
         )
     }
 
@@ -87,9 +89,18 @@ class SettingsViewModel @Inject constructor(
                 settingsRepository.setWarningsEnabled(event.enabled)
             }
 
+            is SettingsEvent.ToggleShowCategorizedApps -> {
+                _state.value = _state.value.copy(showCategorizedAppsEnabled = event.enabled)
+                settingsRepository.setShouldShowCategorizedApps(event.enabled)
+            }
             is SettingsEvent.ToggleKeyboardTrigger -> {
                 _state.value = _state.value.copy(keyboardTriggerEnabled = event.enabled)
                 settingsRepository.setShouldTriggerKeyboardInAppDrawer(event.enabled)
+            }
+
+            is SettingsEvent.ToggleWeeklySchedule -> {
+                _state.value = _state.value.copy(showWeeklyScheduleEnabled = event.enabled)
+                settingsRepository.setShowEntireWeekSchedule(event.enabled)
             }
 
             is SettingsEvent.SetDefaultLauncher -> {

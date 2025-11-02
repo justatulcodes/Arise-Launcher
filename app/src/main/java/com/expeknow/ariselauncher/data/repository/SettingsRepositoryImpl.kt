@@ -39,6 +39,15 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun setShouldTriggerKeyboardInAppDrawer(shouldTrigger: Boolean) =
         preferencesDataSource.setShouldTriggerAppDrawerKeyboard(shouldTrigger)
 
+    override fun getShowEntireWeekSchedule(): Boolean = preferencesDataSource.getShowEntireWeekSchedule()
+    override fun setShowEntireWeekSchedule(enabled: Boolean) =
+        preferencesDataSource.setShowEntireWeekSchedule(enabled)
+
+    override fun getShouldShowCategorizedApps(): Boolean = preferencesDataSource.getShouldShowCategorizedApps()
+    override fun setShouldShowCategorizedApps(shouldShow: Boolean) =
+        preferencesDataSource.setShouldShowCategorizedApps(shouldShow)
+
+
 
     override fun resetAllSettings() = preferencesDataSource.resetAllSettings()
 }
