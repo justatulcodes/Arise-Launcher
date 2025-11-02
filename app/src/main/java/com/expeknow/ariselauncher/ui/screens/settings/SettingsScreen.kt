@@ -85,6 +85,14 @@ fun SettingsScreen(
                 theme = theme
             )
 
+            ShowCategorizedApps(
+                categorizedAppsEnabled = state.showCategorizedAppsEnabled,
+                onToggle = { enabled: Boolean ->
+                    viewModel.onEvent(SettingsEvent.ToggleShowCategorizedApps(enabled))
+                },
+                theme = theme
+            )
+
             AccessDelaysSection(
                 appDrawerDelay = state.appDrawerDelay,
                 distractionAppsDelay = state.distractionAppsDelay,

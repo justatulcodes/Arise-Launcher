@@ -45,7 +45,8 @@ class SettingsViewModel @Inject constructor(
             pointThreshold = settingsRepository.getPointThreshold(),
             warningsEnabled = settingsRepository.getWarningsEnabled(),
             keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer(),
-            showWeeklyScheduleEnabled = settingsRepository.getShowEntireWeekSchedule()
+            showWeeklyScheduleEnabled = settingsRepository.getShowEntireWeekSchedule(),
+            showCategorizedAppsEnabled = settingsRepository.getShouldShowCategorizedApps()
         )
     }
 
@@ -88,6 +89,10 @@ class SettingsViewModel @Inject constructor(
                 settingsRepository.setWarningsEnabled(event.enabled)
             }
 
+            is SettingsEvent.ToggleShowCategorizedApps -> {
+                _state.value = _state.value.copy(showCategorizedAppsEnabled = event.enabled)
+                settingsRepository.setShouldShowCategorizedApps(event.enabled)
+            }
             is SettingsEvent.ToggleKeyboardTrigger -> {
                 _state.value = _state.value.copy(keyboardTriggerEnabled = event.enabled)
                 settingsRepository.setShouldTriggerKeyboardInAppDrawer(event.enabled)

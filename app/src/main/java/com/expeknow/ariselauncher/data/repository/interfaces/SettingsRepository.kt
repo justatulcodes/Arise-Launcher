@@ -25,5 +25,8 @@ interface SettingsRepository {
     fun getShowEntireWeekSchedule(): Boolean
     fun setShowEntireWeekSchedule(enabled: Boolean)
 
+    fun getShouldShowCategorizedApps(): Boolean
+    fun setShouldShowCategorizedApps(shouldShow: Boolean)
+
     fun resetAllSettings()
 }
