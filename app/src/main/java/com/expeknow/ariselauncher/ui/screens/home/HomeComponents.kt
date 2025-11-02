@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerTheme
+import com.expeknow.ariselauncher.ui.screens.apps.AppGridItemV2
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
@@ -871,13 +873,11 @@ fun EssentialAppsBar(
             ) {
 
                 for (app in appsList) {
-                    AppIcon(
-                        icon = app.icon,
-                        label = app.name,
-                        onClick = {
+                    AppGridItemV2(
+                        app = app,
+                        onAppClick = {
                             onAppClick(app)
-                        },
-                        theme = theme
+                        }
                     )
                 }
             }

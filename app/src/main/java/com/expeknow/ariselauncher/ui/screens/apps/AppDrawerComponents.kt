@@ -350,15 +350,14 @@ fun AppGrid(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 rowApps.forEach { app ->
                     Box(modifier = Modifier.weight(1f)) {
-                        AppGridItem(
+                        AppGridItemV2(
                             app = app,
                             onAppClick = onAppClick,
-                            theme = theme
                         )
                     }
                 }
@@ -398,6 +397,79 @@ private fun AppGridItem(
                 Image(
                     contentDescription = app.name,
                     modifier = Modifier.size(54.dp),
+                    bitmap = it
+                )
+            }
+
+            if (app.pointCost > 0) {
+                Surface(
+                    color = when {
+                        app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.2f)
+                        app.pointCost <= 15 -> Color(0xFFFFB74D).copy(alpha = 0.2f)
+                        else -> Color(0xFFE57373).copy(alpha = 0.2f)
+                    },
+                    shape = RoundedCornerShape(4.dp),
+                    border = androidx.compose.foundation.BorderStroke(
+                        width = 1.dp,
+                        color = when {
+                            app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.4f)
+                            app.pointCost <= 15 -> Color(0xFFFFB74D).copy(alpha = 0.4f)
+                            else -> Color(0xFFE57373).copy(alpha = 0.4f)
+                        }
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 6.dp, y = (-6).dp)
+                ) {
+                    Text(
+                        text = "-${app.pointCost}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = when {
+                            app.pointCost <= 5 -> Color(0xFFFFD54F)
+                            app.pointCost <= 15 -> Color(0xFFFFB74D)
+                            else -> Color(0xFFE57373)
+                        },
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        //trim app name if too long and add ...
+        val appName = if (app.name.length > 12) {
+            app.name.substring(0,9) + "..."
+        } else {
+            app.name
+        }
+        Text(
+            text = appName,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White.copy(alpha = 0.8f),
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun AppGridItemV2(
+    app: AppDrawerApp,
+    onAppClick: (AppDrawerApp) -> Unit,
+) {
+    Column() {
+        Box(
+            modifier = Modifier
+                .size(64.dp)
+                .clickable { onAppClick(app) },
+            contentAlignment = Alignment.Center
+        ) {
+            app.icon?.toImageBitmap()?.let {
+                Image(
+                    contentDescription = app.name,
+                    modifier = Modifier.size(56.dp),
                     bitmap = it
                 )
             }
