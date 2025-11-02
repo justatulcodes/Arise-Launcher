@@ -25,7 +25,8 @@ import android.util.Log
 @Composable
 fun AppDrawerScreen(
     onClose: () -> Unit = {},
-    viewModel: AppDrawerViewModel = viewModel()
+    viewModel: AppDrawerViewModel = viewModel(),
+    shouldShowCategorizedApps: Boolean
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = AppDrawerTheme()
@@ -36,7 +37,6 @@ fun AppDrawerScreen(
     val shouldTriggerKeyboard = viewModel.getShouldTriggerKeyboard()
     val focusManager = LocalFocusManager.current
 
-    // Common log tag
     val TAG = "AppDrawerXXX"
 
     var shouldShowKeyboard by remember { mutableStateOf(true) }
@@ -258,21 +258,37 @@ fun AppDrawerScreen(
                             )
                         }
                     } else {
-                        // Show categorized apps
-                        val categorizedApps = viewModel.getCategorizedApps()
-                        categorizedApps.forEach { (category, apps) ->
+
+                        if(shouldShowCategorizedApps){
+                            val categorizedApps = viewModel.getCategorizedApps()
+                            categorizedApps.forEach { (category, apps) ->
+                                item {
+                                    AppCategorySection(
+                                        category = category,
+                                        apps = apps,
+                                        onAppClick = { app: AppDrawerApp ->
+                                            Log.d(TAG, "[AppClick][Category:$category] Selected app: $app")
+                                            viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                        },
+                                        theme = theme
+                                    )
+                                }
+                            }
+                        }
+                        else{
+                            val allApps = viewModel.getAlphabeticallyArrangedApps()
                             item {
-                                AppCategorySection(
-                                    category = category,
-                                    apps = apps,
+                                AppGrid(
+                                    apps = allApps,
                                     onAppClick = { app: AppDrawerApp ->
-                                        Log.d(TAG, "[AppClick][Category:$category] Selected app: $app")
+                                        Log.d(TAG, "[AppClick][SearchResults] Selected app: $app")
                                         viewModel.onEvent(AppDrawerEvent.SelectApp(app))
                                     },
                                     theme = theme
                                 )
                             }
                         }
+
                     }
                 }
             }
@@ -280,13 +296,4 @@ fun AppDrawerScreen(
         }
     }
 
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-private fun AppDrawerScreenPreview() {
-    AppDrawerScreen(
-        onClose = {},
-        viewModel = viewModel()
-    )
 }
