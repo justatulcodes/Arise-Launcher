@@ -200,7 +200,8 @@ fun HomeScreen(
         ) {
             AppDrawerScreen(
                 onClose = { showAppDrawerBottomSheet = false },
-                viewModel = appDrawerViewModel
+                viewModel = appDrawerViewModel,
+                shouldShowCategorizedApps = state.showCategorizedApps
             )
         }
     }

@@ -160,6 +160,11 @@ class AppDrawerViewModel @Inject constructor(
             .toSortedMap(compareBy { it.priority })
     }
 
+    fun getAlphabeticallyArrangedApps() : List<AppDrawerApp> {
+        return _state.value.apps
+            .sortedBy { it.name }
+    }
+
     fun getSearchResults(searchQuery: String): List<AppDrawerApp> {
         val query = searchQuery
         return if (query.isBlank()) {
