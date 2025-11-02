@@ -48,6 +48,7 @@ data class HomeState(
     val mode: HomeMode = HomeMode.SIMPLE,
     val hideCompletedTasks: Boolean = true,
     val showWeeklySchedule: Boolean = false,
+    val showCategorizedApps : Boolean = false,
     val focusCategories: List<FocusCategory> = getDefaultFocusCategories(),
     val editingCategoryId: TaskCategory? = null,
     val editingCategoryName: String = "",

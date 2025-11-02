@@ -39,10 +39,12 @@ class HomeViewModel @Inject constructor(
         val tunnelVisionEnabled = settingsRepository.getTunnelVisionMode()
         val shouldHideCompletedTasks = settingsRepository.getHideCompletedTasks()
         val showWeeklySchedule = settingsRepository.getShowEntireWeekSchedule()
+        val shouldShowCategorizedApps = settingsRepository.getShouldShowCategorizedApps()
         _state.value = _state.value.copy(
             mode = if (tunnelVisionEnabled) HomeMode.FOCUSED else HomeMode.SIMPLE,
             hideCompletedTasks = shouldHideCompletedTasks,
-            showWeeklySchedule = showWeeklySchedule
+            showWeeklySchedule = showWeeklySchedule,
+            showCategorizedApps = shouldShowCategorizedApps
         )
 
     }
