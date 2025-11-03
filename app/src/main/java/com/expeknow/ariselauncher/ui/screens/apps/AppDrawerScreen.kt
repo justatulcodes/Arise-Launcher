@@ -283,6 +283,7 @@ fun AppDrawerScreen(
                                     onAppClick = { app: AppDrawerApp ->
                                         Log.d(TAG, "[AppClick][SearchResults] Selected app: $app")
                                         viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                        onClose()
                                     },
                                     theme = theme
                                 )
