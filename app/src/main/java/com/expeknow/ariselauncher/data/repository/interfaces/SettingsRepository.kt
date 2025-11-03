@@ -28,5 +28,8 @@ interface SettingsRepository {
     fun getShouldShowCategorizedApps(): Boolean
     fun setShouldShowCategorizedApps(shouldShow: Boolean)
 
+    fun getIsFreshDatabaseInstance(): Boolean
+    fun setIsFreshDatabaseInstance(isFresh: Boolean)
+
     fun resetAllSettings()
 }
