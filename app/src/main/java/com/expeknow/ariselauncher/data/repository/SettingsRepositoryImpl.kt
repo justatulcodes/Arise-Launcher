@@ -47,6 +47,8 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun setShouldShowCategorizedApps(shouldShow: Boolean) =
         preferencesDataSource.setShouldShowCategorizedApps(shouldShow)
 
+    override fun getIsFreshDatabaseInstance(): Boolean = preferencesDataSource.getIsFreshDbInstance()
+    override fun setIsFreshDatabaseInstance(isFresh: Boolean) = preferencesDataSource.setIsFreshDbInstance(isFresh)
 
 
     override fun resetAllSettings() = preferencesDataSource.resetAllSettings()

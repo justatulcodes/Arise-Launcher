@@ -53,12 +53,26 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             loadApps()
             observeTasks()
+            loadPoints()
         }
     }
     private fun observePoints() {
         viewModelScope.launch {
             pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
                 updateState { it.copy(currentPoints = points) }
+            }
+        }
+    }
+
+    private fun loadPoints() {
+        viewModelScope.launch {
+            if(settingsRepository.getIsFreshDatabaseInstance()) {
+                pointsLogRepositoryImpl.earnPoints(
+                    1000,
+                    "initial_points",
+                    "initial_points",
+                )
+                settingsRepository.setIsFreshDatabaseInstance(false)
             }
         }
     }
