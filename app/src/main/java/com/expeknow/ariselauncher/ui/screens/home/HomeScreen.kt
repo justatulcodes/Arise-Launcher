@@ -72,6 +72,10 @@ fun HomeScreen(
     )
     val shouldShowTaskCategory = state.mode == HomeMode.FOCUSED && pagerState.currentPage == 1
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshTasksToMatchCurrentDay()
+    }
+
     LaunchedEffect(pagerState.currentPage) {
         viewModel.onEvent(HomeEvent.UpdateCurrentPage(pagerState.currentPage))
     }
