@@ -107,17 +107,6 @@ class SettingsViewModel @Inject constructor(
                 appRepositoryImpl.openDefaultLauncherSettings()
             }
 
-            is SettingsEvent.ToggleAppEssential -> {
-                val updatedApps = _state.value.apps.map { app ->
-                    if (app.id == event.appId) {
-                        app.copy(essential = !app.essential)
-                    } else {
-                        app
-                    }
-                }
-                _state.value = _state.value.copy(apps = updatedApps)
-            }
-
             is SettingsEvent.ShowResetPointsDialog -> {
                 _state.value = _state.value.copy(showResetPointsDialog = true)
             }
@@ -151,7 +140,6 @@ class SettingsViewModel @Inject constructor(
                 }
                 _state.value = _state.value.copy(
                     showFactoryResetDialog = false,
-                    apps = _state.value.apps // Keep app list as is
                 )
             }
 

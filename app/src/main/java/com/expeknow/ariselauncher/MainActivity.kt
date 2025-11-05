@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
             addDataScheme("package")
         }
         registerReceiver(packageReceiver, filter)
-        Log.d("PackageReceiver", "Package receiver registered")
 
         setContent {
             AriseLauncherTheme {
@@ -95,7 +94,6 @@ class MainActivity : ComponentActivity() {
                 putExtra(AppUsageTimerService.EXTRA_APP_NAME, appName)
             }
             context.startService(intent)
-            Log.d(TAG, "Timer service started for $appName")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start timer service", e)
         }
@@ -115,7 +113,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        Log.d("AppUsageService", "onStop called")
         val (packageName, appName) = getForegroundAppInfo(this)
             ?: return
         startTimerForApp(this, packageName, appName)
@@ -123,7 +120,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d("AppUsageService", "onStart called")
         stopTimerForApp(this)
     }
 
