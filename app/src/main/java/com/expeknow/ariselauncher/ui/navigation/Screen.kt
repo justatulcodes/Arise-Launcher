@@ -1,6 +1,7 @@
 package com.expeknow.ariselauncher.ui.navigation
 
 sealed class Screen(val route: String) {
+    data object PermissionOnboarding : Screen("permission_onboarding")
     data object Settings : Screen("settings")
     data object Focus : Screen("focus")
 //    data object Points : Screen("points")

@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.expeknow.ariselauncher.ui.screens.home.HomeScreen
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsScreen
+import com.expeknow.ariselauncher.ui.screens.onboarding.PermissionOnboardingScreen
 import com.expeknow.ariselauncher.ui.screens.points.PointsScreen
 import com.expeknow.ariselauncher.ui.screens.points.TaskHistoryScreen
 import com.expeknow.ariselauncher.ui.screens.settings.SettingsScreen
@@ -50,7 +51,7 @@ import com.expeknow.ariselauncher.ui.screens.points.PointsViewModel
 import com.expeknow.ariselauncher.ui.screens.settings.SettingsViewModel
 
 @Composable
-fun AppNavigation(navController: NavHostController) {
+fun AppNavigation(navController: NavHostController, startDestination: String = Screen.Focus.route) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -82,9 +83,12 @@ fun AppNavigation(navController: NavHostController) {
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Focus.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(paddingValues)
         ) {
+            composable(Screen.PermissionOnboarding.route) {
+                PermissionOnboardingScreen(navController)
+            }
             composable(Screen.Focus.route) {
 
                 val viewModel = it.sharedViewModel<HomeViewModel>(navController = navController)
