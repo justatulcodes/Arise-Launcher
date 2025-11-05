@@ -37,17 +37,9 @@ data class SettingsState(
     val showCategorizedAppsEnabled : Boolean = false,
     val showWeeklyScheduleEnabled: Boolean = false,
     val isDefaultLauncher: Boolean = false,
-    val apps: List<SettingsAppInfo> = getDefaultApps(),
     val showResetPointsDialog: Boolean = false,
     val showFactoryResetDialog: Boolean = false,
     val showAppRefreshDialog: Boolean = false,
-)
-
-private fun getDefaultApps(): List<SettingsAppInfo> = listOf(
-    SettingsAppInfo("1", "Phone", true, Icons.Default.Phone, AppCategory.ESSENTIAL),
-    SettingsAppInfo("2", "Messages", true, Icons.Default.Message, AppCategory.ESSENTIAL),
-    SettingsAppInfo("3", "Mail", false, Icons.Default.Email, AppCategory.PRODUCTIVITY),
-    SettingsAppInfo("4", "Calendar", false, Icons.Default.CalendarToday, AppCategory.PRODUCTIVITY)
 )
 
 sealed class SettingsEvent {
@@ -59,7 +51,6 @@ sealed class SettingsEvent {
     data class ToggleWarnings(val enabled: Boolean) : SettingsEvent()
     data class ToggleKeyboardTrigger(val enabled: Boolean) : SettingsEvent()
     data class ToggleWeeklySchedule(val enabled: Boolean) : SettingsEvent()
-    data class ToggleAppEssential(val appId: String) : SettingsEvent()
     data class ToggleShowCategorizedApps(val enabled: Boolean) : SettingsEvent()
     data object ShowResetPointsDialog : SettingsEvent()
     data object HideResetPointsDialog : SettingsEvent()
