@@ -4,9 +4,12 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -24,15 +27,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.ExtraBold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.R
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
@@ -46,6 +53,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,12 +66,40 @@ fun HomeScreen(
 
     val theme = HomeTheme()
     val keyboardController = LocalSoftwareKeyboardController.current
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-    )
-    var showAppDrawerBottomSheet by remember { mutableStateOf(false) }
+    var showAppDrawer by remember { mutableStateOf(false) }
+    var hasOpenedDrawer by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    var appDrawerOffsetY by remember { mutableFloatStateOf(0f) }
+    var isDraggingAppDrawer by remember { mutableStateOf(false) }
+    var screenHeight by remember { mutableFloatStateOf(0f) }
+
+    LaunchedEffect(screenHeight) {
+        if (screenHeight > 0f && appDrawerOffsetY == 0f) {
+            appDrawerOffsetY = screenHeight * 0.3f // Initialize to closed position
+        }
+    }
+
+    // Animate the offset when not dragging
+    val animatedOffsetY by animateFloatAsState(
+        targetValue = appDrawerOffsetY,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "appDrawerOffset"
+    )
+
+    // Calculate progress: 0f = closed (at 70% from bottom), 1f = fully open (at top)
+    val drawerProgress = if (screenHeight > 0f) {
+        val closedOffset = screenHeight * 0.3f
+        val openOffset = 0f
+        1f - ((animatedOffsetY - openOffset) / (closedOffset - openOffset)).coerceIn(0f, 1f)
+    } else 0f
+
+    // Alpha based on progress
+    val drawerAlpha = drawerProgress
 
     val pageCount = if (state.mode == HomeMode.FOCUSED) 3 else 2
     val pagerState = rememberPagerState(
@@ -80,10 +116,30 @@ fun HomeScreen(
         viewModel.onEvent(HomeEvent.UpdateCurrentPage(pagerState.currentPage))
     }
 
+    // Handle opening/closing app drawer
+    LaunchedEffect(showAppDrawer, screenHeight) {
+        if (screenHeight > 0f) {
+            if (!isDraggingAppDrawer) {
+                appDrawerOffsetY = if (showAppDrawer) {
+                    hasOpenedDrawer = true
+                    0f // Fully open
+                } else {
+                    screenHeight * 0.3f // Closed at 60% from bottom
+                }
+            }
+        }
+    }
+
     BackHandler {
-        if (pagerState.currentPage != 0) {
-            coroutineScope.launch {
-                pagerState.animateScrollToPage(0)
+        when {
+            showAppDrawer -> {
+                showAppDrawer = false
+                appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
+            }
+            pagerState.currentPage != 0 -> {
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(0)
+                }
             }
         }
     }
@@ -92,6 +148,11 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
+            .onSizeChanged { size ->
+                if (screenHeight == 0f) {
+                    screenHeight = size.height.toFloat()
+                }
+            }
     ) {
         val allNormalTasksCompleted =
             state.normalTotalTasks > 0 && state.normalCompletedTasks == state.normalTotalTasks
@@ -116,7 +177,7 @@ fun HomeScreen(
                             },
                             onOpenFullApps = {
                                 appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
-                                showAppDrawerBottomSheet = true
+                                showAppDrawer = true
                             }
                         )
                     }
@@ -176,37 +237,62 @@ fun HomeScreen(
                 )
             }
         }
-    }
 
-    if (showAppDrawerBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                keyboardController?.hide()
-                showAppDrawerBottomSheet = false
-                appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
-                               },
-            sheetState = bottomSheetState,
-            containerColor = Color.Black,
-            contentColor = Color.White,
-            dragHandle = {
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .width(32.dp)
-                        .height(4.dp)
-                        .background(
-                            Color.White.copy(alpha = 0.3f),
-                            androidx.compose.foundation.shape.RoundedCornerShape(2.dp)
+        // Custom App Drawer - Always present but animated
+        if (screenHeight > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(if (drawerProgress > 0.01f) 10f else -1f)
+                    .graphicsLayer {
+                        translationY = animatedOffsetY
+                        alpha = drawerAlpha
+                    }
+                    .background(Color.Black)
+                    .pointerInput(screenHeight, showAppDrawer) {
+                        detectVerticalDragGestures(
+                            onDragStart = {
+                                isDraggingAppDrawer = true
+                            },
+                            onVerticalDrag = { change, dragAmount ->
+                                change.consume()
+                                val newOffset = (appDrawerOffsetY + dragAmount).coerceIn(
+                                    0f,
+                                    screenHeight * 0.4f
+                                )
+                                appDrawerOffsetY = newOffset
+                            },
+                            onDragEnd = {
+                                isDraggingAppDrawer = false
+                                // Snap to open or closed based on position
+                                val threshold = screenHeight * 0.2f // 20% threshold
+                                if (appDrawerOffsetY < threshold) {
+                                    showAppDrawer = true
+                                    appDrawerOffsetY = 0f
+                                } else {
+                                    showAppDrawer = false
+                                    appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
+                                    keyboardController?.hide()
+                                    appDrawerOffsetY = screenHeight * 0.4f
+                                }
+                            }
                         )
-                )
-            },
-            modifier = Modifier.statusBarsPadding(),
-        ) {
-            AppDrawerScreen(
-                onClose = { showAppDrawerBottomSheet = false },
-                viewModel = appDrawerViewModel,
-                shouldShowCategorizedApps = state.showCategorizedApps
-            )
+                    }
+            ) {
+                // Keep AppDrawerScreen in composition once it's been opened
+                // This prevents LayoutNode lifecycle issues
+                if (hasOpenedDrawer) {
+                    AppDrawerScreen(
+                        onClose = {
+                            showAppDrawer = false
+                            appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
+                            keyboardController?.hide()
+                        },
+                        viewModel = appDrawerViewModel,
+                        shouldShowCategorizedApps = state.showCategorizedApps
+                    )
+                }
+            }
         }
     }
 
@@ -276,18 +362,6 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
     var totalDrag by remember { mutableStateOf(0f) }
     var hasTriggered by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val offsetY by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = -8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1000,
-                easing = FastOutLinearInEasing
-            ),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "offset_animation"
-    )
 
     LaunchedEffect(Unit) {
         while (true) {
