@@ -40,8 +40,6 @@ class MainActivity : ComponentActivity() {
         registerReceiver(packageReceiver, filter)
         Log.d("PackageReceiver", "Package receiver registered")
 
-        checkAndLogPermissions()
-
         setContent {
             AriseLauncherTheme {
                 Surface(
@@ -49,24 +47,18 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    AppNavigation(navController = navController)
+
+                    val startDestination = if (PermissionHelper.hasAllPermissions(this)) {
+                        com.expeknow.ariselauncher.ui.navigation.Screen.Focus.route
+                    } else {
+                        com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route
+                    }
+
+                    AppNavigation(navController = navController, startDestination = startDestination)
                 }
             }
         }
     }
-
-    private fun checkAndLogPermissions() {
-        val hasOverlay = PermissionHelper.hasOverlayPermission(this)
-        val hasUsageStats = PermissionHelper.hasUsageStatsPermission(this)
-        if(!hasOverlay) {
-            PermissionHelper.requestOverlayPermission(this)
-        }
-        if(!hasUsageStats) {
-            PermissionHelper.requestUsageStatsPermission(this)
-        }
-
-    }
-
     private fun getForegroundAppInfo(context: Context): Pair<String, String>? {
         val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val time = System.currentTimeMillis()
