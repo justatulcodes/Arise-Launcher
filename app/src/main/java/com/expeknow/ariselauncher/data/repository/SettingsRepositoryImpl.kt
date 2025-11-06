@@ -50,6 +50,8 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun getIsFreshDatabaseInstance(): Boolean = preferencesDataSource.getIsFreshDbInstance()
     override fun setIsFreshDatabaseInstance(isFresh: Boolean) = preferencesDataSource.setIsFreshDbInstance(isFresh)
 
+    override fun getAppTimerEnabled(): Boolean = preferencesDataSource.getAppTimerEnabled()
+    override fun setAppTimerEnabled(enabled: Boolean) = preferencesDataSource.setAppTimerEnabled(enabled)
 
     override fun resetAllSettings() = preferencesDataSource.resetAllSettings()
 }
