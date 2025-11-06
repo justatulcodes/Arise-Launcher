@@ -86,6 +86,14 @@ fun SettingsScreen(
                 theme = theme
             )
 
+            AppTimerSection(
+                appTimerEnabled = state.appTimerEnabled,
+                onToggle = { enabled: Boolean ->
+                    viewModel.onEvent(SettingsEvent.ToggleAppTimer(enabled))
+                },
+                theme = theme
+            )
+
             TaskCompletionSection(
                 hideCompletedTasks = state.hideCompletedTasks,
                 onToggle = { hide: Boolean ->

@@ -46,7 +46,8 @@ class SettingsViewModel @Inject constructor(
             warningsEnabled = settingsRepository.getWarningsEnabled(),
             keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer(),
             showWeeklyScheduleEnabled = settingsRepository.getShowEntireWeekSchedule(),
-            showCategorizedAppsEnabled = settingsRepository.getShouldShowCategorizedApps()
+            showCategorizedAppsEnabled = settingsRepository.getShouldShowCategorizedApps(),
+            appTimerEnabled = settingsRepository.getAppTimerEnabled()
         )
     }
 
@@ -101,6 +102,11 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ToggleWeeklySchedule -> {
                 _state.value = _state.value.copy(showWeeklyScheduleEnabled = event.enabled)
                 settingsRepository.setShowEntireWeekSchedule(event.enabled)
+            }
+
+            is SettingsEvent.ToggleAppTimer -> {
+                _state.value = _state.value.copy(appTimerEnabled = event.enabled)
+                settingsRepository.setAppTimerEnabled(event.enabled)
             }
 
             is SettingsEvent.SetDefaultLauncher -> {

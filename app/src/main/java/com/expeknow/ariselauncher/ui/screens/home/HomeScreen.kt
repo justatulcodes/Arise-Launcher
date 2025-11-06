@@ -1,14 +1,9 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +28,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight.Companion.ExtraBold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
@@ -53,7 +47,6 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
 import kotlinx.coroutines.launch
-import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +70,7 @@ fun HomeScreen(
 
     LaunchedEffect(screenHeight) {
         if (screenHeight > 0f && appDrawerOffsetY == 0f) {
-            appDrawerOffsetY = screenHeight * 0.3f // Initialize to closed position
+            appDrawerOffsetY = screenHeight * 0.3f
         }
     }
 
@@ -166,7 +159,8 @@ fun HomeScreen(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
-            ) { page ->
+            )
+            { page ->
                 when (page) {
                     0 -> {
                         BlankScreen(
@@ -238,7 +232,6 @@ fun HomeScreen(
             }
         }
 
-        // Custom App Drawer - Always present but animated
         if (screenHeight > 0f) {
             Box(
                 modifier = Modifier
@@ -266,8 +259,7 @@ fun HomeScreen(
                                 isDraggingAppDrawer = false
                                 // Snap to open or closed based on position
                                 val threshold = screenHeight * 0.2f // 20% threshold
-                                if (appDrawerOffsetY < threshold) {
-                                    showAppDrawer = true
+                                if (appDrawerOffsetY < threshold) { showAppDrawer = true
                                     appDrawerOffsetY = 0f
                                 } else {
                                     showAppDrawer = false
@@ -290,7 +282,28 @@ fun HomeScreen(
                             keyboardController?.hide()
                         },
                         viewModel = appDrawerViewModel,
-                        shouldShowCategorizedApps = state.showCategorizedApps
+                        shouldShowCategorizedApps = state.showCategorizedApps,
+                        onDragDelta = { delta ->
+                            // Handle nested scroll from app list when at top
+                            if (!isDraggingAppDrawer) {
+                                isDraggingAppDrawer = true
+                            }
+                            val newOffset = (appDrawerOffsetY + delta).coerceIn(
+                                0f,
+                                screenHeight * 0.4f
+                            )
+                            appDrawerOffsetY = newOffset
+
+                            // Auto-dismiss if dragged past threshold
+                            val threshold = screenHeight * 0.2f
+                            if (newOffset > threshold) {
+                                showAppDrawer = false
+                                appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
+                                keyboardController?.hide()
+                                appDrawerOffsetY = screenHeight * 0.4f
+                                isDraggingAppDrawer = false
+                            }
+                        }
                     )
                 }
             }

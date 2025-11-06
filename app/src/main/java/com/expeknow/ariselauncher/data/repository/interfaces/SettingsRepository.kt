@@ -31,5 +31,8 @@ interface SettingsRepository {
     fun getIsFreshDatabaseInstance(): Boolean
     fun setIsFreshDatabaseInstance(isFresh: Boolean)
 
+    fun getAppTimerEnabled(): Boolean
+    fun setAppTimerEnabled(enabled: Boolean)
+
     fun resetAllSettings()
 }

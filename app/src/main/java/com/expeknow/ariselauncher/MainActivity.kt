@@ -15,17 +15,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.service.AppUsageTimerService
 import com.expeknow.ariselauncher.ui.navigation.AppNavigation
 import com.expeknow.ariselauncher.ui.theme.AriseLauncherTheme
 import com.expeknow.ariselauncher.utils.PackageChangeReceiver
 import com.expeknow.ariselauncher.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val packageReceiver = PackageChangeReceiver()
     private val TAG = "MainActivity"
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +63,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
     private fun getForegroundAppInfo(context: Context): Pair<String, String>? {
         val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
         val time = System.currentTimeMillis()
@@ -113,6 +119,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
+        if (!settingsRepository.getAppTimerEnabled()) {
+            return
+        }
         val (packageName, appName) = getForegroundAppInfo(this)
             ?: return
         startTimerForApp(this, packageName, appName)
@@ -120,6 +129,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
+        if (!settingsRepository.getAppTimerEnabled()) {
+            return
+        }
         stopTimerForApp(this)
     }
 

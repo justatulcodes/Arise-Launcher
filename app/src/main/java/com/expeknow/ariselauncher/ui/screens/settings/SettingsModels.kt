@@ -36,6 +36,7 @@ data class SettingsState(
     val keyboardTriggerEnabled: Boolean = false,
     val showCategorizedAppsEnabled : Boolean = false,
     val showWeeklyScheduleEnabled: Boolean = false,
+    val appTimerEnabled: Boolean = true,
     val isDefaultLauncher: Boolean = false,
     val showResetPointsDialog: Boolean = false,
     val showFactoryResetDialog: Boolean = false,
@@ -52,6 +53,7 @@ sealed class SettingsEvent {
     data class ToggleKeyboardTrigger(val enabled: Boolean) : SettingsEvent()
     data class ToggleWeeklySchedule(val enabled: Boolean) : SettingsEvent()
     data class ToggleShowCategorizedApps(val enabled: Boolean) : SettingsEvent()
+    data class ToggleAppTimer(val enabled: Boolean) : SettingsEvent()
     data object ShowResetPointsDialog : SettingsEvent()
     data object HideResetPointsDialog : SettingsEvent()
     data object ShowFactoryResetDialog : SettingsEvent()
