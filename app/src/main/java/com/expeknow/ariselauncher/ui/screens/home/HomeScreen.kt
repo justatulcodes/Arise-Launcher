@@ -1,5 +1,6 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -47,6 +48,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
 import kotlinx.coroutines.launch
+import kotlin.times
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -171,6 +173,7 @@ fun HomeScreen(
                             },
                             onOpenFullApps = {
                                 appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
+                                Log.d("Taggzz", "onOpenFullApps callback hit and made showAppDrawer = true")
                                 showAppDrawer = true
                             }
                         )
@@ -259,10 +262,13 @@ fun HomeScreen(
                                 isDraggingAppDrawer = false
                                 // Snap to open or closed based on position
                                 val threshold = screenHeight * 0.2f // 20% threshold
-                                if (appDrawerOffsetY < threshold) { showAppDrawer = true
+                                if (appDrawerOffsetY < threshold) {
+                                    Log.d("Taggzz", "onDragEnd on app drawer and made showAppDrawer = true")
+                                    showAppDrawer = true
                                     appDrawerOffsetY = 0f
                                 } else {
                                     showAppDrawer = false
+                                    Log.d("Taggzz", "onDragEnd on app drawer and made showAppDrawer = false")
                                     appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
                                     keyboardController?.hide()
                                     appDrawerOffsetY = screenHeight * 0.4f
@@ -271,20 +277,18 @@ fun HomeScreen(
                         )
                     }
             ) {
-                // Keep AppDrawerScreen in composition once it's been opened
-                // This prevents LayoutNode lifecycle issues
-                if (hasOpenedDrawer) {
+
+                if(hasOpenedDrawer) {
                     AppDrawerScreen(
                         onClose = {
+                            Log.d("Taggzz", "onClose for AppDrawerScreen made showAppDrawer = false")
                             showAppDrawer = false
-                            hasOpenedDrawer = false
                             appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
                             keyboardController?.hide()
                         },
                         viewModel = appDrawerViewModel,
                         shouldShowCategorizedApps = state.showCategorizedApps,
                         onDragDelta = { delta ->
-                            // Handle nested scroll from app list when at top
                             if (!isDraggingAppDrawer) {
                                 isDraggingAppDrawer = true
                             }
@@ -294,10 +298,10 @@ fun HomeScreen(
                             )
                             appDrawerOffsetY = newOffset
 
-                            // Auto-dismiss if dragged past threshold
                             val threshold = screenHeight * 0.2f
                             if (newOffset > threshold) {
                                 showAppDrawer = false
+                                Log.d("Taggzz", "onDragDelta for AppDrawerScreen made showAppDrawer = false")
                                 appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
                                 keyboardController?.hide()
                                 appDrawerOffsetY = screenHeight * 0.4f
@@ -305,7 +309,9 @@ fun HomeScreen(
                             }
                         }
                     )
+
                 }
+
             }
         }
     }
@@ -401,6 +407,7 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
                 .pointerInput(Unit) {
                     detectVerticalDragGestures(
                         onDragStart = {
+                            Log.d("Taggzz", "drag started")
                             totalDrag = 0f
                             hasTriggered = false
                         },
@@ -409,10 +416,12 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
 
                             totalDrag += dragAmount
                             if (totalDrag < -50f && !hasTriggered) {
-                                hasTriggered = true
+                                Log.d("Taggzz", "totaldrag < -50 so opening full apps")
                                 onOpenFullApps()
+                                hasTriggered = true
                             }
                             else if (totalDrag > 50f && !hasTriggered) {
+                                Log.d("Taggzz", "totaldrag > 50 so opening notification panel")
                                 hasTriggered = true
                                 try {
                                     val service = context.getSystemService("statusbar")
@@ -425,6 +434,7 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
                             }
                         },
                         onDragEnd = {
+                            Log.d("Taggzz", "onDragEnd, reseting the used variables")
                             totalDrag = 0f
                             hasTriggered = false
                         }
@@ -497,6 +507,12 @@ fun MainTaskContentScreen(
     showWeeklySchedule: Boolean,
     allFocusedTasks: List<Task>
 ) {
+
+    val currentDay by remember {
+        mutableStateOf(java.text.SimpleDateFormat("EEEE", java.util.Locale.getDefault()))
+    }
+    var day by remember { mutableStateOf(currentDay.format(java.util.Date())) }
+
     Column(modifier = Modifier.fillMaxSize()) {
         EnhancedPointsHeader(
             currentPoints = currentPoints,
@@ -515,7 +531,26 @@ fun MainTaskContentScreen(
             theme = theme
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (mode == HomeMode.FOCUSED && !showWeeklySchedule) {
+            CompactDayOfWeekIndicator(
+                currentDay = day,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        if (mode == HomeMode.SIMPLE) {
+            Text(
+                text = day,
+                style = MaterialTheme.typography.titleLarge,
+                color = getDayColor(day),
+                fontSize = 24.sp,
+                fontWeight = SemiBold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         when (mode) {
                 HomeMode.SIMPLE -> {
