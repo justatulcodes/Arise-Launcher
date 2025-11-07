@@ -64,6 +64,55 @@ fun getDayColor(dayName: String): Color {
 }
 
 @Composable
+fun CompactDayOfWeekIndicator(
+    currentDay: String,
+    modifier: Modifier = Modifier
+) {
+    val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val fullDayNames = listOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
+    val currentDayIndex = fullDayNames.indexOf(currentDay.uppercase())
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        daysOfWeek.forEachIndexed { index, day ->
+            val isCurrentDay = index == currentDayIndex
+            val dayColor = getDayColor(fullDayNames[index])
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 2.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = day,
+                        fontSize = 11.sp,
+                        fontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isCurrentDay) dayColor else Color.White.copy(alpha = 0.4f)
+                    )
+                    if (isCurrentDay) {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 2.dp)
+                                .size(4.dp)
+                                .background(dayColor, CircleShape)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun EnhancedPointsHeader(
     currentPoints: Int,
     pointChange: Int,
