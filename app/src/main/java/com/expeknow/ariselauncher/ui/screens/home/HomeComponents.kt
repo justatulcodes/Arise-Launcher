@@ -71,7 +71,7 @@ fun CompactDayOfWeekIndicator(
     val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     val fullDayNames = listOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
     val currentDayIndex = fullDayNames.indexOf(currentDay.uppercase())
-
+    
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -82,7 +82,7 @@ fun CompactDayOfWeekIndicator(
         daysOfWeek.forEachIndexed { index, day ->
             val isCurrentDay = index == currentDayIndex
             val dayColor = getDayColor(fullDayNames[index])
-
+            
             Box(
                 modifier = Modifier
                     .weight(1f)

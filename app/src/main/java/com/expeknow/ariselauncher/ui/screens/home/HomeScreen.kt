@@ -47,6 +47,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.times
 
@@ -62,11 +63,10 @@ fun HomeScreen(
     val theme = HomeTheme()
     val keyboardController = LocalSoftwareKeyboardController.current
     var showAppDrawer by remember { mutableStateOf(false) }
-    var hasOpenedDrawer by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    var appDrawerOffsetY by remember { mutableFloatStateOf(0f) }
+    var appDrawerOffsetY by remember { mutableFloatStateOf(Float.MAX_VALUE) }
     var isDraggingAppDrawer by remember { mutableStateOf(false) }
     var screenHeight by remember { mutableFloatStateOf(0f) }
 
@@ -116,7 +116,6 @@ fun HomeScreen(
         if (screenHeight > 0f) {
             if (!isDraggingAppDrawer) {
                 appDrawerOffsetY = if (showAppDrawer) {
-                    hasOpenedDrawer = true
                     0f // Fully open
                 } else {
                     screenHeight * 0.3f // Closed at 60% from bottom
@@ -173,7 +172,6 @@ fun HomeScreen(
                             },
                             onOpenFullApps = {
                                 appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
-                                Log.d("Taggzz", "onOpenFullApps callback hit and made showAppDrawer = true")
                                 showAppDrawer = true
                             }
                         )
@@ -235,84 +233,76 @@ fun HomeScreen(
             }
         }
 
-        if (screenHeight > 0f) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .zIndex(if (drawerProgress > 0.01f) 10f else -1f)
-                    .graphicsLayer {
-                        translationY = animatedOffsetY
-                        alpha = drawerAlpha
-                    }
-                    .background(Color.Black)
-                    .pointerInput(screenHeight, showAppDrawer) {
-                        detectVerticalDragGestures(
-                            onDragStart = {
-                                isDraggingAppDrawer = true
-                            },
-                            onVerticalDrag = { change, dragAmount ->
-                                change.consume()
-                                val newOffset = (appDrawerOffsetY + dragAmount).coerceIn(
-                                    0f,
-                                    screenHeight * 0.4f
-                                )
-                                appDrawerOffsetY = newOffset
-                            },
-                            onDragEnd = {
-                                isDraggingAppDrawer = false
-                                // Snap to open or closed based on position
-                                val threshold = screenHeight * 0.2f // 20% threshold
-                                if (appDrawerOffsetY < threshold) {
-                                    Log.d("Taggzz", "onDragEnd on app drawer and made showAppDrawer = true")
-                                    showAppDrawer = true
-                                    appDrawerOffsetY = 0f
-                                } else {
-                                    showAppDrawer = false
-                                    Log.d("Taggzz", "onDragEnd on app drawer and made showAppDrawer = false")
-                                    appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
-                                    keyboardController?.hide()
-                                    appDrawerOffsetY = screenHeight * 0.4f
-                                }
-                            }
-                        )
-                    }
-            ) {
-
-                if(hasOpenedDrawer) {
-                    AppDrawerScreen(
-                        onClose = {
-                            Log.d("Taggzz", "onClose for AppDrawerScreen made showAppDrawer = false")
-                            showAppDrawer = false
-                            appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
-                            keyboardController?.hide()
+        Box(
+            modifier = Modifier
+                .graphicsLayer {
+                    translationY = animatedOffsetY
+                    alpha = drawerAlpha
+                }
+                .fillMaxSize()
+                .zIndex(if (drawerProgress > 0.01f) 10f else -1f)
+                .background(Color.Black)
+                .pointerInput(screenHeight, showAppDrawer) {
+                    detectVerticalDragGestures(
+                        onDragStart = {
+                            isDraggingAppDrawer = true
                         },
-                        viewModel = appDrawerViewModel,
-                        shouldShowCategorizedApps = state.showCategorizedApps,
-                        onDragDelta = { delta ->
-                            if (!isDraggingAppDrawer) {
-                                isDraggingAppDrawer = true
-                            }
-                            val newOffset = (appDrawerOffsetY + delta).coerceIn(
+                        onVerticalDrag = { change, dragAmount ->
+                            change.consume()
+                            val newOffset = (appDrawerOffsetY + dragAmount).coerceIn(
                                 0f,
                                 screenHeight * 0.4f
                             )
                             appDrawerOffsetY = newOffset
-
-                            val threshold = screenHeight * 0.2f
-                            if (newOffset > threshold) {
+                        },
+                        onDragEnd = {
+                            isDraggingAppDrawer = false
+                            // Snap to open or closed based on position
+                            val threshold = screenHeight * 0.2f // 20% threshold
+                            if (appDrawerOffsetY < threshold) {
+                                showAppDrawer = true
+                                appDrawerOffsetY = 0f
+                            } else {
                                 showAppDrawer = false
-                                Log.d("Taggzz", "onDragDelta for AppDrawerScreen made showAppDrawer = false")
                                 appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
                                 keyboardController?.hide()
                                 appDrawerOffsetY = screenHeight * 0.4f
-                                isDraggingAppDrawer = false
                             }
                         }
                     )
-
                 }
+        ) {
 
-            }
+            AppDrawerScreen(
+                onClose = {
+                    showAppDrawer = false
+                    appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
+                    keyboardController?.hide()
+                },
+                viewModel = appDrawerViewModel,
+                shouldShowCategorizedApps = state.showCategorizedApps,
+                isVisible = showAppDrawer,
+                onDragDelta = { delta ->
+                    if (!isDraggingAppDrawer) {
+                        isDraggingAppDrawer = true
+                    }
+                    val newOffset = (appDrawerOffsetY + delta).coerceIn(
+                        0f,
+                        screenHeight * 0.4f
+                    )
+                    appDrawerOffsetY = newOffset
+
+                    val threshold = screenHeight * 0.2f
+                    if (newOffset > threshold) {
+                        showAppDrawer = false
+                        appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
+                        keyboardController?.hide()
+                        appDrawerOffsetY = screenHeight * 0.4f
+                        isDraggingAppDrawer = false
+                    }
+                }
+            )
+
         }
     }
 
@@ -407,7 +397,6 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
                 .pointerInput(Unit) {
                     detectVerticalDragGestures(
                         onDragStart = {
-                            Log.d("Taggzz", "drag started")
                             totalDrag = 0f
                             hasTriggered = false
                         },
@@ -416,12 +405,10 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
 
                             totalDrag += dragAmount
                             if (totalDrag < -50f && !hasTriggered) {
-                                Log.d("Taggzz", "totaldrag < -50 so opening full apps")
                                 onOpenFullApps()
                                 hasTriggered = true
                             }
                             else if (totalDrag > 50f && !hasTriggered) {
-                                Log.d("Taggzz", "totaldrag > 50 so opening notification panel")
                                 hasTriggered = true
                                 try {
                                     val service = context.getSystemService("statusbar")
@@ -434,7 +421,6 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
                             }
                         },
                         onDragEnd = {
-                            Log.d("Taggzz", "onDragEnd, reseting the used variables")
                             totalDrag = 0f
                             hasTriggered = false
                         }
