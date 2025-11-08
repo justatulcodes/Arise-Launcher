@@ -1,5 +1,6 @@
 package com.expeknow.ariselauncher.ui.screens.apps
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,7 +25,8 @@ fun AppDrawerScreen(
     onClose: () -> Unit = {},
     viewModel: AppDrawerViewModel = viewModel(),
     shouldShowCategorizedApps: Boolean,
-    onDragDelta: (Float) -> Unit = {}
+    onDragDelta: (Float) -> Unit = {},
+    isVisible: Boolean = true,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val theme = AppDrawerTheme()
@@ -47,6 +49,7 @@ fun AppDrawerScreen(
 
                 if (isAtTop && isDraggingUp) {
                     // Pass the scroll to the parent (app drawer drag handler)
+                    Log.d("Taggzz", "sending available y with values = ${available.y}")
                     onDragDelta(available.y)
                     // Hide keyboard when starting to drag
                     if (shouldShowKeyboard) {
@@ -54,10 +57,20 @@ fun AppDrawerScreen(
                         focusManager.clearFocus(force = true)
                         shouldShowKeyboard = false
                     }
-                    return available // Consume the scroll
+//                    return available // Consume the scroll
                 }
                 return Offset.Zero
             }
+        }
+    }
+
+    LaunchedEffect(isVisible) {
+        if (!isVisible) {
+            searchQuery = ""
+            listState.scrollToItem(0)
+            focusManager.clearFocus(force = true)
+            keyboardController?.hide()
+            shouldShowKeyboard = false
         }
     }
 
@@ -99,7 +112,8 @@ fun AppDrawerScreen(
         }
     }
 
-    if (!state.isUnlocked) {
+    Log.d("Taggzz", "State.countdown = ${state.countdown} and !state.isUnlocked = ${!state.isUnlocked}")
+    if (false) {
         CountdownScreen(
             countdown = state.countdown,
             appDrawerDelay = viewModel.getAppDrawerDelay(),

@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface PointsLogRepository {
 
-    // Basic CRUD operations
     fun getAllPointsLog(): Flow<List<PointsLog>>
 
     suspend fun getPointsLogById(logId: String): PointsLog?
@@ -28,7 +27,6 @@ interface PointsLogRepository {
 
     suspend fun resetAllPointsLog()
 
-    // Query operations
     fun getPointsLogByType(type: PointsLogType): Flow<List<PointsLog>>
 
     fun getPointsLogFrom(fromTime: Long): Flow<List<PointsLog>>
@@ -39,7 +37,6 @@ interface PointsLogRepository {
 
     fun getRecentPointsLogByType(type: PointsLogType, limit: Int): Flow<List<PointsLog>>
 
-    // Points calculations
     fun getTotalPointsEarned(): Flow<Int?>
 
     fun getTotalPointsSpent(): Flow<Int?>
@@ -48,7 +45,6 @@ interface PointsLogRepository {
 
     fun getAvailablePoints(): Flow<Int>
 
-    // Count queries
     fun getTotalPointsLogCount(): Flow<Int>
 
     fun getPointsLogCountByType(type: PointsLogType): Flow<Int>
