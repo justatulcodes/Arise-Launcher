@@ -17,6 +17,7 @@ import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodayStartTime
 import com.expeknow.ariselauncher.ui.screens.home.Utils.getTodaysDayOfWeek
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import java.util.Calendar
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -28,6 +29,8 @@ class HomeViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
+    private var lastCheckedDate: String = getCurrentDate()
+
 
     init {
         updateModeFromSettings()
@@ -52,7 +55,8 @@ class HomeViewModel @Inject constructor(
     private fun loadInitialData() {
         viewModelScope.launch {
             loadApps()
-            observeTasks()
+            refreshTasks()
+            loadPoints()
         }
     }
     private fun observePoints() {
@@ -63,10 +67,22 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun loadPoints() {
+        viewModelScope.launch {
+            if(settingsRepository.getIsFreshDatabaseInstance()) {
+                pointsLogRepositoryImpl.earnPoints(
+                    1000,
+                    "initial_points",
+                    "initial_points",
+                )
+                settingsRepository.setIsFreshDatabaseInstance(false)
+            }
+        }
+    }
+
     private fun updateState(update: (HomeState) -> HomeState) {
         _state.value = update(_state.value)
     }
-
 
     fun onEvent(event: HomeEvent) {
         when (event) {
@@ -78,7 +94,7 @@ class HomeViewModel @Inject constructor(
 
             is HomeEvent.LoadTasks -> {
                 viewModelScope.launch {
-                    observeTasks()
+                    refreshTasks()
                 }
             }
 
@@ -178,6 +194,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun refreshTasksToMatchCurrentDay() {
+        val currentDate = getCurrentDate()
+        if (currentDate != lastCheckedDate) {
+            lastCheckedDate = currentDate
+            refreshTasks()
+        }
+    }
+
     private fun loadApps() {
         viewModelScope.launch {
             val apps = appRepositoryImpl.getCallingAndMessagingApps().take(2)
@@ -185,7 +209,12 @@ class HomeViewModel @Inject constructor(
         }
 
     }
-    private fun observeTasks() {
+
+    private fun getCurrentDate(): String {
+        val calendar = Calendar.getInstance()
+        return "${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH)}-${calendar.get(Calendar.DAY_OF_MONTH)}"
+    }
+    private fun refreshTasks() {
         viewModelScope.launch {
             taskRepositoryImpl.getAllTasks().collect { tasks ->
                 markCompletedRecurringTasksAsIncomplete(tasks)
@@ -270,7 +299,6 @@ class HomeViewModel @Inject constructor(
             }
 
             HomeMode.FOCUSED -> {
-                //setup focused task related details
                 val focusedTasks = tasks.filter { it.category in
                         listOf(TaskCategory.PEOPLE, TaskCategory.OPPORTUNITY, TaskCategory.SKILLS)}
                 val completedCountFocusedTask = focusedTasks.count { it.isCompleted }
@@ -284,7 +312,6 @@ class HomeViewModel @Inject constructor(
                     earnedPoints = totalPoints
                 )
 
-                //setup personal tasks related details
                 val personalTasks = tasks.filter { it.category == TaskCategory.PERSONAL }
                 val completedCountPersonalTasks = personalTasks.count { it.isCompleted }
                 val totalCountPersonalTasks = personalTasks.filter {

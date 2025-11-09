@@ -22,7 +22,6 @@ object LauncherUtils {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
-        // Fall back to general applications settings if specific home settings intent is not available
         if (intent.resolveActivity(context.packageManager) == null) {
             intent.action = Settings.ACTION_APPLICATION_SETTINGS
         }

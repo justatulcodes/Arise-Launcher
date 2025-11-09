@@ -15,17 +15,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.service.AppUsageTimerService
 import com.expeknow.ariselauncher.ui.navigation.AppNavigation
 import com.expeknow.ariselauncher.ui.theme.AriseLauncherTheme
 import com.expeknow.ariselauncher.utils.PackageChangeReceiver
 import com.expeknow.ariselauncher.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val packageReceiver = PackageChangeReceiver()
     private val TAG = "MainActivity"
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,9 +43,6 @@ class MainActivity : ComponentActivity() {
             addDataScheme("package")
         }
         registerReceiver(packageReceiver, filter)
-        Log.d("PackageReceiver", "Package receiver registered")
-
-        checkAndLogPermissions()
 
         setContent {
             AriseLauncherTheme {
@@ -49,22 +51,17 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    AppNavigation(navController = navController)
+
+                    val startDestination = if (PermissionHelper.hasAllPermissions(this)) {
+                        com.expeknow.ariselauncher.ui.navigation.Screen.Main.route
+                    } else {
+                        com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route
+                    }
+
+                    AppNavigation(navController = navController, startDestination = startDestination)
                 }
             }
         }
-    }
-
-    private fun checkAndLogPermissions() {
-        val hasOverlay = PermissionHelper.hasOverlayPermission(this)
-        val hasUsageStats = PermissionHelper.hasUsageStatsPermission(this)
-        if(!hasOverlay) {
-            PermissionHelper.requestOverlayPermission(this)
-        }
-        if(!hasUsageStats) {
-            PermissionHelper.requestUsageStatsPermission(this)
-        }
-
     }
 
     private fun getForegroundAppInfo(context: Context): Pair<String, String>? {
@@ -103,7 +100,6 @@ class MainActivity : ComponentActivity() {
                 putExtra(AppUsageTimerService.EXTRA_APP_NAME, appName)
             }
             context.startService(intent)
-            Log.d(TAG, "Timer service started for $appName")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start timer service", e)
         }
@@ -123,7 +119,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        Log.d("AppUsageService", "onStop called")
+        if (!settingsRepository.getAppTimerEnabled()) {
+            return
+        }
         val (packageName, appName) = getForegroundAppInfo(this)
             ?: return
         startTimerForApp(this, packageName, appName)
@@ -131,7 +129,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        Log.d("AppUsageService", "onStart called")
+        if (!settingsRepository.getAppTimerEnabled()) {
+            return
+        }
         stopTimerForApp(this)
     }
 

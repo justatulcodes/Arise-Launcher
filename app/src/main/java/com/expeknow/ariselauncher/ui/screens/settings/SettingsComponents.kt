@@ -392,8 +392,8 @@ fun ConfirmationDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    onConfirm()
                     onDismiss()
+                    onConfirm()
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (isDestructive) Color(0xFFE57373).copy(alpha = 0.2f) else theme.accent.copy(
