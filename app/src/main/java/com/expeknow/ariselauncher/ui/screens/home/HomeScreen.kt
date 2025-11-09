@@ -280,6 +280,7 @@ fun HomeScreen(
                 viewModel = appDrawerViewModel,
                 shouldShowCategorizedApps = state.showCategorizedApps,
                 isVisible = showAppDrawer,
+                isFullyExpanded = drawerProgress > 0.95f, // Only consider fully expanded when progress > 95%
                 onDragDelta = { delta ->
                     val newOffset = (appDrawerOffsetY + delta).coerceIn(0f, screenHeight * 0.4f)
                     appDrawerOffsetY = newOffset
