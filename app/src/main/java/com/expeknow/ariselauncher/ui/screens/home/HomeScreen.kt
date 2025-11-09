@@ -77,7 +77,7 @@ fun HomeScreen(
     val animatedOffsetY by animateFloatAsState(
         targetValue = appDrawerOffsetY,
         animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
+            dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium
         ),
         label = "appDrawerOffset"
