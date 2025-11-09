@@ -1,6 +1,5 @@
 package com.expeknow.ariselauncher.ui.screens.home
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -47,9 +46,7 @@ import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerEvent
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.home.Utils.openLink
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.times
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -283,22 +280,18 @@ fun HomeScreen(
                 shouldShowCategorizedApps = state.showCategorizedApps,
                 isVisible = showAppDrawer,
                 onDragDelta = { delta ->
-                    if (!isDraggingAppDrawer) {
-                        isDraggingAppDrawer = true
-                    }
-                    val newOffset = (appDrawerOffsetY + delta).coerceIn(
-                        0f,
-                        screenHeight * 0.4f
-                    )
+                    val newOffset = (appDrawerOffsetY + delta).coerceIn(0f, screenHeight * 0.4f)
                     appDrawerOffsetY = newOffset
-
+                },
+                onDragEnd = {
                     val threshold = screenHeight * 0.2f
-                    if (newOffset > threshold) {
+                    if (appDrawerOffsetY > threshold) {
                         showAppDrawer = false
                         appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
                         keyboardController?.hide()
                         appDrawerOffsetY = screenHeight * 0.4f
-                        isDraggingAppDrawer = false
+                    } else {
+                        appDrawerOffsetY = 0f
                     }
                 }
             )
