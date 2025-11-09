@@ -28,6 +28,7 @@ fun AppDrawerScreen(
     shouldShowCategorizedApps: Boolean,
     onDragDelta: (Float) -> Unit = {},
     isVisible: Boolean = true,
+    isFullyExpanded: Boolean = false,
     onDragEnd: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -39,36 +40,8 @@ fun AppDrawerScreen(
     val shouldTriggerKeyboard = viewModel.getShouldTriggerKeyboard()
     val focusManager = LocalFocusManager.current
 
-    var shouldShowKeyboard by remember { mutableStateOf(true) }
+    var shouldShowKeyboard by remember { mutableStateOf(false) }
     var isBottomSheetMoving by remember { mutableStateOf(false) }
-
-//    val nestedScrollConnection = remember {
-//        object : NestedScrollConnection {
-//            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-//                // Check if we're at the top and trying to scroll up (negative delta)
-//                val isAtTop = listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
-//                val isDraggingUp = available.y > 0 // Positive means dragging down (scrolling up)
-//
-//                if (isAtTop && isDraggingUp) {
-//                    // Pass the scroll to the parent (app drawer drag handler)
-//                    onDragDelta(available.y)
-//                    // Hide keyboard when starting to drag
-//                    if (shouldShowKeyboard) {
-//                        keyboardController?.hide()
-//                        focusManager.clearFocus(force = true)
-//                        shouldShowKeyboard = false
-//                    }
-////                    return available // Consume the scroll
-//                }
-//                return Offset.Zero
-//            }
-//
-//            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-//                return super.onPostFling(consumed, available)
-//
-//            }
-//        }
-//    }
 
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -101,12 +74,17 @@ fun AppDrawerScreen(
         }
     }
 
-    LaunchedEffect(state.isUnlocked, shouldTriggerKeyboard) {
-        if (state.isUnlocked && shouldTriggerKeyboard) {
+    // Update keyboard trigger to only show when fully expanded
+    LaunchedEffect(isFullyExpanded, state.isUnlocked, shouldTriggerKeyboard) {
+        if (isFullyExpanded && state.isUnlocked && shouldTriggerKeyboard && !shouldShowKeyboard) {
             delay(200)
             focusRequester.requestFocus()
             keyboardController?.show()
             shouldShowKeyboard = true
+        } else if (!isFullyExpanded && shouldShowKeyboard) {
+            keyboardController?.hide()
+            focusManager.clearFocus(force = true)
+            shouldShowKeyboard = false
         }
     }
 
@@ -114,13 +92,6 @@ fun AppDrawerScreen(
         snapshotFlow { Triple(listState.isScrollInProgress, listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) }
             .collect { (inProgress, index, offset) ->
                 if (inProgress) {
-//                    // User reached the top - show keyboard
-//                    if (index == 0 && offset == 0 && !shouldShowKeyboard && shouldTriggerKeyboard) {
-//                        delay(200)
-//                        focusRequester.requestFocus()
-//                        keyboardController?.show()
-//                        shouldShowKeyboard = true
-//                    }
                     // User scrolled down - hide keyboard and clear focus
                     if (shouldShowKeyboard && (index > 0 || offset > 50)) {
                         keyboardController?.hide()
