@@ -7,6 +7,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -108,7 +109,6 @@ fun HomeScreen(
         viewModel.onEvent(HomeEvent.UpdateCurrentPage(pagerState.currentPage))
     }
 
-    // Handle opening/closing app drawer
     LaunchedEffect(showAppDrawer, screenHeight) {
         if (screenHeight > 0f) {
             if (!isDraggingAppDrawer) {
@@ -267,6 +267,7 @@ fun HomeScreen(
                             }
                         }
                     )
+
                 }
         ) {
 
