@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
 
                     val startDestination = if (PermissionHelper.hasAllPermissions(this)) {
-                        com.expeknow.ariselauncher.ui.navigation.Screen.Focus.route
+                        com.expeknow.ariselauncher.ui.navigation.Screen.Main.route
                     } else {
                         com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route
                     }

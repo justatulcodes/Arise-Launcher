@@ -174,10 +174,13 @@ fun AppDrawerScreen(
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .nestedScroll(nestedScrollConnection)
-                        .padding(top = 16.dp, start = 16.dp, bottom = 16.dp),
+                        .padding(top = 0.dp, start = 16.dp, bottom = 0.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                     state = listState
                 ) {
+                    item {
+                        Spacer(Modifier.height(2.dp))
+                    }
                     if (searchQuery.isNotEmpty()) {
                         val searchResults = viewModel.getSearchResults(searchQuery)
                         item {
@@ -221,6 +224,9 @@ fun AppDrawerScreen(
                             }
                         }
 
+                    }
+                    item {
+                        Spacer(Modifier.height(2.dp))
                     }
                 }
             }
