@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerTheme
+import com.expeknow.ariselauncher.ui.screens.apps.AppGridItemV2
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
@@ -58,6 +60,55 @@ fun getDayColor(dayName: String): Color {
         "SATURDAY" -> Color(0xFF8B5CF6)
         "SUNDAY" -> Color(0xFFEF4444)
         else -> Color.White
+    }
+}
+
+@Composable
+fun CompactDayOfWeekIndicator(
+    currentDay: String,
+    modifier: Modifier = Modifier
+) {
+    val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val fullDayNames = listOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
+    val currentDayIndex = fullDayNames.indexOf(currentDay.uppercase())
+    
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        daysOfWeek.forEachIndexed { index, day ->
+            val isCurrentDay = index == currentDayIndex
+            val dayColor = getDayColor(fullDayNames[index])
+            
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 2.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = day,
+                        fontSize = 11.sp,
+                        fontWeight = if (isCurrentDay) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isCurrentDay) dayColor else Color.White.copy(alpha = 0.4f)
+                    )
+                    if (isCurrentDay) {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 2.dp)
+                                .size(4.dp)
+                                .background(dayColor, CircleShape)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -871,13 +922,11 @@ fun EssentialAppsBar(
             ) {
 
                 for (app in appsList) {
-                    AppIcon(
-                        icon = app.icon,
-                        label = app.name,
-                        onClick = {
+                    AppGridItemV2(
+                        app = app,
+                        onAppClick = {
                             onAppClick(app)
-                        },
-                        theme = theme
+                        }
                     )
                 }
             }

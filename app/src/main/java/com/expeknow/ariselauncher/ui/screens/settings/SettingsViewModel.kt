@@ -46,7 +46,8 @@ class SettingsViewModel @Inject constructor(
             warningsEnabled = settingsRepository.getWarningsEnabled(),
             keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer(),
             showWeeklyScheduleEnabled = settingsRepository.getShowEntireWeekSchedule(),
-            showCategorizedAppsEnabled = settingsRepository.getShouldShowCategorizedApps()
+            showCategorizedAppsEnabled = settingsRepository.getShouldShowCategorizedApps(),
+            appTimerEnabled = settingsRepository.getAppTimerEnabled()
         )
     }
 
@@ -103,19 +104,13 @@ class SettingsViewModel @Inject constructor(
                 settingsRepository.setShowEntireWeekSchedule(event.enabled)
             }
 
-            is SettingsEvent.SetDefaultLauncher -> {
-                appRepositoryImpl.openDefaultLauncherSettings()
+            is SettingsEvent.ToggleAppTimer -> {
+                _state.value = _state.value.copy(appTimerEnabled = event.enabled)
+                settingsRepository.setAppTimerEnabled(event.enabled)
             }
 
-            is SettingsEvent.ToggleAppEssential -> {
-                val updatedApps = _state.value.apps.map { app ->
-                    if (app.id == event.appId) {
-                        app.copy(essential = !app.essential)
-                    } else {
-                        app
-                    }
-                }
-                _state.value = _state.value.copy(apps = updatedApps)
+            is SettingsEvent.SetDefaultLauncher -> {
+                appRepositoryImpl.openDefaultLauncherSettings()
             }
 
             is SettingsEvent.ShowResetPointsDialog -> {
@@ -151,7 +146,6 @@ class SettingsViewModel @Inject constructor(
                 }
                 _state.value = _state.value.copy(
                     showFactoryResetDialog = false,
-                    apps = _state.value.apps // Keep app list as is
                 )
             }
 

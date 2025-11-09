@@ -65,7 +65,10 @@ class AppDrawerViewModel @Inject constructor(
                 if(points > 0) {
                     _state.value = _state.value.copy(isUnlocked = true)
                 }else {
-                    _state.value = _state.value.copy(isUnlocked = false)
+                    //TODO should we have app drawer delay timer (at all or) controlled by user?
+                    if(settingsRepository.getAppDrawerDelay() > 0){
+                        _state.value = _state.value.copy(isUnlocked = false)
+                    }
                 }
             }
         }

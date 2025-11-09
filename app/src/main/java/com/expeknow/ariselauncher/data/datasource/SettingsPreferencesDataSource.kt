@@ -26,6 +26,8 @@ class SettingsPreferencesDataSource @Inject constructor(
         private const val KEY_SHOULD_TRIGGER_APP_DRAWER_KEYBOARD = "app_drawer_keyboard"
         private const val KEY_SHOW_ENTIRE_WEEK_SCHEDULE = "show_entire_week_schedule"
         private const val KEY_SHOULD_SHOW_CATEGORIZED_APPS = "should_show_categories"
+        private const val KEY_IS_FRESH_DB_INSTANCE = "is_fresh_db_instance"
+        private const val KEY_APP_TIMER_ENABLED = "app_timer_enabled"
     }
 
     fun getHideCompletedTasks(): Boolean = prefs.getBoolean(KEY_HIDE_COMPLETED_TASKS, true)
@@ -62,6 +64,14 @@ class SettingsPreferencesDataSource @Inject constructor(
     fun getShouldShowCategorizedApps() = prefs.getBoolean(KEY_SHOULD_SHOW_CATEGORIZED_APPS, false)
     fun setShouldShowCategorizedApps(enabled: Boolean) =
         prefs.edit { putBoolean(KEY_SHOULD_SHOW_CATEGORIZED_APPS, enabled) }
+
+    fun getIsFreshDbInstance() = prefs.getBoolean(KEY_IS_FRESH_DB_INSTANCE, true)
+    fun setIsFreshDbInstance(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_IS_FRESH_DB_INSTANCE, enabled) }
+
+    fun getAppTimerEnabled(): Boolean = prefs.getBoolean(KEY_APP_TIMER_ENABLED, true)
+    fun setAppTimerEnabled(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_APP_TIMER_ENABLED, enabled) }
 
     fun resetAllSettings() {
         prefs.edit { clear() }

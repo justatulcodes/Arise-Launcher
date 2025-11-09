@@ -134,6 +134,24 @@ fun ShowWeeklyScheduleSection(
 }
 
 @Composable
+fun AppTimerSection(
+    appTimerEnabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+    theme: SettingsTheme
+) {
+    SettingsCard(theme) {
+        SettingsToggleItem(
+            title = "APP USAGE TIMER",
+            subtitle = "Track time spent in other apps",
+            description = "When enabled, the app will track how long you spend in other applications when you leave the launcher",
+            checked = appTimerEnabled,
+            onCheckedChange = onToggle,
+            theme = theme
+        )
+    }
+}
+
+@Composable
 fun AccessDelaysSection(
     appDrawerDelay: Float,
     distractionAppsDelay: Float,
