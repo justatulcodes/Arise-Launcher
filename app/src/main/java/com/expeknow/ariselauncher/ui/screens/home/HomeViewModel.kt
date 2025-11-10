@@ -33,9 +33,13 @@ class HomeViewModel @Inject constructor(
 
 
     init {
-        updateModeFromSettings()
         loadInitialData()
         observePoints()
+    }
+
+    fun refreshState() {
+        loadPoints()
+        updateModeFromSettings()
     }
 
     private fun updateModeFromSettings() {
@@ -56,7 +60,6 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             loadApps()
             refreshTasks()
-            loadPoints()
         }
     }
     private fun observePoints() {

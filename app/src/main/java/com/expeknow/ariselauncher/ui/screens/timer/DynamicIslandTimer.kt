@@ -93,7 +93,7 @@ private fun TimerCapsule(
 
             TimerItem(
                 label = "Points",
-                value = "-$pointsLost",
+                value = if(pointsLost == 0) "$pointsLost" else "-$pointsLost",
                 color = Color(0xFFE57373)
             )
         }

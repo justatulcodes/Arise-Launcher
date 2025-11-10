@@ -103,6 +103,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.refreshTasksToMatchCurrentDay()
+        viewModel.refreshState()
     }
 
     LaunchedEffect(pagerState.currentPage) {
@@ -273,8 +274,8 @@ fun HomeScreen(
 
             AppDrawerScreen(
                 onClose = {
-                    showAppDrawer = false
-                    appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
+//                    showAppDrawer = false
+//                    appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
                     keyboardController?.hide()
                 },
                 viewModel = appDrawerViewModel,

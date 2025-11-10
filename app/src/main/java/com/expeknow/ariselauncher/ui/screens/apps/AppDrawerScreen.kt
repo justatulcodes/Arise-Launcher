@@ -110,8 +110,8 @@ fun AppDrawerScreen(
         }
     }
 
-    Log.d("Taggzz", "State.countdown = ${state.countdown} and !state.isUnlocked = ${!state.isUnlocked}")
-    if (false) {
+    //TODO breaking this countdown screen for now
+    if (!state.isUnlocked && false) {
         CountdownScreen(
             countdown = state.countdown,
             appDrawerDelay = viewModel.getAppDrawerDelay(),
