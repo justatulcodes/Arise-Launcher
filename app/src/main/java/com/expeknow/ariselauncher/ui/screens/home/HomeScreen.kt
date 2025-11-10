@@ -274,8 +274,6 @@ fun HomeScreen(
 
             AppDrawerScreen(
                 onClose = {
-//                    showAppDrawer = false
-//                    appDrawerViewModel.onEvent(AppDrawerEvent.CloseDrawer)
                     keyboardController?.hide()
                 },
                 viewModel = appDrawerViewModel,
