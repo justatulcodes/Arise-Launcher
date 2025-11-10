@@ -40,6 +40,9 @@ data class AppDrawerState(
     val showWarning: Boolean = false,
     val currentPoints: Int = 0,
     val apps: List<AppDrawerApp> = emptyList(),
+    val showTimerDialog: Boolean = false,
+    val timerCountdown: Int = 0,
+    val timerApp: AppDrawerApp? = null
 )
 
 
@@ -53,6 +56,7 @@ sealed class AppDrawerEvent {
     data object CloseDrawer : AppDrawerEvent()
     data object OpenDrawer : AppDrawerEvent()
     data class SearchApps(val query: String) : AppDrawerEvent()
+    data object DismissTimerDialog : AppDrawerEvent()
 }
 
 data class AppDrawerTheme(

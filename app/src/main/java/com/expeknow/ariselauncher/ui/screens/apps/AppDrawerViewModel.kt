@@ -30,6 +30,7 @@ class AppDrawerViewModel @Inject constructor(
     val state: StateFlow<AppDrawerState> = _state.asStateFlow()
 
     private var countdownJob: Job? = null
+    private var timerJob: Job? = null
 
     init {
         resetAppDrawerTimeoutTime()
@@ -93,6 +94,32 @@ class AppDrawerViewModel @Inject constructor(
         countdownJob = null
     }
 
+    fun startTimer() {
+        timerJob?.cancel()
+
+        timerJob = viewModelScope.launch {
+            while (_state.value.timerCountdown > 0) {
+                delay(1000)
+                _state.value = _state.value.copy(timerCountdown = _state.value.timerCountdown - 1)
+            }
+            if (_state.value.timerCountdown == 0) {
+                _state.value.timerApp?.let { app ->
+                    appRepositoryImpl.launchApp(app.packageName)
+                    _state.value = _state.value.copy(
+                        showTimerDialog = false,
+                        timerCountdown = 0,
+                        timerApp = null
+                    )
+                }
+            }
+        }
+    }
+
+    private fun stopTimer() {
+        timerJob?.cancel()
+        timerJob = null
+    }
+
     fun onEvent(event: AppDrawerEvent) {
         when (event) {
             is AppDrawerEvent.UpdateCountdown -> {
@@ -105,7 +132,12 @@ class AppDrawerViewModel @Inject constructor(
 
             is AppDrawerEvent.SelectApp -> {
                 if (event.app.pointCost > 0 && _state.value.currentPoints < event.app.pointCost) {
-                    appRepositoryImpl.launchApp(event.app.packageName)
+                    _state.value = _state.value.copy(
+                        showTimerDialog = true,
+                        timerCountdown = event.app.pointCost,
+                        timerApp = event.app
+                    )
+                    startTimer()
                     return
                 }
 
@@ -153,6 +185,16 @@ class AppDrawerViewModel @Inject constructor(
 
             AppDrawerEvent.OpenDrawer -> {
                 startCountdown()
+            }
+
+            is AppDrawerEvent.DismissTimerDialog -> {
+                timerJob?.cancel()
+                timerJob = null
+                _state.value = _state.value.copy(
+                    showTimerDialog = false,
+                    timerCountdown = 0,
+                    timerApp = null
+                )
             }
         }
     }
