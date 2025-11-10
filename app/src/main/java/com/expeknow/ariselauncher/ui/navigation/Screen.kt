@@ -7,6 +7,7 @@ sealed class Screen(val route: String) {
     data object Main : Screen("main")
 
     data object Focus : Screen("focus")
+    data object Stats : Screen("stats")
     data object Drive : Screen("drive")
     data object Ctrl : Screen("ctrl")
 
