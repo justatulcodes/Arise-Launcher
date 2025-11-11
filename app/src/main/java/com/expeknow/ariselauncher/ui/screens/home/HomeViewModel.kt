@@ -225,6 +225,7 @@ class HomeViewModel @Inject constructor(
                 val filteredTasks = getNormalModeTasksCreatedTodayOrTasksNotYetCompleted(tasks)
                 _state.value = _state.value.copy(normalTasks = filteredTasks)
                 updateTaskStats(filteredTasks)
+                updateMvpStats(tasks) // Compute MVP stats
             }
         }
         viewModelScope.launch {
@@ -299,6 +300,7 @@ class HomeViewModel @Inject constructor(
                     earnedPoints = totalPoints
                 )
 
+
             }
 
             HomeMode.FOCUSED -> {
@@ -327,5 +329,66 @@ class HomeViewModel @Inject constructor(
 
             }
         }
+    }
+
+    // MVP Stats Computation
+    private fun computeTodayStats(allTasks: List<Task>): StatsUi {
+        val focusCats = setOf(
+            TaskCategory.PEOPLE,
+            TaskCategory.OPPORTUNITY,
+            TaskCategory.SKILLS
+        )
+        val todayDow = getTodaysDayOfWeek()
+
+        fun isAvailableToday(t: Task): Boolean =
+            (!t.isRepeated && t.category in focusCats) ||
+                    (t.isRepeated && t.category in focusCats &&
+                            (t.repeatDays.isEmpty() || todayDow in t.repeatDays))
+
+        val focusedAvailable = allTasks.filter { isAvailableToday(it) }
+        val focusedCompleted = focusedAvailable.filter { it.isCompleted }
+        val focusPotentialPoints = focusedAvailable.sumOf { it.points }
+        val focusEarnedPoints = focusedCompleted.sumOf { it.points }
+
+        val perCategory = focusCats.map { c ->
+            val avail = focusedAvailable.filter { it.category == c }
+            val comp = avail.count { it.isCompleted }
+            val potentialPts = avail.sumOf { it.points }
+            val earnedPts = avail.filter { it.isCompleted }.sumOf { it.points }
+            CategoryStat(
+                category = c,
+                completed = comp,
+                total = avail.size,
+                percent = if (avail.isNotEmpty()) comp.toDouble() / avail.size else 0.0,
+                earnedPoints = earnedPts,
+                potentialPoints = potentialPts
+            )
+        }
+
+        // Personal (normal) tasks limited to those you already surface (today or unfinished)
+        val personal = allTasks.filter { it.category == TaskCategory.PERSONAL }
+        val personalAvailable = personal.filter {
+            !it.isRepeated || it.repeatDays.contains(todayDow) || it.repeatDays.isEmpty()
+        }
+        val personalCompleted = personalAvailable.count { it.isCompleted }
+
+        return StatsUi(
+            focusOverallCompleted = focusedCompleted.size,
+            focusOverallTotal = focusedAvailable.size,
+            focusOverallPercent = if (focusedAvailable.isNotEmpty())
+                focusedCompleted.size.toDouble() / focusedAvailable.size else 0.0,
+            categories = perCategory,
+            focusEarnedPoints = focusEarnedPoints,
+            focusPotentialPoints = focusPotentialPoints,
+            personalCompleted = personalCompleted,
+            personalTotal = personalAvailable.size,
+            personalPercent = if (personalAvailable.isNotEmpty())
+                personalCompleted.toDouble() / personalAvailable.size else 0.0
+        )
+    }
+
+    private fun updateMvpStats(allTasks: List<Task>) {
+        val stats = computeTodayStats(allTasks)
+        _state.value = _state.value.copy(statsUi = stats)
     }
 }
