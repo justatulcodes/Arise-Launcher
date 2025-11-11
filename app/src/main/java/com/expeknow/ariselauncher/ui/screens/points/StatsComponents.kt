@@ -30,26 +30,23 @@ fun MvpStatsContent(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // Overall Focus Completion
-        OverallFocusCard(
-            statsUi = statsUi,
-            currentRank = currentRank
-        )
 
-        // Category Breakdown
-        CategoryBreakdownCard(
-            categories = statsUi.categories,
-            currentRank = currentRank
-        )
-
-        // Points Progress
         PointsProgressCard(
             earnedPoints = statsUi.focusEarnedPoints,
             potentialPoints = statsUi.focusPotentialPoints,
             currentRank = currentRank
         )
 
-        // Personal Tasks Progress
+        OverallFocusCard(
+            statsUi = statsUi,
+            currentRank = currentRank
+        )
+
+        CategoryBreakdownCard(
+            categories = statsUi.categories,
+            currentRank = currentRank
+        )
+
         PersonalTasksCard(
             completed = statsUi.personalCompleted,
             total = statsUi.personalTotal,
@@ -78,9 +75,9 @@ private fun OverallFocusCard(
         ) {
             Text(
                 text = "TODAY'S FOCUS COMPLETION",
-                style = MaterialTheme.typography.titleMedium.copy(
+                style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Medium,
-                    letterSpacing = 1.sp
+                    letterSpacing = 0.5.sp
                 ),
                 color = Color(0xFF9CA3AF),
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -102,8 +99,8 @@ private fun OverallFocusCard(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "${(statsUi.focusOverallPercent * 100).toInt()}%",
-                        style = MaterialTheme.typography.displayLarge.copy(
-                            fontSize = 48.sp,
+                        style = MaterialTheme.typography.displayMedium.copy(
+                            fontSize = 42.sp,
                             fontWeight = FontWeight.Bold
                         ),
                         color = currentRank.colors.accent
@@ -142,9 +139,9 @@ private fun CategoryBreakdownCard(
         ) {
             Text(
                 text = "CATEGORY BREAKDOWN",
-                style = MaterialTheme.typography.titleMedium.copy(
+                style = MaterialTheme.typography.titleSmall.copy(
                     fontWeight = FontWeight.Medium,
-                    letterSpacing = 1.sp
+                    letterSpacing = 0.5.sp
                 ),
                 color = currentRank.colors.accent,
                 modifier = Modifier.padding(bottom = 20.dp)
@@ -295,9 +292,9 @@ private fun PointsProgressCard(
                 Column {
                     Text(
                         text = "FOCUS POINTS TODAY",
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Medium,
-                            letterSpacing = 1.sp
+                            letterSpacing = 0.5.sp
                         ),
                         color = currentRank.colors.accent
                     )
@@ -305,14 +302,14 @@ private fun PointsProgressCard(
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
                             text = earnedPoints.toString(),
-                            style = MaterialTheme.typography.displayMedium.copy(
+                            style = MaterialTheme.typography.displaySmall.copy(
                                 fontWeight = FontWeight.Bold
                             ),
                             color = Color(0xFF4ADE80)
                         )
                         Text(
                             text = " / $potentialPoints",
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.titleLarge,
                             color = Color(0xFF9CA3AF)
                         )
                     }
@@ -322,7 +319,7 @@ private fun PointsProgressCard(
                     imageVector = Icons.Filled.EmojiEvents,
                     contentDescription = null,
                     tint = Color(0xFFFFD700),
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(40.dp)
                 )
             }
 
@@ -333,15 +330,15 @@ private fun PointsProgressCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp))
                     .background(Color.White.copy(alpha = 0.2f))
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(progress)
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(5.dp))
                         .background(Color(0xFF4ADE80))
                 )
             }
@@ -385,29 +382,29 @@ private fun PersonalTasksCard(
                 Column {
                     Text(
                         text = "PERSONAL TASKS",
-                        style = MaterialTheme.typography.titleMedium.copy(
+                        style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Medium,
-                            letterSpacing = 1.sp
+                            letterSpacing = 0.5.sp
                         ),
                         color = currentRank.colors.accent
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "$completed / $total completed",
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = Color(0xFF9CA3AF)
                     )
                 }
 
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(70.dp)
+                    modifier = Modifier.size(64.dp)
                 ) {
                     CircularProgressIndicator(
                         progress = { percent.toFloat() },
                         modifier = Modifier.fillMaxSize(),
                         color = Color(0xFF8B5CF6),
-                        strokeWidth = 8.dp,
+                        strokeWidth = 7.dp,
                         trackColor = Color(0xFF8B5CF6).copy(alpha = 0.2f),
                     )
                     Text(
