@@ -30,12 +30,6 @@ fun PointsScreen(
         state.currentPoints >= rank.minPoints && state.currentPoints <= rank.maxPoints
     } ?: ranks[0]
 
-    val nextRank = ranks.find { rank -> rank.minPoints > currentRank.minPoints }
-
-    val progressToNext = nextRank?.let {
-        ((state.currentPoints.toFloat() - currentRank.minPoints) / (it.minPoints - currentRank.minPoints)) * 100f
-    } ?: 100f
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -49,6 +43,14 @@ fun PointsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item { Spacer(Modifier.height(16.dp)) }
+
+            // MVP Stats Section
+            item {
+                MvpStatsContent(
+                    statsUi = state.mvpStats,
+                    currentRank = currentRank
+                )
+            }
 
             item {
                 TasksContent(
