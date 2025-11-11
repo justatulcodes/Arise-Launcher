@@ -44,29 +44,9 @@ fun PointsScreen(
         ) {
             item { Spacer(Modifier.height(16.dp)) }
 
-            // MVP Stats Section
             item {
                 MvpStatsContent(
                     statsUi = state.mvpStats,
-                    currentRank = currentRank
-                )
-            }
-
-            item {
-                TasksContent(
-                    currentRank = currentRank,
-                    taskStats = state.taskStats,
-                    onNavigateToTaskHistory = {
-                        viewModel.onEvent(PointsEvent.NavigateToTaskHistory)
-                    }
-                )
-            }
-
-
-            item {
-                StatsGrid(
-                    totalEarned = state.totalEarned,
-                    totalBurned = state.totalBurned,
                     currentRank = currentRank
                 )
             }
