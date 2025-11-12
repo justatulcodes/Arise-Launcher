@@ -9,7 +9,6 @@ import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 
-// MVP Stats Models
 data class StatsUi(
     val focusOverallCompleted: Int = 0,
     val focusOverallTotal: Int = 0,

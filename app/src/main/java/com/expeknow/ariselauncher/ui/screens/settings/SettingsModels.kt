@@ -29,8 +29,7 @@ data class SettingsTheme(
 data class SettingsState(
     val hideCompletedTasks: Boolean = true,
     val tunnelVisionMode: Boolean = true,
-    val appDrawerDelay: Float = 0f,
-    val distractionAppsDelay: Float = 30f,
+    val appLaunchPopupEnabled: Boolean = true,
     val pointThreshold: Float = 50f,
     val warningsEnabled: Boolean = true,
     val keyboardTriggerEnabled: Boolean = false,
@@ -46,8 +45,7 @@ data class SettingsState(
 sealed class SettingsEvent {
     data class ToggleCompletedTasks(val hide: Boolean) : SettingsEvent()
     data class ToggleTunnelVision(val enabled: Boolean) : SettingsEvent()
-    data class UpdateAppDrawerDelay(val delay: Float) : SettingsEvent()
-    data class UpdateDistractionDelay(val delay: Float) : SettingsEvent()
+    data class ToggleAppLaunchPopup(val enabled: Boolean) : SettingsEvent()
     data class UpdatePointThreshold(val threshold: Float) : SettingsEvent()
     data class ToggleWarnings(val enabled: Boolean) : SettingsEvent()
     data class ToggleKeyboardTrigger(val enabled: Boolean) : SettingsEvent()

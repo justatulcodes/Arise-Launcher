@@ -37,7 +37,6 @@ data class AppDrawerState(
     val countdown: Int = 0,
     val isUnlocked: Boolean = true,
     val selectedApp: AppDrawerApp? = null,
-    val showWarning: Boolean = false,
     val currentPoints: Int = 0,
     val apps: List<AppDrawerApp> = emptyList(),
     val showTimerDialog: Boolean = false,

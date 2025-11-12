@@ -152,11 +152,9 @@ fun AppTimerSection(
 }
 
 @Composable
-fun AccessDelaysSection(
-    appDrawerDelay: Float,
-    distractionAppsDelay: Float,
-    onAppDrawerDelayChange: (Float) -> Unit,
-    onDistractionDelayChange: (Float) -> Unit,
+fun AppLaunchPopupSection(
+    appLaunchPopupEnabled: Boolean,
+    onToggle: (Boolean) -> Unit,
     theme: SettingsTheme
 ) {
     SettingsCard(theme) {
@@ -165,35 +163,16 @@ fun AccessDelaysSection(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                "ACCESS DELAYS",
+                "APP LAUNCH POPUP",
                 style = MaterialTheme.typography.titleMedium,
                 color = theme.accent
             )
 
-            SettingsSliderItem(
-                title = "App Drawer Delay",
-                value = appDrawerDelay,
-                onValueChange = onAppDrawerDelayChange,
-                valueRange = 0f..300f,
-                steps = 19, // 300/15 - 1
-                unit = "s",
-                description = "Delay before app drawer opens",
-                theme = theme
-            )
-
-            HorizontalDivider(
-                color = Color.White.copy(alpha = 0.1f),
-                thickness = 1.dp
-            )
-
-            SettingsSliderItem(
-                title = "Distraction App Delay",
-                value = distractionAppsDelay,
-                onValueChange = onDistractionDelayChange,
-                valueRange = 0f..120f,
-                steps = 11, // 120/10 - 1
-                unit = "s",
-                description = "Additional delay for social/entertainment apps",
+            SettingsToggleItem(
+                title = "App Launch Popup Delay",
+                subtitle = "Show popup delay before launching apps in app drawer",
+                checked = appLaunchPopupEnabled,
+                onCheckedChange = onToggle,
                 theme = theme
             )
         }
@@ -392,12 +371,10 @@ fun KeyboardTriggerSectionPreview() {
 
 @Preview
 @Composable
-fun AccessDelaysSectionPreview() {
-    AccessDelaysSection(
-        appDrawerDelay = 10f,
-        distractionAppsDelay = 5f,
-        onAppDrawerDelayChange = {},
-        onDistractionDelayChange = {},
+fun AppLaunchPopupSectionPreview() {
+    AppLaunchPopupSection(
+        appLaunchPopupEnabled = true,
+        onToggle = {},
         theme = SettingsTheme()
     )
 }
