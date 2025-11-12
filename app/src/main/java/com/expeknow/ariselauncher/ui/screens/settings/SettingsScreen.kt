@@ -126,27 +126,25 @@ fun SettingsScreen(
                 theme = theme
             )
 
-            // Point System
-            PointSystemSection(
-                pointThreshold = state.pointThreshold,
-                warningsEnabled = state.warningsEnabled,
-                onThresholdChange = { threshold: Float ->
-                    viewModel.onEvent(SettingsEvent.UpdatePointThreshold(threshold))
-                },
-                onWarningsToggle = { enabled: Boolean ->
-                    viewModel.onEvent(SettingsEvent.ToggleWarnings(enabled))
-                },
-                theme = theme
-            )
+//            // Point System
+//            PointSystemSection(
+//                pointThreshold = state.pointThreshold,
+//                warningsEnabled = state.warningsEnabled,
+//                onThresholdChange = { threshold: Float ->
+//                    viewModel.onEvent(SettingsEvent.UpdatePointThreshold(threshold))
+//                },
+//                onWarningsToggle = { enabled: Boolean ->
+//                    viewModel.onEvent(SettingsEvent.ToggleWarnings(enabled))
+//                },
+//                theme = theme
+//            )
 
-            // Danger Zone
             DangerZoneCard(
                 onShowRefreshAppDrawerDialog = { viewModel.onEvent(SettingsEvent.ShowAppRefreshDialog) },
                 onShowResetPointsDialog = { viewModel.onEvent(SettingsEvent.ShowResetPointsDialog) },
                 onShowFactoryResetDialog = { viewModel.onEvent(SettingsEvent.ShowFactoryResetDialog) },
             )
 
-            // Footer
             SettingsFooter(theme = theme)
         }
     }
