@@ -11,6 +11,7 @@ import com.expeknow.ariselauncher.data.model.TaskStats
 import com.expeknow.ariselauncher.data.model.ranks
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.ui.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -25,7 +26,8 @@ import java.util.Calendar
 @HiltViewModel
 class PointsViewModel @Inject constructor(
     private val pointsLogRepositoryImpl: PointsLogRepository,
-    private val taskRepositoryImpl: TaskRepository
+    private val taskRepositoryImpl: TaskRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PointsState())
@@ -35,6 +37,14 @@ class PointsViewModel @Inject constructor(
 
     fun setNavController(navController: NavController) {
         this.navController = navController
+        refreshTunnelVisionMode()
+    }
+
+    private fun refreshTunnelVisionMode() {
+        viewModelScope.launch {
+            val isTunnelVision = settingsRepository.getTunnelVisionMode()
+            _state.value = _state.value.copy(isTunnelVisionMode = isTunnelVision)
+        }
     }
 
     init {
@@ -43,6 +53,14 @@ class PointsViewModel @Inject constructor(
         loadPointActivities()
         loadCompletedTasks()
         observeMvpStats()
+        observeTunnelVisionMode()
+    }
+
+    private fun observeTunnelVisionMode() {
+        viewModelScope.launch {
+            val isTunnelVision = settingsRepository.getTunnelVisionMode()
+            _state.value = _state.value.copy(isTunnelVisionMode = isTunnelVision)
+        }
     }
 
     private fun observeMvpStats() {

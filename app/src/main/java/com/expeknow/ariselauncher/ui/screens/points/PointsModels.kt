@@ -21,7 +21,8 @@ data class PointsState(
     val activities: List<PointActivity> = emptyList(),
     val completedTasks: List<Task> = emptyList(),
     val currentRank: Rank = ranks[8],
-    val mvpStats: StatsUi = StatsUi()
+    val mvpStats: StatsUi = StatsUi(),
+    val isTunnelVisionMode: Boolean = false
 )
 
 sealed class PointsEvent {
