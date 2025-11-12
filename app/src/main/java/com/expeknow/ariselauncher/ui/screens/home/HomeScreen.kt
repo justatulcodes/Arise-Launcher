@@ -521,16 +521,7 @@ fun MainTaskContentScreen(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        if (mode == HomeMode.SIMPLE) {
-            Text(
-                text = day,
-                style = MaterialTheme.typography.titleLarge,
-                color = getDayColor(day),
-                fontSize = 24.sp,
-                fontWeight = SemiBold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
+        Spacer(modifier = Modifier.height(8.dp))
 
         when (mode) {
                 HomeMode.SIMPLE -> {

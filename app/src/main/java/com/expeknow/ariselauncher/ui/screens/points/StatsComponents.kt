@@ -357,7 +357,7 @@ private fun PointsProgressCard(
 }
 
 @Composable
-private fun PersonalTasksCard(
+fun PersonalTasksCard(
     completed: Int,
     total: Int,
     percent: Double,
@@ -429,6 +429,267 @@ private fun PersonalTasksCard(
                 trackColor = Color(0xFF8B5CF6).copy(alpha = 0.2f),
             )
         }
+    }
+}
+
+@Composable
+fun FocusTasksStatsTab(
+    statsUi: StatsUi,
+    currentRank: Rank
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        Spacer(Modifier.height(16.dp))
+
+        PointsProgressCard(
+            earnedPoints = statsUi.focusEarnedPoints,
+            potentialPoints = statsUi.focusPotentialPoints,
+            currentRank = currentRank
+        )
+
+        OverallFocusCard(
+            statsUi = statsUi,
+            currentRank = currentRank
+        )
+
+        CategoryBreakdownCard(
+            categories = statsUi.categories,
+            currentRank = currentRank
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+fun PersonalTasksStatsTab(
+    statsUi: StatsUi,
+    currentRank: Rank
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        Spacer(Modifier.height(16.dp))
+
+        PersonalTasksCard(
+            completed = statsUi.personalCompleted,
+            total = statsUi.personalTotal,
+            percent = statsUi.personalPercent,
+            currentRank = currentRank
+        )
+
+        // Additional personal task widgets
+        PersonalTasksDetailCard(
+            statsUi = statsUi,
+            currentRank = currentRank
+        )
+
+        // Personal Task Progress Card
+        PersonalTaskProgressCard(
+            statsUi = statsUi,
+            currentRank = currentRank
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun PersonalTaskProgressCard(
+    statsUi: StatsUi,
+    currentRank: Rank
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = currentRank.colors.background),
+        border = BorderStroke(1.dp, currentRank.colors.border),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "DAILY PROGRESS",
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Medium,
+                        letterSpacing = 0.5.sp
+                    ),
+                    color = currentRank.colors.accent
+                )
+
+                Icon(
+                    imageVector = Icons.Filled.TrendingUp,
+                    contentDescription = null,
+                    tint = Color(0xFF8B5CF6),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Progress visualization
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                repeat(7) { index ->
+                    val height = when {
+                        index < statsUi.personalCompleted -> 100
+                        index == statsUi.personalCompleted -> 60
+                        else -> 30
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 2.dp)
+                            .height((height / 2).dp)
+                            .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                            .background(
+                                when {
+                                    index < statsUi.personalCompleted -> Color(0xFF8B5CF6)
+                                    index == statsUi.personalCompleted -> Color(0xFF8B5CF6).copy(alpha = 0.5f)
+                                    else -> Color(0xFF8B5CF6).copy(alpha = 0.2f)
+                                }
+                            )
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Keep up the momentum! Complete all tasks to reach 100%",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color(0xFF9CA3AF),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+private fun PersonalTasksDetailCard(
+    statsUi: StatsUi,
+    currentRank: Rank
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = currentRank.colors.background),
+        border = BorderStroke(1.dp, currentRank.colors.border),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            Text(
+                text = "PERSONAL TASKS OVERVIEW",
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.5.sp
+                ),
+                color = currentRank.colors.accent,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            // Completion rate
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Completion Rate",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF9CA3AF)
+                    )
+                    Text(
+                        text = "${(statsUi.personalPercent * 100).toInt()}%",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color(0xFF8B5CF6)
+                    )
+                }
+
+                Icon(
+                    imageVector = Icons.Filled.CheckCircle,
+                    contentDescription = null,
+                    tint = Color(0xFF8B5CF6),
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Task count breakdown
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                PersonalStatItem(
+                    label = "Completed",
+                    value = statsUi.personalCompleted.toString(),
+                    color = Color(0xFF4ADE80)
+                )
+
+                PersonalStatItem(
+                    label = "Remaining",
+                    value = (statsUi.personalTotal - statsUi.personalCompleted).toString(),
+                    color = Color(0xFFFB923C)
+                )
+
+                PersonalStatItem(
+                    label = "Total",
+                    value = statsUi.personalTotal.toString(),
+                    color = Color(0xFF60A5FA)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PersonalStatItem(
+    label: String,
+    value: String,
+    color: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            color = color
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = Color(0xFF9CA3AF)
+        )
     }
 }
 
