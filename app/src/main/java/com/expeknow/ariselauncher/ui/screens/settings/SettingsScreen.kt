@@ -118,14 +118,10 @@ fun SettingsScreen(
                 theme = theme
             )
 
-            AccessDelaysSection(
-                appDrawerDelay = state.appDrawerDelay,
-                distractionAppsDelay = state.distractionAppsDelay,
-                onAppDrawerDelayChange = { delay: Float ->
-                    viewModel.onEvent(SettingsEvent.UpdateAppDrawerDelay(delay))
-                },
-                onDistractionDelayChange = { delay: Float ->
-                    viewModel.onEvent(SettingsEvent.UpdateDistractionDelay(delay))
+            AppLaunchPopupSection(
+                appLaunchPopupEnabled = state.appLaunchPopupEnabled,
+                onToggle = { enabled: Boolean ->
+                    viewModel.onEvent(SettingsEvent.ToggleAppLaunchPopup(enabled))
                 },
                 theme = theme
             )

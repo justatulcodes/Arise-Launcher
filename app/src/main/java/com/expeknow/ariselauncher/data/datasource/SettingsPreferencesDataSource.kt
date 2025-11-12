@@ -19,8 +19,7 @@ class SettingsPreferencesDataSource @Inject constructor(
         private const val PREFS_NAME = "arise_launcher_settings"
         private const val KEY_HIDE_COMPLETED_TASKS = "hide_completed_tasks"
         private const val KEY_TUNNEL_VISION_MODE = "tunnel_vision_mode"
-        private const val KEY_APP_DRAWER_DELAY = "app_drawer_delay"
-        private const val KEY_DISTRACTION_APPS_DELAY = "distraction_apps_delay"
+        private const val KEY_APP_LAUNCH_POPUP_ENABLED = "app_launch_popup_enabled"
         private const val KEY_POINT_THRESHOLD = "point_threshold"
         private const val KEY_WARNINGS_ENABLED = "warnings_enabled"
         private const val KEY_SHOULD_TRIGGER_APP_DRAWER_KEYBOARD = "app_drawer_keyboard"
@@ -38,12 +37,9 @@ class SettingsPreferencesDataSource @Inject constructor(
     fun setTunnelVisionMode(enabled: Boolean) =
         prefs.edit { putBoolean(KEY_TUNNEL_VISION_MODE, enabled) }
 
-    fun getAppDrawerDelay(): Float = prefs.getFloat(KEY_APP_DRAWER_DELAY, 60f)
-    fun setAppDrawerDelay(delay: Float) = prefs.edit { putFloat(KEY_APP_DRAWER_DELAY, delay) }
-
-    fun getDistractionAppsDelay(): Float = prefs.getFloat(KEY_DISTRACTION_APPS_DELAY, 30f)
-    fun setDistractionAppsDelay(delay: Float) =
-        prefs.edit { putFloat(KEY_DISTRACTION_APPS_DELAY, delay) }
+    fun getAppLaunchPopupEnabled(): Boolean = prefs.getBoolean(KEY_APP_LAUNCH_POPUP_ENABLED, true)
+    fun setAppLaunchPopupEnabled(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_APP_LAUNCH_POPUP_ENABLED, enabled) }
 
     fun getPointThreshold(): Float = prefs.getFloat(KEY_POINT_THRESHOLD, 50f)
     fun setPointThreshold(threshold: Float) =

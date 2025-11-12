@@ -18,12 +18,8 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun setTunnelVisionMode(enabled: Boolean) =
         preferencesDataSource.setTunnelVisionMode(enabled)
 
-    override fun getAppDrawerDelay(): Float = preferencesDataSource.getAppDrawerDelay()
-    override fun setAppDrawerDelay(delay: Float) = preferencesDataSource.setAppDrawerDelay(delay)
-
-    override fun getDistractionAppsDelay(): Float = preferencesDataSource.getDistractionAppsDelay()
-    override fun setDistractionAppsDelay(delay: Float) =
-        preferencesDataSource.setDistractionAppsDelay(delay)
+    override fun getAppLaunchPopupEnabled(): Boolean = preferencesDataSource.getAppLaunchPopupEnabled()
+    override fun setAppLaunchPopupEnabled(enabled: Boolean) = preferencesDataSource.setAppLaunchPopupEnabled(enabled)
 
     override fun getPointThreshold(): Float = preferencesDataSource.getPointThreshold()
     override fun setPointThreshold(threshold: Float) =

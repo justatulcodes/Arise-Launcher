@@ -40,8 +40,7 @@ class SettingsViewModel @Inject constructor(
         _state.value = _state.value.copy(
             hideCompletedTasks = settingsRepository.getHideCompletedTasks(),
             tunnelVisionMode = settingsRepository.getTunnelVisionMode(),
-            appDrawerDelay = settingsRepository.getAppDrawerDelay(),
-            distractionAppsDelay = settingsRepository.getDistractionAppsDelay(),
+            appLaunchPopupEnabled = settingsRepository.getAppLaunchPopupEnabled(),
             pointThreshold = settingsRepository.getPointThreshold(),
             warningsEnabled = settingsRepository.getWarningsEnabled(),
             keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer(),
@@ -70,14 +69,9 @@ class SettingsViewModel @Inject constructor(
                 settingsRepository.setTunnelVisionMode(event.enabled)
             }
 
-            is SettingsEvent.UpdateAppDrawerDelay -> {
-                _state.value = _state.value.copy(appDrawerDelay = event.delay)
-                settingsRepository.setAppDrawerDelay(event.delay)
-            }
-
-            is SettingsEvent.UpdateDistractionDelay -> {
-                _state.value = _state.value.copy(distractionAppsDelay = event.delay)
-                settingsRepository.setDistractionAppsDelay(event.delay)
+            is SettingsEvent.ToggleAppLaunchPopup -> {
+                _state.value = _state.value.copy(appLaunchPopupEnabled = event.enabled)
+                settingsRepository.setAppLaunchPopupEnabled(event.enabled)
             }
 
             is SettingsEvent.UpdatePointThreshold -> {
