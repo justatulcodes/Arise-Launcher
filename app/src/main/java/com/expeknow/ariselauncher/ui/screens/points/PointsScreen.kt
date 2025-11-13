@@ -1,14 +1,17 @@
 package com.expeknow.ariselauncher.ui.screens.points
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,60 +55,56 @@ fun PointsScreen(
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        // Tab Row
         if (tabs.size > 1) {
-            TabRow(
-                selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = Color.Black,
-                contentColor = Color.White,
-                indicator = { tabPositions ->
-                    if (pagerState.currentPage < tabPositions.size) {
-                        Box(
-                            Modifier
-                                .width(tabPositions[pagerState.currentPage].width)
-                                .offset(x = tabPositions[pagerState.currentPage].left)
-                                .height(3.dp)
-                                .background(currentRank.colors.accent)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF1F1F1F))
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    val isSelected = pagerState.currentPage == index
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(
+                                if (isSelected) currentRank.colors.accent
+                                else Color.Transparent
+                            )
+                            .clickable {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            }
+                            .padding(vertical = 8.dp, horizontal = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                fontSize = 13.sp,
+                                letterSpacing = 0.3.sp
+                            ),
+                            color = if (isSelected) Color.Black else Color(0xFF9CA3AF)
                         )
                     }
                 }
-            ) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(
-                        selected = pagerState.currentPage == index,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        text = {
-                            Text(
-                                text = title.uppercase(),
-                                style = MaterialTheme.typography.titleSmall.copy(
-                                    fontWeight = if (pagerState.currentPage == index)
-                                        FontWeight.Bold else FontWeight.Normal,
-                                    letterSpacing = 0.5.sp
-                                ),
-                                color = if (pagerState.currentPage == index)
-                                    currentRank.colors.accent else Color(0xFF9CA3AF)
-                            )
-                        },
-                        modifier = Modifier.padding(vertical = 12.dp)
-                    )
-                }
             }
         } else {
-            // Single tab header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Black)
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = tabs[0].uppercase(),
+                    text = tabs[0],
                     style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
@@ -115,7 +114,6 @@ fun PointsScreen(
             }
         }
 
-        // Pager content
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.weight(1f)
@@ -126,21 +124,18 @@ fun PointsScreen(
                 item {
                     when {
                         state.isTunnelVisionMode && page == 0 -> {
-                            // Focus Tasks Tab
                             FocusTasksStatsTab(
                                 statsUi = state.mvpStats,
                                 currentRank = currentRank
                             )
                         }
                         state.isTunnelVisionMode && page == 1 -> {
-                            // Personal Tasks Tab (in tunnel vision mode)
                             PersonalTasksStatsTab(
                                 statsUi = state.mvpStats,
                                 currentRank = currentRank
                             )
                         }
                         !state.isTunnelVisionMode && page == 0 -> {
-                            // Personal Tasks Tab (in normal mode)
                             PersonalTasksStatsTab(
                                 statsUi = state.mvpStats,
                                 currentRank = currentRank

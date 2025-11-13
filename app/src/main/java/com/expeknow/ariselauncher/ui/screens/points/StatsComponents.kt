@@ -441,9 +441,9 @@ fun FocusTasksStatsTab(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(8.dp))
 
         PointsProgressCard(
             earnedPoints = statsUi.focusEarnedPoints,
@@ -461,7 +461,7 @@ fun FocusTasksStatsTab(
             currentRank = currentRank
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -474,9 +474,9 @@ fun PersonalTasksStatsTab(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         PersonalTasksCard(
             completed = statsUi.personalCompleted,
@@ -497,7 +497,7 @@ fun PersonalTasksStatsTab(
             currentRank = currentRank
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
