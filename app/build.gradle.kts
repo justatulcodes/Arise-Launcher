@@ -78,6 +78,9 @@ dependencies {
     //Drawable -> Painter
     implementation("com.google.accompanist:accompanist-drawablepainter:0.37.3")
 
+    //Splash Screen API
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
     //add coil dependency
     implementation(libs.coil.compose)
     implementation(libs.androidx.core.ktx.v1120)
