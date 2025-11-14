@@ -30,25 +30,18 @@ class AppDrawerViewModel @Inject constructor(
     val state: StateFlow<AppDrawerState> = _state.asStateFlow()
 
     private var countdownJob: Job? = null
+    private var timerJob: Job? = null
 
     init {
-        resetAppDrawerTimeoutTime()
         loadApps()
         observePoints()
     }
 
-    private fun resetAppDrawerTimeoutTime() {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(countdown = settingsRepository.getAppDrawerDelay().toInt())
-        }
-    }
-
-    fun getAppDrawerDelay(): Float {
-        return settingsRepository.getAppDrawerDelay()
-    }
-
     fun getShouldTriggerKeyboard(): Boolean {
         return settingsRepository.getShouldTriggerKeyboardInAppDrawer()
+    }
+    fun getAppLaunchPopupEnabled(): Boolean {
+        return settingsRepository.getAppLaunchPopupEnabled()
     }
 
     private fun loadApps() {
@@ -66,9 +59,6 @@ class AppDrawerViewModel @Inject constructor(
                     _state.value = _state.value.copy(isUnlocked = true)
                 }else {
                     //TODO should we have app drawer delay timer (at all or) controlled by user?
-                    if(settingsRepository.getAppDrawerDelay() > 0){
-                        _state.value = _state.value.copy(isUnlocked = false)
-                    }
                 }
             }
         }
@@ -93,6 +83,27 @@ class AppDrawerViewModel @Inject constructor(
         countdownJob = null
     }
 
+    fun startTimer() {
+        timerJob?.cancel()
+
+        timerJob = viewModelScope.launch {
+            while (_state.value.timerCountdown > 0) {
+                delay(1000)
+                _state.value = _state.value.copy(timerCountdown = _state.value.timerCountdown - 1)
+            }
+            if (_state.value.timerCountdown == 0) {
+                _state.value.timerApp?.let { app ->
+                    appRepositoryImpl.launchApp(app.packageName)
+                    _state.value = _state.value.copy(
+                        showTimerDialog = false,
+                        timerCountdown = 0,
+                        timerApp = null
+                    )
+                }
+            }
+        }
+    }
+
     fun onEvent(event: AppDrawerEvent) {
         when (event) {
             is AppDrawerEvent.UpdateCountdown -> {
@@ -104,12 +115,21 @@ class AppDrawerViewModel @Inject constructor(
             }
 
             is AppDrawerEvent.SelectApp -> {
-                if (event.app.pointCost > 0 && _state.value.currentPoints < event.app.pointCost) {
-                    appRepositoryImpl.launchApp(event.app.packageName)
+                // Check if app launch popup is enabled and user doesn't have enough points
+                if (getAppLaunchPopupEnabled() &&
+                    event.app.pointCost > 0 &&
+                    _state.value.currentPoints < event.app.pointCost) {
+                    _state.value = _state.value.copy(
+                        showTimerDialog = true,
+                        timerCountdown = event.app.pointCost,
+                        timerApp = event.app
+                    )
+                    startTimer()
                     return
                 }
 
-                if (event.app.pointCost > 0) {
+                // Only deduct points if user has enough points
+                if (event.app.pointCost > 0 && _state.value.currentPoints >= event.app.pointCost) {
                     viewModelScope.launch {
                         pointsLogRepositoryImpl.spendPoints(
                             event.app.pointCost,
@@ -122,12 +142,10 @@ class AppDrawerViewModel @Inject constructor(
             }
 
             is AppDrawerEvent.ShowWarning -> {
-                _state.value = _state.value.copy(showWarning = true)
             }
 
             is AppDrawerEvent.HideWarning -> {
                 _state.value = _state.value.copy(
-                    showWarning = false,
                     selectedApp = null
                 )
             }
@@ -135,7 +153,6 @@ class AppDrawerViewModel @Inject constructor(
             is AppDrawerEvent.ConfirmAppOpen -> {
                 _state.value.selectedApp?.let { app ->
                     _state.value = _state.value.copy(
-                        showWarning = false,
                         selectedApp = null,
                         currentPoints = _state.value.currentPoints - app.pointCost
                     )
@@ -144,7 +161,6 @@ class AppDrawerViewModel @Inject constructor(
 
             is AppDrawerEvent.CloseDrawer -> {
                 stopCountdown()
-                resetAppDrawerTimeoutTime()
             }
 
             is AppDrawerEvent.SearchApps -> {
@@ -153,6 +169,16 @@ class AppDrawerViewModel @Inject constructor(
 
             AppDrawerEvent.OpenDrawer -> {
                 startCountdown()
+            }
+
+            is AppDrawerEvent.DismissTimerDialog -> {
+                timerJob?.cancel()
+                timerJob = null
+                _state.value = _state.value.copy(
+                    showTimerDialog = false,
+                    timerCountdown = 0,
+                    timerApp = null
+                )
             }
         }
     }

@@ -7,11 +7,8 @@ interface SettingsRepository {
     fun getTunnelVisionMode(): Boolean
     fun setTunnelVisionMode(enabled: Boolean)
 
-    fun getAppDrawerDelay(): Float
-    fun setAppDrawerDelay(delay: Float)
-
-    fun getDistractionAppsDelay(): Float
-    fun setDistractionAppsDelay(delay: Float)
+    fun getAppLaunchPopupEnabled(): Boolean
+    fun setAppLaunchPopupEnabled(enabled: Boolean)
 
     fun getPointThreshold(): Float
     fun setPointThreshold(threshold: Float)

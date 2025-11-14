@@ -1,10 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.points
 
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.FitnessCenter
-import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Smartphone
 import com.expeknow.ariselauncher.data.model.*
+import com.expeknow.ariselauncher.ui.screens.home.StatsUi
 
 data class PointsState(
     val currentPoints: Int = 0,
@@ -23,7 +20,9 @@ data class PointsState(
     ),
     val activities: List<PointActivity> = emptyList(),
     val completedTasks: List<Task> = emptyList(),
-    val currentRank: Rank = ranks[8]
+    val currentRank: Rank = ranks[8],
+    val mvpStats: StatsUi = StatsUi(),
+    val isTunnelVisionMode: Boolean = false
 )
 
 sealed class PointsEvent {

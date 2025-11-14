@@ -30,11 +30,13 @@ import com.expeknow.ariselauncher.ui.screens.drive.DriveScreen
 import com.expeknow.ariselauncher.ui.screens.points.TaskHistoryScreen
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsScreen
 import com.expeknow.ariselauncher.ui.screens.onboarding.PermissionOnboardingScreen
+import com.expeknow.ariselauncher.ui.screens.onboarding.WelcomeScreen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerViewModel
 import com.expeknow.ariselauncher.ui.screens.drive.DriveViewModel
 import com.expeknow.ariselauncher.ui.screens.home.HomeViewModel
 import com.expeknow.ariselauncher.ui.screens.settings.SettingsViewModel
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsViewModel
+import com.expeknow.ariselauncher.ui.screens.points.PointsScreen
 import com.expeknow.ariselauncher.ui.screens.points.PointsViewModel
 
 @Composable
@@ -48,7 +50,8 @@ fun AppNavigation(
     val bottomNavRoutes = setOf(
         Screen.Focus.route,
         Screen.Drive.route,
-        Screen.Ctrl.route
+        Screen.Ctrl.route,
+        Screen.Stats.route
     )
 
     val showBottomNav = currentRoute in bottomNavRoutes
@@ -75,6 +78,10 @@ fun AppNavigation(
             startDestination = startDestination,
             modifier = androidx.compose.ui.Modifier.padding(paddingValues)
         ) {
+            composable(Screen.Welcome.route) {
+                WelcomeScreen(navController)
+            }
+
             composable(Screen.PermissionOnboarding.route) {
                 PermissionOnboardingScreen(navController)
             }
@@ -95,6 +102,11 @@ fun AppNavigation(
                         appDrawerViewModel = appDrawerViewModel,
                         state = state
                     )
+                }
+
+                composable(Screen.Stats.route) { backStackEntry ->
+                    val pointsViewModel = backStackEntry.sharedViewModel<PointsViewModel>(navController)
+                    PointsScreen(navController, pointsViewModel)
                 }
 
                 composable(Screen.Drive.route) { backStackEntry ->

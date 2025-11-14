@@ -28,7 +28,9 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.draw.clip
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
+import com.expeknow.ariselauncher.ui.theme.SurfaceCard
 
 @Composable
 fun CountdownScreen(
@@ -370,90 +372,6 @@ fun AppGrid(
         }
     }
 }
-
-@Composable
-private fun AppGridItem(
-    app: AppDrawerApp,
-    onAppClick: (AppDrawerApp) -> Unit,
-    theme: AppDrawerTheme
-) {
-    Column() {
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .background(
-                    Color.White.copy(alpha = 0.1f),
-                    RoundedCornerShape(12.dp)
-                )
-                .border(
-                    width = 1.dp,
-                    color = theme.border,
-                    shape = RoundedCornerShape(12.dp)
-                )
-                .clickable { onAppClick(app) },
-            contentAlignment = Alignment.Center
-        ) {
-            app.icon?.toImageBitmap()?.let {
-                Image(
-                    contentDescription = app.name,
-                    modifier = Modifier.size(54.dp),
-                    bitmap = it
-                )
-            }
-
-            if (app.pointCost > 0) {
-                Surface(
-                    color = when {
-                        app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.2f)
-                        app.pointCost <= 15 -> Color(0xFFFFB74D).copy(alpha = 0.2f)
-                        else -> Color(0xFFE57373).copy(alpha = 0.2f)
-                    },
-                    shape = RoundedCornerShape(4.dp),
-                    border = androidx.compose.foundation.BorderStroke(
-                        width = 1.dp,
-                        color = when {
-                            app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.4f)
-                            app.pointCost <= 15 -> Color(0xFFFFB74D).copy(alpha = 0.4f)
-                            else -> Color(0xFFE57373).copy(alpha = 0.4f)
-                        }
-                    ),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 6.dp, y = (-6).dp)
-                ) {
-                    Text(
-                        text = "-${app.pointCost}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = when {
-                            app.pointCost <= 5 -> Color(0xFFFFD54F)
-                            app.pointCost <= 15 -> Color(0xFFFFB74D)
-                            else -> Color(0xFFE57373)
-                        },
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        //trim app name if too long and add ...
-        val appName = if (app.name.length > 12) {
-            app.name.substring(0,9) + "..."
-        } else {
-            app.name
-        }
-        Text(
-            text = appName,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.White.copy(alpha = 0.8f),
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
 @Composable
 fun AppGridItemV2(
     app: AppDrawerApp,
@@ -678,81 +596,177 @@ fun SearchResultsSection(
 }
 
 @Composable
-fun AppWarningDialog(
+fun AppTimerDialog(
     app: AppDrawerApp?,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    timerCountdown: Int,
+    onDismiss: () -> Unit,
+    theme: AppDrawerTheme
 ) {
     if (app != null) {
-        AlertDialog(
-            onDismissRequest = onDismiss,
-            containerColor = Color.Black,
-            shape = RoundedCornerShape(12.dp),
-            title = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = "Warning",
-                        tint = Color(0xFFE57373)
-                    )
+        androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+            Surface(
+                shape = RoundedCornerShape(16.dp),
+                color = SurfaceCard,
+                border = BorderStroke(1.dp, theme.border)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Header
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = "Timer",
+                            tint = Color(0xFFFFB74D),
+                            modifier = Modifier.size(24.dp)
+                        )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
 
-                    Text(
-                        text = "DISTRACTION WARNING",
-                        color = Color(0xFFE57373)
-                    )
-                }
-            },
-            text = {
-                Column {
-                    Text(
-                        text = "Opening ${app.name} will cost ${app.pointCost} points and may disrupt your focus.",
-                        color = Color.White.copy(alpha = 0.7f)
-                    )
+                        Text(
+                            text = "INSUFFICIENT POINTS",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // App Icon
+                    app.icon?.toImageBitmap()?.let {
+                        Image(
+                            contentDescription = app.name,
+                            modifier = Modifier.size(64.dp),
+                            bitmap = it
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "\"True discipline means resisting instant gratification.\"",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontStyle = FontStyle.Italic
+                        text = app.name,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            color = Color(0xFFE57373).copy(alpha = 0.2f),
+                            shape = RoundedCornerShape(4.dp),
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = Color(0xFFE57373).copy(alpha = 0.4f)
+                            )
+                        ) {
+                            Text(
+                                text = "COST: ${app.pointCost}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color(0xFFE57373),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .border(
+                                width = 4.dp,
+                                color = theme.border,
+                                shape = CircleShape
+                            )
+                            .background(
+                                theme.background,
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = timerCountdown.toString(),
+                                style = MaterialTheme.typography.displayLarge,
+                                color = Color(0xFFFFB74D),
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "seconds",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White.copy(alpha = 0.6f)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    LinearProgressIndicator(
+                        progress = 1f - (timerCountdown.toFloat() / app.pointCost),
+                        modifier = Modifier
+                            .height(6.dp)
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = Color(0xFFFFB74D),
+                        trackColor = Color.White.copy(alpha = 0.1f)
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = "Please wait to use this app",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.8f),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Earn points by completing tasks for instant access",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.5f),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Cancel Button
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color.White
                         ),
-                        color = Color.White.copy(alpha = 0.5f)
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = onConfirm,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFE57373).copy(alpha = 0.2f),
-                        contentColor = Color(0xFFE57373)
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(
-                        width = 1.dp,
-                        color = Color(0xFFE57373).copy(alpha = 0.4f)
-                    )
-                ) {
-                    Text("USE ANYWAY (-${app.pointCost} pts)")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = Color.White
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(
-                        width = 1.dp,
-                        color = Color.White.copy(alpha = 0.4f)
-                    )
-                ) {
-                    Text("STAY FOCUSED")
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = Color.White.copy(alpha = 0.3f)
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            "CANCEL",
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+                    }
                 }
             }
-        )
+        }
     }
 }
 
@@ -811,4 +825,3 @@ private fun AppDrawerFooterPreview() {
         theme = AppDrawerTheme()
     )
 }
-
