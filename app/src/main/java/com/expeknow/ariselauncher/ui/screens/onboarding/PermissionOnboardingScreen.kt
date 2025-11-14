@@ -28,6 +28,7 @@ import com.expeknow.ariselauncher.ui.theme.SurfaceCard
 import com.expeknow.ariselauncher.ui.theme.TaskTitle
 import com.expeknow.ariselauncher.ui.theme.BannerTextGray
 import com.expeknow.ariselauncher.utils.PermissionHelper
+import androidx.core.content.edit
 
 enum class PermissionType {
     OVERLAY,
@@ -43,7 +44,6 @@ fun PermissionOnboardingScreen(
     var usageStatsGranted by remember { mutableStateOf(PermissionHelper.hasUsageStatsPermission(context)) }
     var currentPermissionRequest by remember { mutableStateOf<PermissionType?>(null) }
 
-    // Check permissions when screen resumes
     DisposableEffect(Unit) {
         val activity = context as? Activity
         val callback = object : android.app.Application.ActivityLifecycleCallbacks {
@@ -51,8 +51,10 @@ fun PermissionOnboardingScreen(
                 overlayGranted = PermissionHelper.hasOverlayPermission(context)
                 usageStatsGranted = PermissionHelper.hasUsageStatsPermission(context)
 
-                // If all permissions are granted, navigate to main app
                 if (overlayGranted && usageStatsGranted) {
+                    val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)
+                    prefs.edit { putBoolean("has_seen_welcome", true) }
+
                     navController.navigate(com.expeknow.ariselauncher.ui.navigation.Screen.Focus.route) {
                         popUpTo(com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route) {
                             inclusive = true

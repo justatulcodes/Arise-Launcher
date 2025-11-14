@@ -9,6 +9,27 @@ import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 
+data class StatsUi(
+    val focusOverallCompleted: Int = 0,
+    val focusOverallTotal: Int = 0,
+    val focusOverallPercent: Double = 0.0,
+    val categories: List<CategoryStat> = emptyList(),
+    val focusEarnedPoints: Int = 0,
+    val focusPotentialPoints: Int = 0,
+    val personalCompleted: Int = 0,
+    val personalTotal: Int = 0,
+    val personalPercent: Double = 0.0
+)
+
+data class CategoryStat(
+    val category: TaskCategory,
+    val completed: Int,
+    val total: Int,
+    val percent: Double,
+    val earnedPoints: Int,
+    val potentialPoints: Int
+)
+
 data class FocusCategory(
     val id: TaskCategory,
     val name: String,
@@ -53,7 +74,8 @@ data class HomeState(
     val editingCategoryId: TaskCategory? = null,
     val editingCategoryName: String = "",
     val expandedLinkId: String? = null,
-    val currentPage: Int = 1 // 0 = blank, 1 = main tasks, 2 = alternate (focused mode only)
+    val currentPage: Int = 1, // 0 = blank, 1 = main tasks, 2 = alternate (focused mode only)
+    val statsUi: StatsUi = StatsUi() // MVP stats
 )
 
 sealed class HomeEvent {

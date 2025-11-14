@@ -64,6 +64,7 @@ class AppUsageTimerService
     private var timerJob: Job? = null
     private var currentAppName: String = ""
     private var currentAppPackage : String = ""
+    private var currentPoints : Int = 0
     private var isVisible by mutableStateOf(false)
     private var elapsedSeconds by mutableStateOf(0)
     private var pointsLost by mutableStateOf(0)
@@ -100,6 +101,11 @@ class AppUsageTimerService
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
+        lifecycleScope.launch {
+            pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
+                currentPoints = points
+            }
+        }
         val filter = IntentFilter(ACTION_STOP_TRACKING)
         registerReceiver(stopReceiver, filter, RECEIVER_NOT_EXPORTED)
     }
@@ -281,16 +287,18 @@ class AppUsageTimerService
             while (true) {
                 delay(1000)
                 elapsedSeconds++
-                if (elapsedSeconds % POINT_DEPLETION_INTERVAL_SECONDS == 0) {
-                    pointsLost++
-//                    if (pointsLost % 10 == 0) {
-//                        vibrateDevice()
-//                    }
-                    pointsLogRepositoryImpl.spendPoints(
-                        amount = 1,
-                        taskId = currentAppPackage,
-                        taskName = "Used ${currentAppName}")
+                if(currentPoints > 0) {
+                    if (elapsedSeconds % POINT_DEPLETION_INTERVAL_SECONDS == 0) {
+                        pointsLost++
+                        pointsLogRepositoryImpl.spendPoints(
+                            amount = 1,
+                            taskId = currentAppPackage,
+                            taskName = "Used ${currentAppName}")
+                    }
+                }else {
+                    pointsLost = 0
                 }
+
             }
         }
     }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.service.AppUsageTimerService
@@ -33,6 +34,8 @@ class MainActivity : ComponentActivity() {
     lateinit var settingsRepository: SettingsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -52,10 +55,13 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    val startDestination = if (PermissionHelper.hasAllPermissions(this)) {
-                        com.expeknow.ariselauncher.ui.navigation.Screen.Main.route
-                    } else {
-                        com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route
+                    val prefs = getSharedPreferences("arise_prefs", Context.MODE_PRIVATE)
+                    val hasSeenWelcome = prefs.getBoolean("has_seen_welcome", false)
+
+                    val startDestination = when {
+                        !hasSeenWelcome -> com.expeknow.ariselauncher.ui.navigation.Screen.Welcome.route
+                        PermissionHelper.hasAllPermissions(this) -> com.expeknow.ariselauncher.ui.navigation.Screen.Main.route
+                        else -> com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route
                     }
 
                     AppNavigation(navController = navController, startDestination = startDestination)

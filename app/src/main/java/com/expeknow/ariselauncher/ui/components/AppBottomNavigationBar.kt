@@ -12,11 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.ControlPoint
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,17 +64,17 @@ fun AppBottomNavigationBar(navController: NavController) {
                     }
                 }
             )
-//            NavBarItem(
-//                icon = Icons.Filled.EmojiEvents,
-//                label = "POINTS",
-//                isSelected = currentRoute == Screen.Points.route,
-//                onClick = {
-//                    navController.navigate(Screen.Points.route) {
-//                        popUpTo(Screen.Focus.route)
-//                        launchSingleTop = true
-//                    }
-//                }
-//            )
+            NavBarItem(
+                icon = Icons.Filled.Analytics,
+                label = "STATS",
+                isSelected = currentRoute == Screen.Stats.route,
+                onClick = {
+                    navController.navigate(Screen.Stats.route) {
+                        popUpTo(Screen.Focus.route)
+                        launchSingleTop = true
+                    }
+                }
+            )
             NavBarItem(
                 icon = Icons.Filled.Dashboard,
                 label = "DRIVE",
@@ -84,8 +87,8 @@ fun AppBottomNavigationBar(navController: NavController) {
                 }
             )
             NavBarItem(
-                icon = Icons.Filled.ControlPoint,
-                label = "CTRL",
+                icon = Icons.Filled.Settings,
+                label = "SETTINGS",
                 isSelected = currentRoute == Screen.Ctrl.route,
                 onClick = {
                     navController.navigate(Screen.Ctrl.route) {

@@ -110,98 +110,96 @@ fun AppDrawerScreen(
         }
     }
 
-    Log.d("Taggzz", "State.countdown = ${state.countdown} and !state.isUnlocked = ${!state.isUnlocked}")
-    if (false) {
-        CountdownScreen(
-            countdown = state.countdown,
-            appDrawerDelay = viewModel.getAppDrawerDelay(),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        AppDrawerSearchBar(
+            searchQuery = searchQuery,
+            onSearchQueryChange = { query ->
+                searchQuery = query
+            },
             theme = theme,
-            onReturnToTasks = onClose
+            focusRequester = focusRequester
         )
-    }
-    else
-    {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-        ) {
-            AppDrawerSearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { query ->
-                    searchQuery = query
-                },
-                theme = theme,
-                focusRequester = focusRequester
-            )
 
-            Box(
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .fillMaxHeight()
+                    .nestedScroll(nestedScrollConnection)
+                    .padding(top = 0.dp, start = 16.dp, bottom = 0.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                state = listState
             ) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .nestedScroll(nestedScrollConnection)
-                        .padding(top = 0.dp, start = 16.dp, bottom = 0.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                    state = listState
-                ) {
+                item {
+                    Spacer(Modifier.height(2.dp))
+                }
+                if (searchQuery.isNotEmpty()) {
+                    val searchResults = viewModel.getSearchResults(searchQuery)
                     item {
-                        Spacer(Modifier.height(2.dp))
+                        SearchResultsSection(
+                            searchQuery = searchQuery,
+                            searchResults = searchResults,
+                            onAppClick = { app: AppDrawerApp ->
+                                viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                            },
+                            theme = theme
+                        )
                     }
-                    if (searchQuery.isNotEmpty()) {
-                        val searchResults = viewModel.getSearchResults(searchQuery)
-                        item {
-                            SearchResultsSection(
-                                searchQuery = searchQuery,
-                                searchResults = searchResults,
-                                onAppClick = { app: AppDrawerApp ->
-                                    viewModel.onEvent(AppDrawerEvent.SelectApp(app))
-                                },
-                                theme = theme
-                            )
-                        }
-                    } else {
+                } else {
 
-                        if(shouldShowCategorizedApps){
-                            val categorizedApps = viewModel.getCategorizedApps()
-                            categorizedApps.forEach { (category, apps) ->
-                                item {
-                                    AppCategorySection(
-                                        category = category,
-                                        apps = apps,
-                                        onAppClick = { app: AppDrawerApp ->
-                                            viewModel.onEvent(AppDrawerEvent.SelectApp(app))
-                                        },
-                                        theme = theme
-                                    )
-                                }
-                            }
-                        }
-                        else{
-                            val allApps = viewModel.getAlphabeticallyArrangedApps()
+                    if(shouldShowCategorizedApps){
+                        val categorizedApps = viewModel.getCategorizedApps()
+                        categorizedApps.forEach { (category, apps) ->
                             item {
-                                AppGrid(
-                                    apps = allApps,
+                                AppCategorySection(
+                                    category = category,
+                                    apps = apps,
                                     onAppClick = { app: AppDrawerApp ->
                                         viewModel.onEvent(AppDrawerEvent.SelectApp(app))
-                                        onClose()
                                     },
                                     theme = theme
                                 )
                             }
                         }
+                    }
+                    else{
+                        val allApps = viewModel.getAlphabeticallyArrangedApps()
+                        item {
+                            AppGrid(
+                                apps = allApps,
+                                onAppClick = { app: AppDrawerApp ->
+                                    viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                    onClose()
+                                },
+                                theme = theme
+                            )
+                        }
+                    }
 
-                    }
-                    item {
-                        Spacer(Modifier.height(2.dp))
-                    }
+                }
+                item {
+                    Spacer(Modifier.height(2.dp))
                 }
             }
+        }
 
+        if (state.showTimerDialog) {
+            AppTimerDialog(
+                app = state.timerApp,
+                timerCountdown = state.timerCountdown,
+                onDismiss = {
+                    viewModel.onEvent(AppDrawerEvent.DismissTimerDialog)
+                },
+                theme = theme
+            )
         }
     }
 
