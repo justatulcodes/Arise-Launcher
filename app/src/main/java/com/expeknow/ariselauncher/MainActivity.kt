@@ -52,10 +52,13 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    val startDestination = if (PermissionHelper.hasAllPermissions(this)) {
-                        com.expeknow.ariselauncher.ui.navigation.Screen.Main.route
-                    } else {
-                        com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route
+                    val prefs = getSharedPreferences("arise_prefs", Context.MODE_PRIVATE)
+                    val hasSeenWelcome = prefs.getBoolean("has_seen_welcome", false)
+
+                    val startDestination = when {
+                        !hasSeenWelcome -> com.expeknow.ariselauncher.ui.navigation.Screen.Welcome.route
+                        PermissionHelper.hasAllPermissions(this) -> com.expeknow.ariselauncher.ui.navigation.Screen.Main.route
+                        else -> com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route
                     }
 
                     AppNavigation(navController = navController, startDestination = startDestination)
