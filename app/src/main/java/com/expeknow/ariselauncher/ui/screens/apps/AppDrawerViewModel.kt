@@ -29,11 +29,15 @@ class AppDrawerViewModel @Inject constructor(
     private val _state = MutableStateFlow(AppDrawerState())
     val state: StateFlow<AppDrawerState> = _state.asStateFlow()
 
+    private val _topUsedApps = MutableStateFlow<List<AppDrawerApp>>(emptyList())
+    val topUsedApps: StateFlow<List<AppDrawerApp>> = _topUsedApps.asStateFlow()
+
     private var countdownJob: Job? = null
     private var timerJob: Job? = null
 
     init {
         loadApps()
+        loadTopUsedApps()
         observePoints()
     }
 
@@ -48,6 +52,13 @@ class AppDrawerViewModel @Inject constructor(
         viewModelScope.launch {
             val apps = appRepositoryImpl.getInstalledApps()
             _state.value = _state.value.copy(apps = apps)
+        }
+    }
+
+    private fun loadTopUsedApps() {
+        viewModelScope.launch {
+            val topUsed = appRepositoryImpl.getTopUsedApps(5)
+            _topUsedApps.value = topUsed
         }
     }
 

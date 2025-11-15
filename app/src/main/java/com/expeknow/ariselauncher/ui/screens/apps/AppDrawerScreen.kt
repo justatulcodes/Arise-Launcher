@@ -5,8 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -32,6 +35,7 @@ fun AppDrawerScreen(
     onDragEnd: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val topUsedApps by viewModel.topUsedApps.collectAsStateWithLifecycle()
     val theme = AppDrawerTheme()
     val listState = rememberLazyListState()
     var searchQuery by remember { mutableStateOf("") }
@@ -135,12 +139,13 @@ fun AppDrawerScreen(
                     .fillMaxHeight()
                     .nestedScroll(nestedScrollConnection)
                     .padding(top = 0.dp, start = 16.dp, bottom = 0.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 state = listState
             ) {
                 item {
                     Spacer(Modifier.height(2.dp))
                 }
+
                 if (searchQuery.isNotEmpty()) {
                     val searchResults = viewModel.getSearchResults(searchQuery)
                     item {
@@ -154,6 +159,35 @@ fun AppDrawerScreen(
                         )
                     }
                 } else {
+                    // Show top used apps row only when not searching and not in categorized view
+                    if (!shouldShowCategorizedApps && topUsedApps.isNotEmpty()) {
+                        item {
+                            TopUsedAppsRow(
+                                apps = topUsedApps,
+                                onAppClick = { app: AppDrawerApp ->
+                                    viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                    onClose()
+                                },
+                                theme = theme
+                            )
+                        }
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(56.dp)
+                                        .height(2.dp)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(Color.White)
+                                )
+                            }
+                        }
+                    }
 
                     if(shouldShowCategorizedApps){
                         val categorizedApps = viewModel.getCategorizedApps()

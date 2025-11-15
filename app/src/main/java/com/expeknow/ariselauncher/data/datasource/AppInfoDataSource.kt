@@ -27,7 +27,7 @@ class AppInfoDataSource(
 
     fun getAppCategory(packageName: String) = appInfoDao.getAppCategory(packageName)
 
-    fun getTopUsedApps(count: Int) = appInfoDao.getTopUsedApps(count)
+    suspend fun getTopUsedApps(count: Int) = appInfoDao.getTopUsedApps(count)
 
     fun recordAppLaunch(packageName: String) {
         appInfoDao.recordAppLaunch(packageName, System.currentTimeMillis())
