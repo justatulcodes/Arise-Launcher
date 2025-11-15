@@ -124,6 +124,10 @@ class AppRepositoryImpl(
         launchIntent?.let {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(it)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                recordAppLaunch(packageName)
+            }
         }
     }
 
@@ -137,5 +141,44 @@ class AppRepositoryImpl(
 
     override fun getAppCategory(packageName: String): String {
         return appInfoDataSource.getAppCategory(packageName)
+    }
+
+    override fun recordAppLaunch(packageName: String) {
+        appInfoDataSource.recordAppLaunch(packageName)
+    }
+
+    override suspend fun getTopUsedApps(count: Int): List<AppDrawerApp> {
+        val topUsedAppInfos = appInfoDataSource.getTopUsedApps(count)
+        val packageManager = context.packageManager
+
+        return topUsedAppInfos.mapNotNull { appInfo ->
+            try {
+                val packageInfo = packageManager.getPackageInfo(appInfo.packageName, 0)
+                val launchIntent = packageManager.getLaunchIntentForPackage(appInfo.packageName)
+
+                // Only include apps that are still installed and launchable
+                if (launchIntent != null) {
+                    val appName = packageManager.getApplicationLabel(
+                        packageManager.getApplicationInfo(appInfo.packageName, 0)
+                    ).toString()
+                    val icon = packageManager.getApplicationIcon(appInfo.packageName)
+
+                    AppDrawerApp(
+                        id = appInfo.packageName,
+                        name = appName,
+                        packageName = appInfo.packageName,
+                        icon = icon,
+                        category = mapCategoryToAppCategory(appInfo.category),
+                        pointCost = AppClassifier.getAppPointCost(mapCategoryToAppCategory(appInfo.category)),
+                        appInstallTime = appInfo.installTime
+                    )
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                // App might have been uninstalled, skip it
+                null
+            }
+        }
     }
 }
