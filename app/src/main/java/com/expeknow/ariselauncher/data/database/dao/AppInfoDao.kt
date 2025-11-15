@@ -28,7 +28,7 @@ interface AppInfoDao {
     fun deleteAllAppInfo()
 
     @Query("SELECT * FROM app_info ORDER BY launchCount DESC, lastUsedTimestamp DESC LIMIT :count")
-    fun getTopUsedApps(count: Int): List<AppInfo>
+    suspend fun getTopUsedApps(count: Int): List<AppInfo>
 
     @Query("UPDATE app_info SET launchCount = launchCount + 1, lastUsedTimestamp = :timestamp WHERE packageName = :packageName")
     fun recordAppLaunch(packageName: String, timestamp: Long)

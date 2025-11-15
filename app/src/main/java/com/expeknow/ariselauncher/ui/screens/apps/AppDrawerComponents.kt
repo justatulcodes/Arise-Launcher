@@ -770,6 +770,43 @@ fun AppTimerDialog(
     }
 }
 
+@Composable
+fun TopUsedAppsRow(
+    apps: List<AppDrawerApp>,
+    onAppClick: (AppDrawerApp) -> Unit,
+    theme: AppDrawerTheme
+) {
+    if (apps.isEmpty()) return
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 0.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            apps.take(4).forEach { app ->
+                Box(modifier = Modifier.weight(1f)) {
+                    AppGridItemV2(
+                        app = app,
+                        onAppClick = onAppClick,
+                    )
+                }
+            }
+            // Fill remaining space if less than 4 apps
+            if (apps.size < 4) {
+                repeat(4 - apps.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun AppDrawerSearchBarPreview() {
