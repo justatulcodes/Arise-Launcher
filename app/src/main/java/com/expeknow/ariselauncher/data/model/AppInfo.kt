@@ -11,5 +11,8 @@ data class AppInfo(
     val id: String = UUID.randomUUID().toString(),
     val packageName: String,
     val category: String,
-    val installTime: Long
+    val installTime: Long,
+    val launchCount : Int = 0,
+    val lastUsedTimestamp : Long = 0,
+    val totalTimeSpent : Long = 0
 ) 
