@@ -67,6 +67,9 @@ fun AppDrawerScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadTopUsedApps()
+    }
 
     LaunchedEffect(isVisible) {
         if (!isVisible) {

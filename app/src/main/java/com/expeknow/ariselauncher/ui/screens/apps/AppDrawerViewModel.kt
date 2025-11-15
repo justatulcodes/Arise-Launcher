@@ -37,7 +37,6 @@ class AppDrawerViewModel @Inject constructor(
 
     init {
         loadApps()
-        loadTopUsedApps()
         observePoints()
     }
 
@@ -55,7 +54,7 @@ class AppDrawerViewModel @Inject constructor(
         }
     }
 
-    private fun loadTopUsedApps() {
+    fun loadTopUsedApps() {
         viewModelScope.launch {
             val topUsed = appRepositoryImpl.getTopUsedApps(5)
             _topUsedApps.value = topUsed
