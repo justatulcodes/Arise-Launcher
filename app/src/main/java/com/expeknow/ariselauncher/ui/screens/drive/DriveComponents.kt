@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -342,7 +344,8 @@ fun AddDriveItemDialog(
                                 focusedBorderColor = AccentGreen,
                                 focusedLabelColor = AccentGreen,
                                 cursorColor = AccentGreen
-                            )
+                            ),
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         OutlinedTextField(
@@ -354,7 +357,8 @@ fun AddDriveItemDialog(
                                 focusedBorderColor = AccentGreen,
                                 focusedLabelColor = AccentGreen,
                                 cursorColor = AccentGreen
-                            )
+                            ),
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                         )
                     }
 
@@ -502,7 +506,8 @@ fun AddDriveItemDialog(
                                 focusedBorderColor = AccentGreen,
                                 focusedLabelColor = AccentGreen,
                                 cursorColor = AccentGreen
-                            )
+                            ),
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         OutlinedTextField(
@@ -516,7 +521,8 @@ fun AddDriveItemDialog(
                                 focusedBorderColor = AccentGreen,
                                 focusedLabelColor = AccentGreen,
                                 cursorColor = AccentGreen
-                            )
+                            ),
+                            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                         )
                     }
                 }
