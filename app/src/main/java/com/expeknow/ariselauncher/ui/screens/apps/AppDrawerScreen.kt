@@ -157,6 +157,7 @@ fun AppDrawerScreen(
                             searchResults = searchResults,
                             onAppClick = { app: AppDrawerApp ->
                                 viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                searchQuery = ""
                             },
                             theme = theme
                         )
@@ -169,6 +170,7 @@ fun AppDrawerScreen(
                                 apps = topUsedApps,
                                 onAppClick = { app: AppDrawerApp ->
                                     viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                    searchQuery = ""
                                     onClose()
                                 },
                                 theme = theme
@@ -201,6 +203,7 @@ fun AppDrawerScreen(
                                     apps = apps,
                                     onAppClick = { app: AppDrawerApp ->
                                         viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                        searchQuery = ""
                                     },
                                     theme = theme
                                 )
@@ -214,6 +217,7 @@ fun AppDrawerScreen(
                                 apps = allApps,
                                 onAppClick = { app: AppDrawerApp ->
                                     viewModel.onEvent(AppDrawerEvent.SelectApp(app))
+                                    searchQuery = ""
                                     onClose()
                                 },
                                 theme = theme

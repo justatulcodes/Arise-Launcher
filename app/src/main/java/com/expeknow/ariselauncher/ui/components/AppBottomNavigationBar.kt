@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AdsClick
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.CheckBox
@@ -65,22 +66,22 @@ fun AppBottomNavigationBar(navController: NavController) {
                 }
             )
             NavBarItem(
-                icon = Icons.Filled.Analytics,
-                label = "STATS",
-                isSelected = currentRoute == Screen.Stats.route,
+                icon = Icons.Filled.AdsClick,
+                label = "DRIVE",
+                isSelected = currentRoute == Screen.Drive.route,
                 onClick = {
-                    navController.navigate(Screen.Stats.route) {
+                    navController.navigate(Screen.Drive.route) {
                         popUpTo(Screen.Focus.route)
                         launchSingleTop = true
                     }
                 }
             )
             NavBarItem(
-                icon = Icons.Filled.Dashboard,
-                label = "DRIVE",
-                isSelected = currentRoute == Screen.Drive.route,
+                icon = Icons.Filled.Analytics,
+                label = "STATS",
+                isSelected = currentRoute == Screen.Stats.route,
                 onClick = {
-                    navController.navigate(Screen.Drive.route) {
+                    navController.navigate(Screen.Stats.route) {
                         popUpTo(Screen.Focus.route)
                         launchSingleTop = true
                     }
