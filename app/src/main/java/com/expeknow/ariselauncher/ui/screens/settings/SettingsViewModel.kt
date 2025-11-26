@@ -149,6 +149,7 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.RefreshApps -> {
                 CoroutineScope(Dispatchers.IO).launch {
                     appInfoDataSource.deleteAllAppInfo()
+                    settingsRepository.setShouldRefreshAppDrawer(true)
                 }
                 _state.value = _state.value.copy(showAppRefreshDialog = false)
             }

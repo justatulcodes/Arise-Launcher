@@ -40,6 +40,12 @@ class AppDrawerViewModel @Inject constructor(
         observePoints()
     }
 
+    fun checkAndRefreshAppList() {
+        if(settingsRepository.getShouldRefreshAppDrawer()){
+            loadApps()
+        }
+    }
+
     fun getShouldTriggerKeyboard(): Boolean {
         return settingsRepository.getShouldTriggerKeyboardInAppDrawer()
     }
