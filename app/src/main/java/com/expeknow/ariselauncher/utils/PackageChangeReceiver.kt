@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.widget.Toast
 import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -28,11 +27,6 @@ class PackageChangeReceiver : BroadcastReceiver() {
 
                 if (!isUpdate) {
                     Log.d("PackageReceiver", "New app installed: $packageName")
-                    Toast.makeText(
-                        context,
-                        "Installed: $packageName",
-                        Toast.LENGTH_SHORT
-                    ).show()
 
                     // Perform classification and persistence off the main thread
                     val pendingResult = goAsync()
@@ -56,11 +50,6 @@ class PackageChangeReceiver : BroadcastReceiver() {
                     }
                 } else {
                     Log.d("PackageReceiver", "App updated: $packageName")
-                    Toast.makeText(
-                        context,
-                        "Updated: $packageName",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
 
@@ -69,12 +58,6 @@ class PackageChangeReceiver : BroadcastReceiver() {
 
                 if (!isUpdate) {
                     Log.d("PackageReceiver", "App uninstalled: $packageName")
-                    Toast.makeText(
-                        context,
-                        "Uninstalled: $packageName",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
                     // Remove from local db on uninstall
                     val pendingResult = goAsync()
                     CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {

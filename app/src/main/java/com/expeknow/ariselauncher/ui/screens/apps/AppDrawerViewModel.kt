@@ -42,6 +42,7 @@ class AppDrawerViewModel @Inject constructor(
 
     fun checkAndRefreshAppList() {
         if(settingsRepository.getShouldRefreshAppDrawer()){
+            settingsRepository.setShouldRefreshAppDrawer(false)
             loadApps()
         }
     }
