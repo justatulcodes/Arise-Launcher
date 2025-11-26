@@ -69,6 +69,7 @@ fun AppDrawerScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadTopUsedApps()
+        viewModel.checkAndRefreshAppList()
     }
 
     LaunchedEffect(isVisible) {

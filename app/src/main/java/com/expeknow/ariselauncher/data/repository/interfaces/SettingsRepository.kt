@@ -31,5 +31,8 @@ interface SettingsRepository {
     fun getAppTimerEnabled(): Boolean
     fun setAppTimerEnabled(enabled: Boolean)
 
+    fun getShouldRefreshAppDrawer() : Boolean
+    fun setShouldRefreshAppDrawer(enabled: Boolean)
+
     fun resetAllSettings()
 }
