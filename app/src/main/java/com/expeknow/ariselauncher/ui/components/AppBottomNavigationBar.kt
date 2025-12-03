@@ -56,11 +56,22 @@ fun AppBottomNavigationBar(navController: NavController) {
         ) {
             NavBarItem(
                 icon = Icons.Filled.CheckBox,
-                label = "FOCUS",
+                label = "TASKS",
                 isSelected = currentRoute == Screen.Focus.route,
                 onClick = {
                     navController.navigate(Screen.Focus.route) {
                         popUpTo(Screen.Focus.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+            NavBarItem(
+                icon = Icons.Filled.EmojiEvents,
+                label = "TARGETS",
+                isSelected = currentRoute == Screen.Targets.route,
+                onClick = {
+                    navController.navigate(Screen.Targets.route) {
+                        popUpTo(Screen.Focus.route)
                         launchSingleTop = true
                     }
                 }

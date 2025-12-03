@@ -38,6 +38,8 @@ import com.expeknow.ariselauncher.ui.screens.settings.SettingsViewModel
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsViewModel
 import com.expeknow.ariselauncher.ui.screens.points.PointsScreen
 import com.expeknow.ariselauncher.ui.screens.points.PointsViewModel
+import com.expeknow.ariselauncher.ui.screens.targets.TargetsScreen
+import com.expeknow.ariselauncher.ui.screens.targets.TargetsViewModel
 
 @Composable
 fun AppNavigation(
@@ -51,7 +53,8 @@ fun AppNavigation(
         Screen.Focus.route,
         Screen.Drive.route,
         Screen.Ctrl.route,
-        Screen.Stats.route
+        Screen.Stats.route,
+        Screen.Targets.route
     )
 
     val showBottomNav = currentRoute in bottomNavRoutes
@@ -107,6 +110,11 @@ fun AppNavigation(
                 composable(Screen.Stats.route) { backStackEntry ->
                     val pointsViewModel = backStackEntry.sharedViewModel<PointsViewModel>(navController)
                     PointsScreen(navController, pointsViewModel)
+                }
+
+                composable(Screen.Targets.route) { backStackEntry ->
+                    val targetsViewModel = backStackEntry.sharedViewModel<TargetsViewModel>(navController)
+                    TargetsScreen(navController, targetsViewModel)
                 }
 
                 composable(Screen.Drive.route) { backStackEntry ->
