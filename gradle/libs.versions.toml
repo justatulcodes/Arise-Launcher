@@ -15,6 +15,7 @@ navigationCompose = "2.8.9"
 roomRuntime = "2.7.2"
 runtimeLivedata = "1.8.0"
 foundation = "1.9.0"
+workRuntime = "2.9.0"
 
 
 [libraries]
@@ -43,10 +44,11 @@ ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntime" }
+androidx-hilt-work = { module = "androidx.hilt:hilt-work", version = "1.2.0" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
