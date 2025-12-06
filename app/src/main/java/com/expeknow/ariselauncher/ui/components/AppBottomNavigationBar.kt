@@ -87,17 +87,17 @@ fun AppBottomNavigationBar(navController: NavController) {
                     }
                 }
             )
-            NavBarItem(
-                icon = Icons.Filled.Analytics,
-                label = "STATS",
-                isSelected = currentRoute == Screen.Stats.route,
-                onClick = {
-                    navController.navigate(Screen.Stats.route) {
-                        popUpTo(Screen.Focus.route)
-                        launchSingleTop = true
-                    }
-                }
-            )
+//            NavBarItem(
+//                icon = Icons.Filled.Analytics,
+//                label = "STATS",
+//                isSelected = currentRoute == Screen.Stats.route,
+//                onClick = {
+//                    navController.navigate(Screen.Stats.route) {
+//                        popUpTo(Screen.Focus.route)
+//                        launchSingleTop = true
+//                    }
+//                }
+//            )
             NavBarItem(
                 icon = Icons.Filled.Settings,
                 label = "SETTINGS",
