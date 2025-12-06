@@ -20,11 +20,20 @@ class TaskReminderWorker @AssistedInject constructor(
     companion object {
         const val WORK_NAME = "task_reminder_work"
         private const val MIN_COMPLETED_TASKS_THRESHOLD = 2
+        const val KEY_TIME_OF_DAY = "time_of_day"
     }
 
     override suspend fun doWork(): Result {
         return try {
             val (startOfDay, endOfDay) = getTodayTimestamps()
+
+            // Get time of day from input data
+            val timeOfDayString = inputData.getString(KEY_TIME_OF_DAY) ?: "AFTERNOON"
+            val timeOfDay = try {
+                TaskReminderNotificationHelper.Companion.TimeOfDay.valueOf(timeOfDayString)
+            } catch (e: Exception) {
+                TaskReminderNotificationHelper.Companion.TimeOfDay.AFTERNOON
+            }
 
             // Get task completion stats for Focus Mode (PEOPLE, OPPORTUNITY, SKILLS)
             val focusModeCompleted = taskDao.getFocusModeTasksCompletedToday(startOfDay, endOfDay)
@@ -38,12 +47,12 @@ class TaskReminderWorker @AssistedInject constructor(
 
             // Send Focus Mode reminder if user has active tasks but completed very few
             if (focusModeActive > 0 && focusModeCompleted < MIN_COMPLETED_TASKS_THRESHOLD) {
-                notificationHelper.sendFocusModeReminder(focusModeCompleted, focusModeActive)
+                notificationHelper.sendFocusModeReminder(focusModeCompleted, focusModeActive, timeOfDay)
             }
 
             // Send Normal Mode reminder if user has active tasks but completed very few
             if (normalModeActive > 0 && normalModeCompleted < MIN_COMPLETED_TASKS_THRESHOLD) {
-                notificationHelper.sendNormalModeReminder(normalModeCompleted, normalModeActive)
+                notificationHelper.sendNormalModeReminder(normalModeCompleted, normalModeActive, timeOfDay)
             }
 
             Result.success()
@@ -73,4 +82,3 @@ class TaskReminderWorker @AssistedInject constructor(
         return Pair(startOfDay, endOfDay)
     }
 }
-

@@ -2,10 +2,12 @@ package com.expeknow.ariselauncher.worker
 
 import android.content.Context
 import androidx.work.Constraints
+import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.expeknow.ariselauncher.notification.TaskReminderNotificationHelper
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -18,17 +20,33 @@ object TaskReminderScheduler {
     fun scheduleTaskReminders(context: Context) {
         val workManager = WorkManager.getInstance(context)
 
-        // Schedule reminders at 4 PM, 8 PM, and 10 PM
-        scheduleReminderAt(workManager, WORK_NAME_4PM, 16, 0) // 4 PM
-        scheduleReminderAt(workManager, WORK_NAME_8PM, 20, 0) // 8 PM
-        scheduleReminderAt(workManager, WORK_NAME_10PM, 22, 0) // 10 PM
+        // Schedule reminders at 4 PM, 8 PM, and 10 PM with appropriate time of day context
+        scheduleReminderAt(
+            workManager,
+            WORK_NAME_4PM,
+            16, 0,
+            TaskReminderNotificationHelper.Companion.TimeOfDay.AFTERNOON
+        )
+        scheduleReminderAt(
+            workManager,
+            WORK_NAME_8PM,
+            20, 0,
+            TaskReminderNotificationHelper.Companion.TimeOfDay.EVENING
+        )
+        scheduleReminderAt(
+            workManager,
+            WORK_NAME_10PM,
+            22, 0,
+            TaskReminderNotificationHelper.Companion.TimeOfDay.NIGHT
+        )
     }
 
     private fun scheduleReminderAt(
         workManager: WorkManager,
         workName: String,
         hour: Int,
-        minute: Int
+        minute: Int,
+        timeOfDay: TaskReminderNotificationHelper.Companion.TimeOfDay
     ) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
@@ -49,12 +67,17 @@ object TaskReminderScheduler {
 
         val initialDelay = scheduledTime.timeInMillis - currentTime.timeInMillis
 
+        val inputData = Data.Builder()
+            .putString(TaskReminderWorker.KEY_TIME_OF_DAY, timeOfDay.name)
+            .build()
+
         val reminderWork = PeriodicWorkRequestBuilder<TaskReminderWorker>(
             repeatInterval = 24,
             repeatIntervalTimeUnit = TimeUnit.HOURS
         )
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .setConstraints(constraints)
+            .setInputData(inputData)
             .addTag(workName)
             .build()
 
@@ -72,4 +95,3 @@ object TaskReminderScheduler {
         workManager.cancelUniqueWork(WORK_NAME_10PM)
     }
 }
-
