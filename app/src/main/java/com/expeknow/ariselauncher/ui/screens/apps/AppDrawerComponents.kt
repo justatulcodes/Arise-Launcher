@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -51,6 +52,7 @@ private object AppContextMenuDefaults {
     val ICON_SIZE_DP = 64
     val MENU_OFFSET_X_DP = 32
     val MENU_OFFSET_Y_DP = -20
+    val DESTRUCTIVE_ACTION_COLOR = Color(0xFFE57373)
 }
 
 @Composable
@@ -156,13 +158,13 @@ fun AppContextMenu(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Uninstall",
-                        tint = Color(0xFFE57373),
+                        tint = AppContextMenuDefaults.DESTRUCTIVE_ACTION_COLOR,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
                         text = "Uninstall",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFFE57373),
+                        color = AppContextMenuDefaults.DESTRUCTIVE_ACTION_COLOR,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -499,6 +501,7 @@ fun AppGrid(
                         AppGridItemV2(
                             app = app,
                             onAppClick = onAppClick,
+                            theme = theme
                         )
                     }
                 }
@@ -515,11 +518,12 @@ fun AppGrid(
 fun AppGridItemV2(
     app: AppDrawerApp,
     onAppClick: (AppDrawerApp) -> Unit,
+    theme: AppDrawerTheme = AppDrawerTheme()
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     var showContextMenu by remember { mutableStateOf(false) }
-    val density = androidx.compose.ui.platform.LocalDensity.current
+    val density = LocalDensity.current
     
     // Calculate menu offset based on icon size
     val menuOffset = with(density) {
@@ -635,7 +639,7 @@ fun AppGridItemV2(
                     }
                     context.startActivity(intent)
                 },
-                theme = AppDrawerTheme()
+                theme = theme
             )
         }
     }
@@ -990,6 +994,7 @@ fun TopUsedAppsRow(
                     AppGridItemV2(
                         app = app,
                         onAppClick = onAppClick,
+                        theme = theme
                     )
                 }
             }
