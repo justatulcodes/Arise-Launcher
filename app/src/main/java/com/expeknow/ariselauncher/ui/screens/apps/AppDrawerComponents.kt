@@ -45,6 +45,14 @@ import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 import com.expeknow.ariselauncher.ui.theme.SurfaceCard
 import kotlin.math.roundToInt
 
+// Constants for context menu
+private object AppContextMenuDefaults {
+    val MENU_WIDTH = 180.dp
+    val ICON_SIZE_DP = 64
+    val MENU_OFFSET_X_DP = 32
+    val MENU_OFFSET_Y_DP = -20
+}
+
 @Composable
 fun AppContextMenu(
     app: AppDrawerApp,
@@ -95,7 +103,7 @@ fun AppContextMenu(
         ) {
             Column(
                 modifier = Modifier
-                    .width(180.dp)
+                    .width(AppContextMenuDefaults.MENU_WIDTH)
                     .padding(vertical = 8.dp)
             ) {
                 // App Info option
@@ -113,13 +121,13 @@ fun AppContextMenu(
                     Icon(
                         imageVector = Icons.Default.Info,
                         contentDescription = "App Info",
-                        tint = Color.White.copy(alpha = 0.8f),
+                        tint = theme.accent.copy(alpha = 0.8f),
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
                         text = "App Info",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.9f),
+                        color = theme.accent.copy(alpha = 0.9f),
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -130,7 +138,7 @@ fun AppContextMenu(
                         .fillMaxWidth()
                         .height(1.dp)
                         .padding(horizontal = 12.dp)
-                        .background(Color.White.copy(alpha = 0.1f))
+                        .background(theme.border)
                 )
                 
                 // Uninstall option
@@ -511,7 +519,15 @@ fun AppGridItemV2(
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     var showContextMenu by remember { mutableStateOf(false) }
-    var menuOffset by remember { mutableStateOf(IntOffset(0, 0)) }
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    
+    // Calculate menu offset based on icon size
+    val menuOffset = with(density) {
+        IntOffset(
+            AppContextMenuDefaults.MENU_OFFSET_X_DP.dp.roundToPx(),
+            AppContextMenuDefaults.MENU_OFFSET_Y_DP.dp.roundToPx()
+        )
+    }
     
     val scale by animateFloatAsState(
         targetValue = if (showContextMenu) 1.05f else 1f,
@@ -526,7 +542,7 @@ fun AppGridItemV2(
         Column() {
             Box(
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(AppContextMenuDefaults.ICON_SIZE_DP.dp)
                     .graphicsLayer {
                         scaleX = scale
                         scaleY = scale
@@ -535,7 +551,6 @@ fun AppGridItemV2(
                         onClick = { onAppClick(app) },
                         onLongClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            menuOffset = IntOffset(32, -20)
                             showContextMenu = true
                         }
                     ),
