@@ -49,9 +49,9 @@ import kotlin.math.roundToInt
 // Constants for context menu
 private object AppContextMenuDefaults {
     val MENU_WIDTH = 180.dp
-    val ICON_SIZE_DP = 64
-    val MENU_OFFSET_X_DP = 32
-    val MENU_OFFSET_Y_DP = -20
+    val ICON_SIZE = 64.dp
+    val MENU_OFFSET_X = 32.dp
+    val MENU_OFFSET_Y = (-20).dp
     val DESTRUCTIVE_ACTION_COLOR = Color(0xFFE57373)
 }
 
@@ -528,8 +528,8 @@ fun AppGridItemV2(
     // Calculate menu offset based on icon size
     val menuOffset = with(density) {
         IntOffset(
-            AppContextMenuDefaults.MENU_OFFSET_X_DP.dp.roundToPx(),
-            AppContextMenuDefaults.MENU_OFFSET_Y_DP.dp.roundToPx()
+            AppContextMenuDefaults.MENU_OFFSET_X.roundToPx(),
+            AppContextMenuDefaults.MENU_OFFSET_Y.roundToPx()
         )
     }
     
@@ -546,7 +546,7 @@ fun AppGridItemV2(
         Column() {
             Box(
                 modifier = Modifier
-                    .size(AppContextMenuDefaults.ICON_SIZE_DP.dp)
+                    .size(AppContextMenuDefaults.ICON_SIZE)
                     .graphicsLayer {
                         scaleX = scale
                         scaleY = scale
@@ -576,7 +576,7 @@ fun AppGridItemV2(
                             else -> Color(0xFFE57373).copy(alpha = 0.2f)
                         },
                         shape = RoundedCornerShape(4.dp),
-                        border = androidx.compose.foundation.BorderStroke(
+                        border = BorderStroke(
                             width = 1.dp,
                             color = when {
                                 app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.4f)
