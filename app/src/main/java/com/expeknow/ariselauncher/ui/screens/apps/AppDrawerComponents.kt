@@ -1,27 +1,37 @@
 package com.expeknow.ariselauncher.ui.screens.apps
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.BasicTextField
@@ -29,8 +39,129 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 import com.expeknow.ariselauncher.ui.theme.SurfaceCard
+import kotlin.math.roundToInt
+
+@Composable
+fun AppContextMenu(
+    app: AppDrawerApp,
+    offset: IntOffset,
+    onDismiss: () -> Unit,
+    onUninstall: () -> Unit,
+    onAppInfo: () -> Unit,
+    theme: AppDrawerTheme
+) {
+    var isVisible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        isVisible = true
+    }
+    
+    val scale by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0.8f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "scale"
+    )
+    
+    val alpha by animateFloatAsState(
+        targetValue = if (isVisible) 1f else 0f,
+        animationSpec = tween(durationMillis = 200),
+        label = "alpha"
+    )
+    
+    Popup(
+        alignment = Alignment.TopStart,
+        offset = offset,
+        onDismissRequest = onDismiss,
+        properties = PopupProperties(focusable = true)
+    ) {
+        Surface(
+            modifier = Modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    this.alpha = alpha
+                },
+            shape = RoundedCornerShape(12.dp),
+            color = SurfaceCard,
+            border = BorderStroke(1.dp, theme.border),
+            shadowElevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier
+                    .width(180.dp)
+                    .padding(vertical = 8.dp)
+            ) {
+                // App Info option
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onAppInfo()
+                            onDismiss()
+                        }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "App Info",
+                        tint = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = "App Info",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+                
+                // Divider
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .padding(horizontal = 12.dp)
+                        .background(Color.White.copy(alpha = 0.1f))
+                )
+                
+                // Uninstall option
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onUninstall()
+                            onDismiss()
+                        }
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Uninstall",
+                        tint = Color(0xFFE57373),
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = "Uninstall",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFFE57373),
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun CountdownScreen(
@@ -377,71 +508,121 @@ fun AppGridItemV2(
     app: AppDrawerApp,
     onAppClick: (AppDrawerApp) -> Unit,
 ) {
-    Column() {
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .clickable { onAppClick(app) },
-            contentAlignment = Alignment.Center
-        ) {
-            app.icon?.toImageBitmap()?.let {
-                Image(
-                    contentDescription = app.name,
-                    modifier = Modifier.size(56.dp),
-                    bitmap = it
-                )
-            }
-
-            if (app.pointCost > 0) {
-                Surface(
-                    color = when {
-                        app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.2f)
-                        app.pointCost <= 15 -> Color(0xFFFFB74D).copy(alpha = 0.2f)
-                        else -> Color(0xFFE57373).copy(alpha = 0.2f)
-                    },
-                    shape = RoundedCornerShape(4.dp),
-                    border = androidx.compose.foundation.BorderStroke(
-                        width = 1.dp,
-                        color = when {
-                            app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.4f)
-                            app.pointCost <= 15 -> Color(0xFFFFB74D).copy(alpha = 0.4f)
-                            else -> Color(0xFFE57373).copy(alpha = 0.4f)
+    val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
+    var showContextMenu by remember { mutableStateOf(false) }
+    var menuOffset by remember { mutableStateOf(IntOffset(0, 0)) }
+    
+    val scale by animateFloatAsState(
+        targetValue = if (showContextMenu) 1.05f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "iconScale"
+    )
+    
+    Box {
+        Column() {
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                    .combinedClickable(
+                        onClick = { onAppClick(app) },
+                        onLongClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            menuOffset = IntOffset(32, -20)
+                            showContextMenu = true
                         }
                     ),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 6.dp, y = (-6).dp)
-                ) {
-                    Text(
-                        text = "-${app.pointCost}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = when {
-                            app.pointCost <= 5 -> Color(0xFFFFD54F)
-                            app.pointCost <= 15 -> Color(0xFFFFB74D)
-                            else -> Color(0xFFE57373)
-                        },
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                contentAlignment = Alignment.Center
+            ) {
+                app.icon?.toImageBitmap()?.let {
+                    Image(
+                        contentDescription = app.name,
+                        modifier = Modifier.size(56.dp),
+                        bitmap = it
                     )
                 }
+
+                if (app.pointCost > 0) {
+                    Surface(
+                        color = when {
+                            app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.2f)
+                            app.pointCost <= 15 -> Color(0xFFFFB74D).copy(alpha = 0.2f)
+                            else -> Color(0xFFE57373).copy(alpha = 0.2f)
+                        },
+                        shape = RoundedCornerShape(4.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            width = 1.dp,
+                            color = when {
+                                app.pointCost <= 5 -> Color(0xFFFFD54F).copy(alpha = 0.4f)
+                                app.pointCost <= 15 -> Color(0xFFFFB74D).copy(alpha = 0.4f)
+                                else -> Color(0xFFE57373).copy(alpha = 0.4f)
+                            }
+                        ),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = 6.dp, y = (-6).dp)
+                    ) {
+                        Text(
+                            text = "-${app.pointCost}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = when {
+                                app.pointCost <= 5 -> Color(0xFFFFD54F)
+                                app.pointCost <= 15 -> Color(0xFFFFB74D)
+                                else -> Color(0xFFE57373)
+                            },
+                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                        )
+                    }
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
-        //trim app name if too long and add ...
-        val appName = if (app.name.length > 12) {
-            app.name.substring(0,9) + "..."
-        } else {
-            app.name
+            //trim app name if too long and add ...
+            val appName = if (app.name.length > 12) {
+                app.name.substring(0,9) + "..."
+            } else {
+                app.name
+            }
+            Text(
+                text = appName,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.8f),
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                textAlign = TextAlign.Center
+            )
         }
-        Text(
-            text = appName,
-            style = MaterialTheme.typography.bodySmall,
-            color = Color.White.copy(alpha = 0.8f),
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            textAlign = TextAlign.Center
-        )
+        
+        if (showContextMenu) {
+            AppContextMenu(
+                app = app,
+                offset = menuOffset,
+                onDismiss = { showContextMenu = false },
+                onUninstall = {
+                    val intent = Intent(Intent.ACTION_DELETE).apply {
+                        data = Uri.parse("package:${app.packageName}")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(intent)
+                },
+                onAppInfo = {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.parse("package:${app.packageName}")
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                    context.startActivity(intent)
+                },
+                theme = AppDrawerTheme()
+            )
+        }
     }
 }
 
