@@ -126,18 +126,6 @@ fun SettingsScreen(
                 theme = theme
             )
 
-//            // Point System
-//            PointSystemSection(
-//                pointThreshold = state.pointThreshold,
-//                warningsEnabled = state.warningsEnabled,
-//                onThresholdChange = { threshold: Float ->
-//                    viewModel.onEvent(SettingsEvent.UpdatePointThreshold(threshold))
-//                },
-//                onWarningsToggle = { enabled: Boolean ->
-//                    viewModel.onEvent(SettingsEvent.ToggleWarnings(enabled))
-//                },
-//                theme = theme
-//            )
 
             DangerZoneCard(
                 onShowRefreshAppDrawerDialog = { viewModel.onEvent(SettingsEvent.ShowAppRefreshDialog) },

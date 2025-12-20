@@ -73,25 +73,62 @@ class AppRepositoryImpl(
         val packageManager = context.packageManager
         val result = mutableListOf<AppDrawerApp>()
 
-        val callIntent = Intent(Intent.ACTION_DIAL)
-        val callApps = packageManager.queryIntentActivities(callIntent, 0)
-        val callAppInstallTime = packageManager.getPackageInfo(callApps[0].activityInfo.packageName, 0).firstInstallTime
 
-        callApps.forEach { resolveInfo ->
-            val packageName = resolveInfo.activityInfo.packageName
-            if (packageName != context.packageName) {
-                result.add(
-                    AppDrawerApp(
-                        name = resolveInfo.loadLabel(packageManager).toString(),
-                        packageName = packageName,
-                        icon = resolveInfo.loadIcon(packageManager),
-                        id = packageName,
-                        category = AppCategory.ESSENTIAL,
-                        pointCost = AppClassifier.getAppPointCost(AppCategory.ESSENTIAL),
-                        appInstallTime = callAppInstallTime
-                    )
+        try {
+            val callIntent = Intent(Intent.ACTION_DIAL)
+            val callApps = packageManager.queryIntentActivities(callIntent, 0)
+
+            // Priority 1: Look for known standard dialer packages
+            val dialerApp = callApps.find { resolveInfo ->
+                val pkgName = resolveInfo.activityInfo.packageName
+                pkgName == "com.android.dialer" ||
+                pkgName == "com.google.android.dialer" ||
+                pkgName == "com.android.contacts" ||
+                pkgName == "com.google.android.contacts"
+            } ?:
+            // Priority 2: Look for packages containing "dialer" or ".phone" (but not jio, whatsapp, etc.)
+            callApps.find { resolveInfo ->
+                val pkgName = resolveInfo.activityInfo.packageName
+                val isSystemApp = (resolveInfo.activityInfo.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+
+                // Exclude known non-dialer apps
+                val excludedPackages = listOf("jio", "whatsapp", "telegram", "truecaller", "facebook", "instagram", "skype", "zoom", "viber")
+                val isExcluded = excludedPackages.any { pkgName.contains(it, ignoreCase = true) }
+
+                !isExcluded && isSystemApp && (
+                    pkgName.contains("dialer", ignoreCase = true) ||
+                    pkgName.contains(".phone", ignoreCase = true)
                 )
+            } ?:
+            // Priority 3: Any system app that handles dial intents
+            callApps.find { resolveInfo ->
+                val pkgName = resolveInfo.activityInfo.packageName
+                val isSystemApp = (resolveInfo.activityInfo.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+
+                val excludedPackages = listOf("jio", "whatsapp", "telegram", "truecaller", "facebook", "instagram", "skype", "zoom", "viber")
+                val isExcluded = excludedPackages.any { pkgName.contains(it, ignoreCase = true) }
+
+                !isExcluded && isSystemApp
             }
+
+            dialerApp?.let { resolveInfo ->
+                val packageName = resolveInfo.activityInfo.packageName
+                if (packageName != context.packageName) {
+                    val appInstallTime = packageManager.getPackageInfo(packageName, 0).firstInstallTime
+                    result.add(
+                        AppDrawerApp(
+                            name = resolveInfo.loadLabel(packageManager).toString(),
+                            packageName = packageName,
+                            icon = resolveInfo.loadIcon(packageManager),
+                            id = packageName,
+                            category = AppCategory.ESSENTIAL,
+                            pointCost = AppClassifier.getAppPointCost(AppCategory.ESSENTIAL),
+                            appInstallTime = appInstallTime
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
         }
 
         val smsIntent = Intent(Intent.ACTION_SENDTO, "smsto:".toUri())
@@ -124,6 +161,10 @@ class AppRepositoryImpl(
         launchIntent?.let {
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(it)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                recordAppLaunch(packageName)
+            }
         }
     }
 
@@ -137,5 +178,44 @@ class AppRepositoryImpl(
 
     override fun getAppCategory(packageName: String): String {
         return appInfoDataSource.getAppCategory(packageName)
+    }
+
+    override fun recordAppLaunch(packageName: String) {
+        appInfoDataSource.recordAppLaunch(packageName)
+    }
+
+    override suspend fun getTopUsedApps(count: Int): List<AppDrawerApp> {
+        val topUsedAppInfos = appInfoDataSource.getTopUsedApps(count)
+        val packageManager = context.packageManager
+
+        return topUsedAppInfos.mapNotNull { appInfo ->
+            try {
+                val packageInfo = packageManager.getPackageInfo(appInfo.packageName, 0)
+                val launchIntent = packageManager.getLaunchIntentForPackage(appInfo.packageName)
+
+                // Only include apps that are still installed and launchable
+                if (launchIntent != null) {
+                    val appName = packageManager.getApplicationLabel(
+                        packageManager.getApplicationInfo(appInfo.packageName, 0)
+                    ).toString()
+                    val icon = packageManager.getApplicationIcon(appInfo.packageName)
+
+                    AppDrawerApp(
+                        id = appInfo.packageName,
+                        name = appName,
+                        packageName = appInfo.packageName,
+                        icon = icon,
+                        category = mapCategoryToAppCategory(appInfo.category),
+                        pointCost = AppClassifier.getAppPointCost(mapCategoryToAppCategory(appInfo.category)),
+                        appInstallTime = appInfo.installTime
+                    )
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                // App might have been uninstalled, skip it
+                null
+            }
+        }
     }
 }

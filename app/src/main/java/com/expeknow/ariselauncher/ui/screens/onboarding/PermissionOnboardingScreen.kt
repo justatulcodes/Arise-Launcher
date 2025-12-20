@@ -1,6 +1,8 @@
 package com.expeknow.ariselauncher.ui.screens.onboarding
 
+import android.Manifest
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.Layers
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,12 +32,17 @@ import com.expeknow.ariselauncher.ui.theme.TaskTitle
 import com.expeknow.ariselauncher.ui.theme.BannerTextGray
 import com.expeknow.ariselauncher.utils.PermissionHelper
 import androidx.core.content.edit
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 enum class PermissionType {
     OVERLAY,
-    USAGE_STATS
+    USAGE_STATS,
+    NOTIFICATIONS
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun PermissionOnboardingScreen(
     navController: NavController
@@ -44,6 +52,22 @@ fun PermissionOnboardingScreen(
     var usageStatsGranted by remember { mutableStateOf(PermissionHelper.hasUsageStatsPermission(context)) }
     var currentPermissionRequest by remember { mutableStateOf<PermissionType?>(null) }
 
+    // Notification permission state (only for Android 13+)
+    val notificationPermissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+        null
+    }
+
+    val notificationGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        notificationPermissionState?.status?.isGranted == true
+    } else {
+        true // Not needed for older versions
+    }
+
+    // Check if all required permissions are granted
+    val allPermissionsGranted = overlayGranted && usageStatsGranted && notificationGranted
+
     DisposableEffect(Unit) {
         val activity = context as? Activity
         val callback = object : android.app.Application.ActivityLifecycleCallbacks {
@@ -51,7 +75,7 @@ fun PermissionOnboardingScreen(
                 overlayGranted = PermissionHelper.hasOverlayPermission(context)
                 usageStatsGranted = PermissionHelper.hasUsageStatsPermission(context)
 
-                if (overlayGranted && usageStatsGranted) {
+                if (overlayGranted && usageStatsGranted && notificationGranted) {
                     val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)
                     prefs.edit { putBoolean("has_seen_welcome", true) }
 
@@ -103,7 +127,7 @@ fun PermissionOnboardingScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "To provide you with the best experience, we need a couple of permissions",
+                text = "To provide you with the best experience, we need a few permissions",
                 fontSize = 16.sp,
                 color = BannerTextGray,
                 textAlign = TextAlign.Center,
@@ -136,10 +160,32 @@ fun PermissionOnboardingScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Notification Permission Card (only show on Android 13+)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                PermissionCard(
+                    icon = Icons.Outlined.Notifications,
+                    title = "Notifications",
+                    description = "Allows Arise to send you task reminders and progress updates throughout the day, helping you stay on track with your goals.",
+                    isGranted = notificationGranted,
+                    onGrantClick = {
+                        currentPermissionRequest = PermissionType.NOTIFICATIONS
+                        notificationPermissionState?.launchPermissionRequest()
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Both permissions are required to use Arise. Your privacy is important to us - all data stays on your device.",
+                text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    "All permissions are required to use Arise. Your privacy is important to us - all data stays on your device."
+                } else {
+                    "Both permissions are required to use Arise. Your privacy is important to us - all data stays on your device."
+                },
                 fontSize = 13.sp,
                 color = BannerTextGray.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,

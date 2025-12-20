@@ -53,4 +53,16 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE isRepeated = 1")
     fun getAllRecurringTasks(): Flow<List<Task>>
 
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1 AND completedAt >= :startOfDay AND completedAt <= :endOfDay AND category != 'PERSONAL'")
+    suspend fun getFocusModeTasksCompletedToday(startOfDay: Long, endOfDay: Long): Int
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 1 AND completedAt >= :startOfDay AND completedAt <= :endOfDay AND category = 'PERSONAL'")
+    suspend fun getNormalModeTasksCompletedToday(startOfDay: Long, endOfDay: Long): Int
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND category != 'PERSONAL'")
+    suspend fun getActiveFocusModeTasks(): Int
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE isCompleted = 0 AND category = 'PERSONAL'")
+    suspend fun getActiveNormalModeTasks(): Int
+
 }

@@ -49,5 +49,8 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun getAppTimerEnabled(): Boolean = preferencesDataSource.getAppTimerEnabled()
     override fun setAppTimerEnabled(enabled: Boolean) = preferencesDataSource.setAppTimerEnabled(enabled)
 
+    override fun getShouldRefreshAppDrawer(): Boolean = preferencesDataSource.getShouldRefreshAppDrawer()
+    override fun setShouldRefreshAppDrawer(enabled: Boolean) = preferencesDataSource.setShouldRefreshAppDrawer(enabled)
+
     override fun resetAllSettings() = preferencesDataSource.resetAllSettings()
 }
