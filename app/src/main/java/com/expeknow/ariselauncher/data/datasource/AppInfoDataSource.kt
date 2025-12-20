@@ -27,4 +27,14 @@ class AppInfoDataSource(
 
     fun getAppCategory(packageName: String) = appInfoDao.getAppCategory(packageName)
 
+    suspend fun getTopUsedApps(count: Int) = appInfoDao.getTopUsedApps(count)
+
+    fun recordAppLaunch(packageName: String) {
+        appInfoDao.recordAppLaunch(packageName, System.currentTimeMillis())
+    }
+
+    fun getRecentlyUsedApps(sinceDaysAgo: Int, count: Int): List<AppInfo> {
+        val sinceTimestamp = System.currentTimeMillis() - (sinceDaysAgo * 24 * 60 * 60 * 1000L)
+        return appInfoDao.getRecentlyUsedApps(sinceTimestamp, count)
+    }
 }

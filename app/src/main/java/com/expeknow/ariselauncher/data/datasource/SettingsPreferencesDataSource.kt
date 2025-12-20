@@ -27,6 +27,8 @@ class SettingsPreferencesDataSource @Inject constructor(
         private const val KEY_SHOULD_SHOW_CATEGORIZED_APPS = "should_show_categories"
         private const val KEY_IS_FRESH_DB_INSTANCE = "is_fresh_db_instance"
         private const val KEY_APP_TIMER_ENABLED = "app_timer_enabled"
+
+        private const val KEY_SHOULD_REFRESH_APP_DRAWER = "should_refresh_app_drawer"
     }
 
     fun getHideCompletedTasks(): Boolean = prefs.getBoolean(KEY_HIDE_COMPLETED_TASKS, true)
@@ -68,6 +70,11 @@ class SettingsPreferencesDataSource @Inject constructor(
     fun getAppTimerEnabled(): Boolean = prefs.getBoolean(KEY_APP_TIMER_ENABLED, true)
     fun setAppTimerEnabled(enabled: Boolean) =
         prefs.edit { putBoolean(KEY_APP_TIMER_ENABLED, enabled) }
+
+    fun getShouldRefreshAppDrawer(): Boolean = prefs.getBoolean(KEY_SHOULD_REFRESH_APP_DRAWER, false)
+    fun setShouldRefreshAppDrawer(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_SHOULD_REFRESH_APP_DRAWER, enabled) }
+
 
     fun resetAllSettings() {
         prefs.edit { clear() }

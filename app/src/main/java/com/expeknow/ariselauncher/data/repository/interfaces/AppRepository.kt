@@ -15,4 +15,8 @@ interface AppRepository {
     fun openDefaultLauncherSettings()
 
     fun getAppCategory(packageName: String) : String
+
+    fun recordAppLaunch(packageName: String)
+
+    suspend fun getTopUsedApps(count: Int): List<AppDrawerApp>
 }

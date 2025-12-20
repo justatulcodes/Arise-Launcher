@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AdsClick
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.AutoGraph
 import androidx.compose.material.icons.filled.CheckBox
@@ -55,7 +56,7 @@ fun AppBottomNavigationBar(navController: NavController) {
         ) {
             NavBarItem(
                 icon = Icons.Filled.CheckBox,
-                label = "FOCUS",
+                label = "TASKS",
                 isSelected = currentRoute == Screen.Focus.route,
                 onClick = {
                     navController.navigate(Screen.Focus.route) {
@@ -65,18 +66,18 @@ fun AppBottomNavigationBar(navController: NavController) {
                 }
             )
             NavBarItem(
-                icon = Icons.Filled.Analytics,
-                label = "STATS",
-                isSelected = currentRoute == Screen.Stats.route,
+                icon = Icons.Filled.EmojiEvents,
+                label = "TARGETS",
+                isSelected = currentRoute == Screen.Targets.route,
                 onClick = {
-                    navController.navigate(Screen.Stats.route) {
+                    navController.navigate(Screen.Targets.route) {
                         popUpTo(Screen.Focus.route)
                         launchSingleTop = true
                     }
                 }
             )
             NavBarItem(
-                icon = Icons.Filled.Dashboard,
+                icon = Icons.Filled.AdsClick,
                 label = "DRIVE",
                 isSelected = currentRoute == Screen.Drive.route,
                 onClick = {
@@ -86,6 +87,17 @@ fun AppBottomNavigationBar(navController: NavController) {
                     }
                 }
             )
+//            NavBarItem(
+//                icon = Icons.Filled.Analytics,
+//                label = "STATS",
+//                isSelected = currentRoute == Screen.Stats.route,
+//                onClick = {
+//                    navController.navigate(Screen.Stats.route) {
+//                        popUpTo(Screen.Focus.route)
+//                        launchSingleTop = true
+//                    }
+//                }
+//            )
             NavBarItem(
                 icon = Icons.Filled.Settings,
                 label = "SETTINGS",
