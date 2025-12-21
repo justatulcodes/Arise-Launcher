@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.AriseLauncher" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.AriseLauncher"
+        parent="android:Theme.Material.Light.NoActionBar" />
 
-    <!-- Splash Screen Theme for Android 12+ -->
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <!-- Set the splash screen background to black -->
-        <item name="android:windowSplashScreenBackground">@color/black</item>
-        <!-- Set the logo/icon for the splash screen -->
-        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
-        <!-- Keep the splash screen on-screen for longer period -->
-        <item name="android:windowSplashScreenAnimationDuration">1000</item>
-        <!-- Set the theme for the Activity after splash screen -->
         <item name="postSplashScreenTheme">@style/Theme.AriseLauncher</item>
     </style>
+
 </resources>
