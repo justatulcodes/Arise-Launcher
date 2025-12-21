@@ -46,12 +46,11 @@ import com.expeknow.ariselauncher.ui.screens.home.Utils.toImageBitmap
 import com.expeknow.ariselauncher.ui.theme.SurfaceCard
 import kotlin.math.roundToInt
 
-// Constants for context menu
 private object AppContextMenuDefaults {
-    val MENU_WIDTH = 180.dp
+    val MENU_WIDTH = 120.dp
     val ICON_SIZE = 64.dp
-    val MENU_OFFSET_X = 32.dp
-    val MENU_OFFSET_Y = (-20).dp
+    val MENU_OFFSET_X = 26.dp
+    val MENU_OFFSET_Y = (-36).dp
     val DESTRUCTIVE_ACTION_COLOR = Color(0xFFE57373)
 }
 
@@ -106,7 +105,7 @@ fun AppContextMenu(
             Column(
                 modifier = Modifier
                     .width(AppContextMenuDefaults.MENU_WIDTH)
-                    .padding(vertical = 8.dp)
+                    .padding(vertical = 4.dp)
             ) {
                 // App Info option
                 Row(
@@ -124,50 +123,50 @@ fun AppContextMenu(
                         imageVector = Icons.Default.Info,
                         contentDescription = "App Info",
                         tint = theme.accent.copy(alpha = 0.8f),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                     Text(
                         text = "App Info",
                         style = MaterialTheme.typography.bodyMedium,
                         color = theme.accent.copy(alpha = 0.9f),
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Normal,
                     )
                 }
                 
-                // Divider
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .padding(horizontal = 12.dp)
-                        .background(theme.border)
-                )
-                
-                // Uninstall option
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onUninstall()
-                            onDismiss()
-                        }
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Uninstall",
-                        tint = AppContextMenuDefaults.DESTRUCTIVE_ACTION_COLOR,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "Uninstall",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = AppContextMenuDefaults.DESTRUCTIVE_ACTION_COLOR,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+//                // Divider
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .height(1.dp)
+//                        .padding(horizontal = 12.dp)
+//                        .background(theme.border)
+//                )
+//
+//                // Uninstall option
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .clickable {
+//                            onUninstall()
+//                            onDismiss()
+//                        }
+//                        .padding(horizontal = 16.dp, vertical = 12.dp),
+//                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.Delete,
+//                        contentDescription = "Uninstall",
+//                        tint = AppContextMenuDefaults.DESTRUCTIVE_ACTION_COLOR,
+//                        modifier = Modifier.size(20.dp)
+//                    )
+//                    Text(
+//                        text = "Uninstall",
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        color = AppContextMenuDefaults.DESTRUCTIVE_ACTION_COLOR,
+//                        fontWeight = FontWeight.Medium
+//                    )
+//                }
             }
         }
     }
