@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.expeknow.ariselauncher.data.database.AriseDatabaseMigrations.MIGRATION_2_3
 import com.expeknow.ariselauncher.data.database.AriseDatabaseMigrations.MIGRATION_3_4
+import com.expeknow.ariselauncher.data.database.AriseDatabaseMigrations.MIGRATION_4_5
 import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
 import com.expeknow.ariselauncher.data.database.dao.DriveItemDao
 import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
@@ -21,7 +22,7 @@ import com.expeknow.ariselauncher.data.model.TaskLink
 
 @Database(
     entities = [Task::class, TaskLink::class, PointsLog::class, AppInfo::class, DriveItem::class],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 @TypeConverters(ModelTypeConverters::class)
@@ -44,7 +45,7 @@ abstract class AriseLauncherDatabase : RoomDatabase() {
                     AriseLauncherDatabase::class.java,
                     "arise_launcher_database"
                 )
-                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .build()
                 INSTANCE = instance
                 instance

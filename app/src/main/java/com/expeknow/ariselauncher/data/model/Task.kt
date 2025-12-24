@@ -49,7 +49,7 @@ data class PointsLog(
     val taskId: String,
     val taskName : String,
     val type: PointsLogType,
-    val points: Int,
+    val points: Float,
     val timestamp: Long = System.currentTimeMillis()
 )
 enum class DaysOfWeek {

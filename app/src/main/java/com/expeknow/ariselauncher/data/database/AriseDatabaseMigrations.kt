@@ -49,4 +49,30 @@ object AriseDatabaseMigrations {
             database.execSQL("ALTER TABLE app_info ADD COLUMN totalTimeSpent INTEGER NOT NULL DEFAULT 0")
         }
     }
+
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // Create new table with points as REAL (float)
+            database.execSQL("""
+                CREATE TABLE points_log_new (
+                    id TEXT NOT NULL PRIMARY KEY,
+                    taskId TEXT NOT NULL,
+                    taskName TEXT NOT NULL,
+                    type TEXT NOT NULL,
+                    points REAL NOT NULL,
+                    timestamp INTEGER NOT NULL
+                )
+            """)
+            // Copy data from old table, converting INTEGER to REAL
+            database.execSQL("""
+                INSERT INTO points_log_new (id, taskId, taskName, type, points, timestamp)
+                SELECT id, taskId, taskName, type, CAST(points AS REAL), timestamp
+                FROM points_log
+            """)
+            // Drop old table
+            database.execSQL("DROP TABLE points_log")
+            // Rename new table to original name
+            database.execSQL("ALTER TABLE points_log_new RENAME TO points_log")
+        }
+    }
 }

@@ -45,10 +45,10 @@ interface PointsLogDao {
     fun getPointsLogUntil(toTime: Long): Flow<List<PointsLog>>
 
     @Query("SELECT SUM(points) FROM points_log WHERE type = 'EARNED'")
-    fun getTotalPointsEarned(): Flow<Int?>
+    fun getTotalPointsEarned(): Flow<Float?>
 
     @Query("SELECT SUM(points) FROM points_log WHERE type = 'SPENT'")
-    fun getTotalPointsSpent(): Flow<Int?>
+    fun getTotalPointsSpent(): Flow<Float?>
 
     @Query("""
     SELECT SUM(
@@ -59,7 +59,7 @@ interface PointsLogDao {
         END
     ) FROM points_log
     """)
-    fun getCurrentPointsBalance(): Flow<Int?>
+    fun getCurrentPointsBalance(): Flow<Float?>
 
 
     // Count queries
