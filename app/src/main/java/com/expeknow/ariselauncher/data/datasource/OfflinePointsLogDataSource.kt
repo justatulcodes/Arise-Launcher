@@ -21,7 +21,7 @@ class OfflinePointsLogDataSource(
             taskId = task.id,
             taskName = task.title,
             type = PointsLogType.EARNED,
-            points = task.points
+            points = task.points.toFloat()
         )
         pointsDao.insertPointsLog(pointsLog)
     }
@@ -53,25 +53,25 @@ class OfflinePointsLogDataSource(
     override fun getRecentPointsLogByType(type: PointsLogType, limit: Int): Flow<List<PointsLog>> =
         pointsDao.getRecentPointsLogByType(type, limit)
 
-    override fun getTotalPointsEarned(): Flow<Int?> = pointsDao.getTotalPointsEarned()
-    override fun getTotalPointsSpent(): Flow<Int?> = pointsDao.getTotalPointsSpent()
-    override fun getCurrentPointsBalance(): Flow<Int?> = pointsDao.getCurrentPointsBalance()
+    override fun getTotalPointsEarned(): Flow<Float?> = pointsDao.getTotalPointsEarned()
+    override fun getTotalPointsSpent(): Flow<Float?> = pointsDao.getTotalPointsSpent()
+    override fun getCurrentPointsBalance(): Flow<Float?> = pointsDao.getCurrentPointsBalance()
     override fun getTotalPointsLogCount(): Flow<Int> = pointsDao.getTotalPointsLogCount()
     override fun getPointsLogCountByType(type: PointsLogType): Flow<Int> =
         pointsDao.getPointsLogCountByType(type)
 
     override suspend fun earnPoints(amount: Int, taskId: String, taskName: String) {
-        val pointsLog = PointsLog(taskId = taskId, taskName = taskName, type = PointsLogType.EARNED, points = amount)
+        val pointsLog = PointsLog(taskId = taskId, taskName = taskName, type = PointsLogType.EARNED, points = amount.toFloat())
         pointsDao.insertPointsLog(pointsLog)
     }
 
     override suspend fun spendPoints(amount: Int, taskId: String, taskName: String) {
-        val pointsLog = PointsLog(taskId = taskId, taskName = taskName, type = PointsLogType.SPENT, points = amount)
+        val pointsLog = PointsLog(taskId = taskId, taskName = taskName, type = PointsLogType.SPENT, points = amount.toFloat())
         pointsDao.insertPointsLog(pointsLog)
     }
 
-    override fun getAvailablePoints(): Flow<Int> =
-        getCurrentPointsBalance().map { it ?: 0 }
+    override fun getAvailablePoints(): Flow<Float> =
+        getCurrentPointsBalance().map { it ?: 0f }
 
     override suspend fun resetPointsLog() {
         pointsDao.resetAllPointsLog()

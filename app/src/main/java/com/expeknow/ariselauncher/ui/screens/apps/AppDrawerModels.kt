@@ -9,7 +9,7 @@ data class AppDrawerApp(
     val packageName: String,
     val icon: Drawable? = null,
     var category: AppCategory,
-    var pointCost: Int = 10,
+    var pointCost: Float = 1.0f,
     val description: String = "",
     val appInstallTime : Long
 )
@@ -37,7 +37,7 @@ data class AppDrawerState(
     val countdown: Int = 0,
     val isUnlocked: Boolean = true,
     val selectedApp: AppDrawerApp? = null,
-    val currentPoints: Int = 0,
+    val currentPoints: Float = 0f,
     val apps: List<AppDrawerApp> = emptyList(),
     val showTimerDialog: Boolean = false,
     val timerCountdown: Int = 0,

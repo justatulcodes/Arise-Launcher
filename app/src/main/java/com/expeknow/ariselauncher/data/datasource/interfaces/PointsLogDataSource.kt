@@ -19,13 +19,13 @@ interface PointsLogDataSource {
     fun getPointsLogUntil(toTime: Long): Flow<List<PointsLog>>
     fun getRecentPointsLog(limit: Int): Flow<List<PointsLog>>
     fun getRecentPointsLogByType(type: PointsLogType, limit: Int): Flow<List<PointsLog>>
-    fun getTotalPointsEarned(): Flow<Int?>
-    fun getTotalPointsSpent(): Flow<Int?>
-    fun getCurrentPointsBalance(): Flow<Int?>
+    fun getTotalPointsEarned(): Flow<Float?>
+    fun getTotalPointsSpent(): Flow<Float?>
+    fun getCurrentPointsBalance(): Flow<Float?>
     fun getTotalPointsLogCount(): Flow<Int>
     fun getPointsLogCountByType(type: PointsLogType): Flow<Int>
     suspend fun earnPoints(amount: Int, taskId: String, taskName: String)
     suspend fun spendPoints(amount: Int, taskId: String, taskName: String)
-    fun getAvailablePoints(): Flow<Int>
+    fun getAvailablePoints(): Flow<Float>
     suspend fun resetPointsLog()
 }

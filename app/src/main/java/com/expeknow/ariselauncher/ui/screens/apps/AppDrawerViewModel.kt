@@ -138,7 +138,7 @@ class AppDrawerViewModel @Inject constructor(
                     _state.value.currentPoints < event.app.pointCost) {
                     _state.value = _state.value.copy(
                         showTimerDialog = true,
-                        timerCountdown = event.app.pointCost,
+                        timerCountdown = (event.app.pointCost * 10).toInt(),
                         timerApp = event.app
                     )
                     startTimer()
@@ -149,7 +149,8 @@ class AppDrawerViewModel @Inject constructor(
                 if (event.app.pointCost > 0 && _state.value.currentPoints >= event.app.pointCost) {
                     viewModelScope.launch {
                         pointsLogRepositoryImpl.spendPoints(
-                            event.app.pointCost,
+                            //TODO update the point log repo with float values as well
+                            event.app.pointCost.toInt(),
                             "NIL",
                             "Launched ${event.app.name}",
                         )

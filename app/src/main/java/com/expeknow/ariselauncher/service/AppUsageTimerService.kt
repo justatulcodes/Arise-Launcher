@@ -149,14 +149,14 @@ class AppUsageTimerService
 
 
     }
-    private fun calculateDepletionInterval(pointCost: Int): Int {
+    private fun calculateDepletionInterval(pointCost: Float): Int {
         return when {
-            pointCost == 0 -> Int.MAX_VALUE // effectively no depletion
-            pointCost <= 5 -> 30 // slower depletion
-            pointCost <= 10 -> 20
-            pointCost <= 20 -> 10
-            pointCost <= 25 -> 7
-            pointCost <= 30 -> 5
+            pointCost == 0f -> Int.MAX_VALUE // effectively no depletion
+            pointCost <= 0.5f -> 30 // slower depletion
+            pointCost <= 1.0f -> 20
+            pointCost <= 2.0f -> 10
+            pointCost <= 2.5f -> 7
+            pointCost <= 3.0f -> 5
             else -> 3 // fastest depletion for most addictive apps
         }
     }

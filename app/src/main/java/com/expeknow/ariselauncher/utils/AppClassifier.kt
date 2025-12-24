@@ -118,20 +118,20 @@ object AppClassifier {
         }
     }
 
-    fun getAppPointCost(category: AppCategory): Int {
+    fun getAppPointCost(category: AppCategory): Float {
         return when (category) {
-            AppCategory.ESSENTIAL -> 0
-            AppCategory.PRODUCTIVITY -> 0
-            AppCategory.UTILITY -> 0
-            AppCategory.HEALTH -> 5
-            AppCategory.FINANCE -> 5
-            AppCategory.SHOPPING -> 10
-            AppCategory.COMMUNICATION -> 15
-            AppCategory.ENTERTAINMENT -> 20
-            AppCategory.STREAMING -> 25
-            AppCategory.SOCIAL_MEDIA -> 30
-            AppCategory.GAMES -> 35
-            AppCategory.MISCELLANEOUS -> 5
+            AppCategory.ESSENTIAL -> 0f
+            AppCategory.PRODUCTIVITY -> 0f
+            AppCategory.UTILITY -> 0f
+            AppCategory.HEALTH -> 0.5f
+            AppCategory.FINANCE -> 0.5f
+            AppCategory.SHOPPING -> 1.0f
+            AppCategory.COMMUNICATION -> 1.5f
+            AppCategory.ENTERTAINMENT -> 2.0f
+            AppCategory.STREAMING -> 2.5f
+            AppCategory.SOCIAL_MEDIA -> 3.0f
+            AppCategory.GAMES -> 3.5f
+            AppCategory.MISCELLANEOUS -> 0.5f
         }
     }
 }

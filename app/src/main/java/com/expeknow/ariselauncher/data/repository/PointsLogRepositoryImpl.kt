@@ -26,7 +26,7 @@ class PointsLogRepositoryImpl(
     override suspend fun insertPointsLogWithTask(task: Task) {
         val pointsLog = PointsLog(
             type = PointsLogType.EARNED,
-            points = task.points,
+            points = task.points.toFloat(),
             taskId = task.id,
             taskName = task.title
         )
