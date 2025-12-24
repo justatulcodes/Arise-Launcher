@@ -5,8 +5,8 @@ import com.expeknow.ariselauncher.ui.screens.home.StatsUi
 
 data class PointsState(
     val currentPoints: Int = 0,
-    val totalEarned: Int = 0,
-    val totalBurned: Int = 0,
+    val totalEarned: Float = 0f,
+    val totalBurned: Float = 0f,
     val selectedTabIndex: Int = 0,
     val debugCurrentRank: Rank? = ranks[8],
     val pointsHistory: List<PointsHistory> = emptyList(),

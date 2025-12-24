@@ -76,19 +76,19 @@ class PointsLogRepositoryImpl(
         return pointsLogDataSource.getRecentPointsLogByType(type, limit)
     }
 
-    override fun getTotalPointsEarned(): Flow<Int?> {
+    override fun getTotalPointsEarned(): Flow<Float?> {
         return pointsLogDataSource.getTotalPointsEarned()
     }
 
-    override fun getTotalPointsSpent(): Flow<Int?> {
+    override fun getTotalPointsSpent(): Flow<Float?> {
         return pointsLogDataSource.getTotalPointsSpent()
     }
 
-    override fun getCurrentPointsBalance(): Flow<Int?> {
+    override fun getCurrentPointsBalance(): Flow<Float?> {
         return pointsLogDataSource.getCurrentPointsBalance()
     }
 
-    override fun getAvailablePoints(): Flow<Int> {
+    override fun getAvailablePoints(): Flow<Float> {
         return pointsLogDataSource.getAvailablePoints()
     }
 

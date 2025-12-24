@@ -103,7 +103,8 @@ class AppUsageTimerService
 
         lifecycleScope.launch {
             pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
-                currentPoints = points
+                //TODO change this to float when you update points log repository
+                currentPoints = points.toInt()
             }
         }
         val filter = IntentFilter(ACTION_STOP_TRACKING)

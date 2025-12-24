@@ -156,7 +156,7 @@ class PointsViewModel @Inject constructor(
                 pointsLogRepositoryImpl.getTotalPointsEarned(),
                 pointsLogRepositoryImpl.getAvailablePoints()
             ) { earnedPoints, availablePoints ->
-                val earned = earnedPoints ?: 0
+                val earned = earnedPoints ?: 0f
                 val spent = earned - availablePoints
                 
                 // Calculate current rank based on points
@@ -165,7 +165,7 @@ class PointsViewModel @Inject constructor(
                 } ?: ranks[0]
 
                 _state.value = _state.value.copy(
-                    currentPoints = availablePoints,
+                    currentPoints = availablePoints.toInt(),
                     totalEarned = earned,
                     totalBurned = spent,
                     currentRank = currentRank

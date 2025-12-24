@@ -37,13 +37,13 @@ interface PointsLogRepository {
 
     fun getRecentPointsLogByType(type: PointsLogType, limit: Int): Flow<List<PointsLog>>
 
-    fun getTotalPointsEarned(): Flow<Int?>
+    fun getTotalPointsEarned(): Flow<Float?>
 
-    fun getTotalPointsSpent(): Flow<Int?>
+    fun getTotalPointsSpent(): Flow<Float?>
 
-    fun getCurrentPointsBalance(): Flow<Int?>
+    fun getCurrentPointsBalance(): Flow<Float?>
 
-    fun getAvailablePoints(): Flow<Int>
+    fun getAvailablePoints(): Flow<Float>
 
     fun getTotalPointsLogCount(): Flow<Int>
 

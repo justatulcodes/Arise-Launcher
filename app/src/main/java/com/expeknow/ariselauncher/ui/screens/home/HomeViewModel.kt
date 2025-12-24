@@ -65,7 +65,7 @@ class HomeViewModel @Inject constructor(
     private fun observePoints() {
         viewModelScope.launch {
             pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
-                updateState { it.copy(currentPoints = points) }
+                updateState { it.copy(currentPoints = points.toInt()) }
             }
         }
     }
