@@ -539,8 +539,16 @@ private fun FocusedCategorySection(
         Spacer(modifier = Modifier.height(16.dp))
 
         if (tasks.isEmpty()) {
+            
+            val emptyTasksListPlaceholderText = when(category.id){
+                TaskCategory.PEOPLE -> "Click + button to add tasks that help you navigate your social life."
+                TaskCategory.OPPORTUNITY -> "Click + button to add tasks that help identify and take advantage of opportunities."
+                TaskCategory.SKILLS -> "Click + button to add tasks that help you become master of your craft."
+                TaskCategory.PERSONAL -> "No tasks yet. Click the + button to add one."
+            }
+            
             Text(
-                "No tasks yet. Click the + button to add one.",
+                text = emptyTasksListPlaceholderText,
                 color = Color.White.copy(alpha = 0.4f),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(vertical = 16.dp)
