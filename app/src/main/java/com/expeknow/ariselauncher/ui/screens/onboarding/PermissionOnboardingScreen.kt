@@ -50,6 +50,15 @@ fun PermissionOnboardingScreen(
     val context = LocalContext.current
     var overlayGranted by remember { mutableStateOf(PermissionHelper.hasOverlayPermission(context)) }
     var usageStatsGranted by remember { mutableStateOf(PermissionHelper.hasUsageStatsPermission(context)) }
+    var notificationGranted by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                PermissionHelper.hasNotificationPermission(context)
+            } else {
+                true // Not needed for older versions
+            }
+        )
+    }
     var currentPermissionRequest by remember { mutableStateOf<PermissionType?>(null) }
 
     // Notification permission state (only for Android 13+)
@@ -59,10 +68,12 @@ fun PermissionOnboardingScreen(
         null
     }
 
-    val notificationGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        notificationPermissionState?.status?.isGranted == true
-    } else {
-        true // Not needed for older versions
+
+    // Update notification permission status when permission state changes
+    LaunchedEffect(notificationPermissionState?.status) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notificationGranted = PermissionHelper.hasNotificationPermission(context)
+        }
     }
 
     // Check if all required permissions are granted
@@ -74,6 +85,9 @@ fun PermissionOnboardingScreen(
             override fun onActivityResumed(activity: Activity) {
                 overlayGranted = PermissionHelper.hasOverlayPermission(context)
                 usageStatsGranted = PermissionHelper.hasUsageStatsPermission(context)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    notificationGranted = PermissionHelper.hasNotificationPermission(context)
+                }
 
                 if (overlayGranted && usageStatsGranted && notificationGranted) {
                     val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)

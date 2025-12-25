@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 
 object PermissionHelper {
@@ -34,14 +35,25 @@ object PermissionHelper {
         return mode == AppOpsManager.MODE_ALLOWED
     }
 
+    fun hasNotificationPermission(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            NotificationManagerCompat.from(context).areNotificationsEnabled()
+        } else {
+            // For older versions, notifications are enabled by default
+            true
+        }
+    }
+
     fun hasAllPermissions(context: Context): Boolean {
         val hasOverlay = hasOverlayPermission(context)
         val hasUsageStats = hasUsageStatsPermission(context)
+        val hasNotification = hasNotificationPermission(context)
 
         Log.d(TAG, "Overlay permission: $hasOverlay")
         Log.d(TAG, "Usage Stats permission: $hasUsageStats")
+        Log.d(TAG, "Notification permission: $hasNotification")
 
-        return hasOverlay && hasUsageStats
+        return hasOverlay && hasUsageStats && hasNotification
     }
 
     fun requestOverlayPermission(context: Context) {
