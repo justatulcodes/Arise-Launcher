@@ -1,6 +1,5 @@
 package com.expeknow.ariselauncher.data.model
 
-import android.graphics.drawable.Drawable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.UUID
@@ -14,5 +13,7 @@ data class AppInfo(
     val installTime: Long,
     val launchCount : Int = 0,
     val lastUsedTimestamp : Long = 0,
-    val totalTimeSpent : Long = 0
-) 
+    val totalTimeSpent : Long = 0,
+    val name: String = "",
+    val pointCost: Float = 1.0f
+)
