@@ -3,10 +3,11 @@ package com.expeknow.ariselauncher.data.repository.interfaces
 import android.content.Context
 import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
+import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {
 
-    suspend fun getInstalledApps(): List<AppDrawerApp>
+    suspend fun getInstalledApps(): Flow<List<AppDrawerApp>>
     suspend fun getCallingAndMessagingApps(): List<AppDrawerApp>
     fun launchApp(packageName: String)
 

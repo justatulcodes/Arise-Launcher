@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.expeknow.ariselauncher.data.model.AppInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AppInfoDao {
@@ -35,4 +36,10 @@ interface AppInfoDao {
 
     @Query("SELECT * FROM app_info WHERE lastUsedTimestamp > :since ORDER BY launchCount DESC LIMIT :count")
     fun getRecentlyUsedApps(since: Long, count: Int): List<AppInfo>
+
+    @Query("SELECT * FROM app_info ORDER BY name COLLATE NOCASE ASC")
+    fun getAllAppsFlow(): Flow<List<AppInfo>>
+
+    @Query("SELECT COUNT(*) FROM app_info")
+    suspend fun getAppCount(): Int
 }

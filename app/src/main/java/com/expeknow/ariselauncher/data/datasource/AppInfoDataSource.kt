@@ -9,12 +9,16 @@ class AppInfoDataSource(
 
     fun getAppInfo(packageName : String) = appInfoDao.getAppInfo(packageName)
 
-    fun addAppInfo(packageName: String, category: String, installTime : Long) {
+    fun getAllAppsFlow() = appInfoDao.getAllAppsFlow()
+
+    fun addAppInfo(packageName: String, category: String, installTime : Long, name: String = "", pointCost: Float = 1.0f) {
         appInfoDao.addAppInfo(
             AppInfo(
                 packageName = packageName,
                 category = category,
-                installTime = installTime
+                installTime = installTime,
+                name = name,
+                pointCost = pointCost
             )
         )
     }
@@ -37,4 +41,6 @@ class AppInfoDataSource(
         val sinceTimestamp = System.currentTimeMillis() - (sinceDaysAgo * 24 * 60 * 60 * 1000L)
         return appInfoDao.getRecentlyUsedApps(sinceTimestamp, count)
     }
+
+    suspend fun getAppCount() = appInfoDao.getAppCount()
 }

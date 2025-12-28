@@ -1,6 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.apps
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -56,8 +57,9 @@ class AppDrawerViewModel @Inject constructor(
 
     private fun loadApps() {
         viewModelScope.launch {
-            val apps = appRepositoryImpl.getInstalledApps()
-            _state.value = _state.value.copy(apps = apps)
+            appRepositoryImpl.getInstalledApps().collect { apps ->
+                _state.value = _state.value.copy(apps = apps)
+            }
         }
     }
 

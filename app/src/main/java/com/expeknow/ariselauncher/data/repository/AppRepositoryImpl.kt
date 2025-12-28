@@ -2,6 +2,7 @@ package com.expeknow.ariselauncher.data.repository
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.ui.screens.apps.AppCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
@@ -10,61 +11,137 @@ import com.expeknow.ariselauncher.utils.LauncherUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
 import androidx.core.net.toUri
 import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.utils.AppClassifier.mapCategoryToAppCategory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import com.expeknow.ariselauncher.utils.AppIconCache
 
 class AppRepositoryImpl(
     private val context: Context,
     private val appInfoDataSource: AppInfoDataSource
     ) : AppRepository {
 
-    override suspend fun getInstalledApps(): List<AppDrawerApp> {
-        val packageManager = context.packageManager
+    private val iconCache by lazy { AppIconCache(context) }
+
+    override suspend fun getInstalledApps(): Flow<List<AppDrawerApp>> {
+        val pm = context.packageManager
+
+        // Seed DB if empty (first launch)
+        if (appInfoDataSource.getAppCount() == 0) {
+            seedAppInfoFromSystem()
+        }
+
+        return appInfoDataSource.getAllAppsFlow()
+            .map { appInfos ->
+                Log.d("DBSEED", "Flow emitted ${appInfos.size} apps from database")
+                withContext(Dispatchers.IO) {
+                    appInfos.mapNotNull { info ->
+                        try {
+                            val launchIntent = pm.getLaunchIntentForPackage(info.packageName)
+                            if (launchIntent == null) {
+                                // app no longer launchable; drop
+                                appInfoDataSource.deleteAppInfo(info.packageName)
+                                return@mapNotNull null
+                            }
+
+                            val icon = iconCache.get(info.packageName) ?: run {
+                                val drawable = pm.getApplicationIcon(info.packageName)
+                                iconCache.put(info.packageName, drawable)
+                                drawable
+                            }
+
+                            AppDrawerApp(
+                                id = info.packageName,
+                                name = info.name.ifBlank {
+                                    pm.getApplicationLabel(
+                                        pm.getApplicationInfo(
+                                            info.packageName,
+                                            0
+                                        )
+                                    ).toString()
+                                },
+                                packageName = info.packageName,
+                                icon = icon,
+                                category = mapCategoryToAppCategory(info.category),
+                                pointCost = info.pointCost,
+                                appInstallTime = info.installTime
+                            )
+                        } catch (e: Exception) {
+                            Log.e(
+                                "AppRepository",
+                                "Error loading app ${info.packageName}: ${e.message}",
+                                e
+                            )
+                            null
+                        }
+                    }.sortedBy { it.name }
+                }
+            }
+            .flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun seedAppInfoFromSystem() = withContext(Dispatchers.IO) {
+        val pm = context.packageManager
         val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
             addCategory(Intent.CATEGORY_LAUNCHER)
         }
-        val apps = packageManager.queryIntentActivities(mainIntent, 0)
+        val installedApps = pm.queryIntentActivities(mainIntent, 0)
 
-        val appDrawerApps = apps.mapNotNull { resolveInfo ->
+        Log.d("DBSEED", "Starting to seed ${installedApps.size} apps")
+
+        // Process apps in parallel for faster loading
+        val jobs = installedApps.mapNotNull { resolveInfo ->
             val packageName = resolveInfo.activityInfo.packageName
             if (packageName == context.packageName) return@mapNotNull null
 
-            val name = resolveInfo.loadLabel(packageManager).toString()
-            val icon = resolveInfo.loadIcon(packageManager)
-            val appInstallTime = packageManager.getPackageInfo(packageName, 0).firstInstallTime
+            async(Dispatchers.IO) {
+                try {
+                    val appName = resolveInfo.loadLabel(pm).toString()
+                    val installTime = pm.getPackageInfo(packageName, 0).firstInstallTime
 
-            AppDrawerApp(
-                name = name,
-                packageName = packageName,
-                icon = icon,
-                id = packageName,
-                category = AppCategory.MISCELLANEOUS,
-                pointCost = AppClassifier.getAppPointCost(AppCategory.MISCELLANEOUS),
-                appInstallTime = appInstallTime
-            )
-        }.sortedBy { it.name }
-        appDrawerApps.forEach { app ->
-            CoroutineScope(Dispatchers.IO).launch {
-                val cachedCategory = appInfoDataSource.getAppInfo(packageName = app.packageName)
-                if(cachedCategory != null) {
-                    app.category = mapCategoryToAppCategory(cachedCategory.category)
-                    app.pointCost = AppClassifier.getAppPointCost(app.category)
-                }else{
-                    val foundCategory = AppClassifier.classifyApp(context, app.packageName)
-                    app.category = foundCategory
-                    app.pointCost = AppClassifier.getAppPointCost(app.category)
+                    // Use getFallbackCategory instead of classifyApp for fast initial load
+                    // classifyApp fetches from Play Store which is slow
+                    val appInfo = pm.getApplicationInfo(packageName, 0)
+                    val category = AppClassifier.getFallbackCategory(appInfo)
+                    val pointCost = AppClassifier.getAppPointCost(category)
+
+                    // Add to database (this is blocking but fast)
                     appInfoDataSource.addAppInfo(
-                        packageName = app.packageName,
-                        category = AppClassifier.getDefaultCategoryString(foundCategory),
-                        installTime = app.appInstallTime)
+                        packageName = packageName,
+                        category = AppClassifier.getDefaultCategoryString(category),
+                        installTime = installTime,
+                        name = appName,
+                        pointCost = pointCost
+                    )
 
+                    // Cache icon
+                    val icon = resolveInfo.loadIcon(pm)
+                    iconCache.put(packageName, icon)
+
+                    Log.d("DBSEED", "Successfully seeded: $appName ($packageName)")
+                    true
+                } catch (e: Exception) {
+                    Log.e(
+                        "DBSEED",
+                        "Error seeding app ${resolveInfo.activityInfo.packageName}: ${e.message}",
+                        e
+                    )
+                    false
                 }
             }
-
         }
-        return appDrawerApps
 
+        val results = awaitAll(*jobs.toTypedArray())
+        val successCount = results.count { it }
+        Log.d(
+            "DBSEED",
+            "Seeding complete: $successCount/${installedApps.size} apps successfully seeded")
     }
 
     override suspend fun getCallingAndMessagingApps(): List<AppDrawerApp> {
