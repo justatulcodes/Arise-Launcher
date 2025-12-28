@@ -13,7 +13,6 @@ import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.utils.AppClassifier.mapCategoryToAppCategory
-import com.expeknow.ariselauncher.utils.InstalledAppObject
 
 class AppRepositoryImpl(
     private val context: Context,
@@ -64,7 +63,6 @@ class AppRepositoryImpl(
             }
 
         }
-        InstalledAppObject.installedAppList = appDrawerApps as MutableList<AppDrawerApp>
         return appDrawerApps
 
     }
