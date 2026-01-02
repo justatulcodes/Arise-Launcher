@@ -88,9 +88,7 @@ fun TargetsScreen(
                             target = target,
                             onEdit = { viewModel.onEvent(TargetsEvent.StartEditTarget(target)) },
                             onDelete = { viewModel.onEvent(TargetsEvent.DeleteTarget(target.id)) },
-                            onProgressChange = { progress ->
-                                viewModel.onEvent(TargetsEvent.UpdateProgress(target.id, progress))
-                            }
+                            onToggleComplete = { viewModel.onEvent(TargetsEvent.ToggleComplete(target.id)) }
                         )
                     }
                 }

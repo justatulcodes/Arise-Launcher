@@ -18,7 +18,8 @@ data class Target(
     val description: String,
     val endDate: Long,
     val progress: Float,
-    val createdAt: Long
+    val createdAt: Long,
+    val isCompleted: Boolean = false
 )
 
 @Singleton

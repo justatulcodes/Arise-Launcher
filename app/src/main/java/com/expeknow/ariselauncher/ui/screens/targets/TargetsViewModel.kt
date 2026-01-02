@@ -69,6 +69,14 @@ class TargetsViewModel @Inject constructor(
                 }
             }
 
+            is TargetsEvent.ToggleComplete -> {
+                val target = _state.value.targets.find { it.id == event.targetId }
+                if (target != null) {
+                    val updatedTarget = target.copy(isCompleted = !target.isCompleted)
+                    targetsDataSource.updateTarget(updatedTarget)
+                }
+            }
+
             TargetsEvent.ShowAddDialog -> {
                 _state.value = _state.value.copy(
                     showAddDialog = true,

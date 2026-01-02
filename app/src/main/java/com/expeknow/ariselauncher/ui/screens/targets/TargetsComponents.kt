@@ -28,18 +28,26 @@ fun TargetCard(
     target: Target,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onProgressChange: (Float) -> Unit
+    onToggleComplete: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    var showProgressDialog by remember { mutableStateOf(false) }
 
     val daysLeft = calculateDaysLeft(target.endDate)
-    val progressColor = getProgressColor(target.progress)
+
+    // Auto-calculate progress based on time elapsed
+    val autoProgress = if (target.isCompleted) {
+        100f
+    } else {
+        calculateAutoProgress(target.createdAt, target.endDate)
+    }
+
+    val progressColor = if (target.isCompleted) AccentGreen else getProgressColor(autoProgress)
+    val daysLeftColor = getDaysLeftColor(daysLeft, target.isCompleted)
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        color = SurfaceCard
+        color = if (target.isCompleted) SurfaceCard.copy(alpha = 0.6f) else SurfaceCard
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -47,163 +55,210 @@ fun TargetCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
+                // Left side - Title and description
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = target.name,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        ),
-                        color = Color.White
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if (target.isCompleted) {
+                            Icon(
+                                Icons.Default.CheckCircle,
+                                contentDescription = "Completed",
+                                tint = AccentGreen,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Text(
+                            text = target.name,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            ),
+                            color = if (target.isCompleted) Color.White.copy(alpha = 0.7f) else Color.White
+                        )
+                    }
 
                     if (target.description.isNotEmpty()) {
                         Text(
                             text = target.description,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = BannerTextGray,
+                            color = BannerTextGray.copy(alpha = if (target.isCompleted) 0.6f else 1f),
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "End: ${formatDate(target.endDate)}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = BannerTextGray.copy(alpha = if (target.isCompleted) 0.6f else 1f)
+                    )
                 }
 
-                Box {
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(
-                            Icons.Default.MoreVert,
-                            contentDescription = "More options",
-                            tint = Color.White
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text("Edit") },
-                            onClick = {
-                                showMenu = false
-                                onEdit()
-                            },
-                            leadingIcon = {
-                                Icon(Icons.Default.Edit, contentDescription = null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Update Progress") },
-                            onClick = {
-                                showMenu = false
-                                showProgressDialog = true
-                            },
-                            leadingIcon = {
-                                Icon(Icons.Default.TrendingUp, contentDescription = null)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Delete") },
-                            onClick = {
-                                showMenu = false
-                                onDelete()
-                            },
-                            leadingIcon = {
-                                Icon(Icons.Default.Delete, contentDescription = null)
-                            }
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                // Right side - Days left (prominent)
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Column {
-                        Text(
-                            text = "End Date",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = BannerTextGray
-                        )
-                        Text(
-                            text = formatDate(target.endDate),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Medium
-                            ),
-                            color = Color.White
-                        )
+                    Box {
+                        IconButton(
+                            onClick = { showMenu = true },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.MoreVert,
+                                contentDescription = "More options",
+                                tint = Color.White.copy(alpha = 0.7f),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(if (target.isCompleted) "Mark Incomplete" else "Mark Complete") },
+                                onClick = {
+                                    showMenu = false
+                                    onToggleComplete()
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        if (target.isCompleted) Icons.Default.Refresh else Icons.Default.CheckCircle,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Edit") },
+                                onClick = {
+                                    showMenu = false
+                                    onEdit()
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Edit, contentDescription = null)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Delete") },
+                                onClick = {
+                                    showMenu = false
+                                    onDelete()
+                                },
+                                leadingIcon = {
+                                    Icon(Icons.Default.Delete, contentDescription = null)
+                                }
+                            )
+                        }
                     }
 
-                    Column {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Prominent days left display
+                    if (target.isCompleted) {
                         Text(
-                            text = "Days Left",
+                            text = "Done",
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 28.sp
+                            ),
+                            color = AccentGreen
+                        )
+                        Text(
+                            text = "Completed",
                             style = MaterialTheme.typography.labelSmall,
-                            color = BannerTextGray
+                            color = AccentGreen.copy(alpha = 0.8f)
+                        )
+                    } else {
+                        Text(
+                            text = when {
+                                daysLeft < 0 -> "${-daysLeft}"
+                                daysLeft == 0L -> "0"
+                                else -> "$daysLeft"
+                            },
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 32.sp
+                            ),
+                            color = daysLeftColor
                         )
                         Text(
                             text = when {
-                                daysLeft < 0 -> "Overdue"
-                                daysLeft == 0L -> "Today"
-                                daysLeft == 1L -> "1 day"
-                                else -> "$daysLeft days"
+                                daysLeft < 0 -> "days overdue"
+                                daysLeft == 0L -> "Due today"
+                                daysLeft == 1L -> "day left"
+                                else -> "days left"
                             },
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Medium
-                            ),
-                            color = when {
-                                daysLeft < 0 -> Color.Red
-                                daysLeft <= 3 -> Color(0xFFFF9800)
-                                else -> Color.White
-                            }
+                            style = MaterialTheme.typography.labelSmall,
+                            color = daysLeftColor.copy(alpha = 0.8f)
                         )
                     }
                 }
-
-                Text(
-                    text = "${target.progress.toInt()}%",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = progressColor
-                )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Color.White.copy(alpha = 0.1f))
+            // Progress bar with percentage
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(target.progress / 100f)
-                        .fillMaxHeight()
+                        .weight(1f)
+                        .height(8.dp)
                         .clip(RoundedCornerShape(4.dp))
-                        .background(progressColor)
+                        .background(Color.White.copy(alpha = 0.1f))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(autoProgress / 100f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(progressColor)
+                    )
+                }
+
+                Text(
+                    text = "${autoProgress.toInt()}%",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = progressColor,
+                    modifier = Modifier.width(40.dp)
                 )
             }
-        }
-    }
 
-    if (showProgressDialog) {
-        UpdateProgressDialog(
-            currentProgress = target.progress,
-            onDismiss = { showProgressDialog = false },
-            onUpdate = { newProgress ->
-                onProgressChange(newProgress)
-                showProgressDialog = false
+            if (!target.isCompleted) {
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Mark as complete button
+                OutlinedButton(
+                    onClick = onToggleComplete,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = AccentGreen
+                    ),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                        brush = androidx.compose.ui.graphics.SolidColor(AccentGreen.copy(alpha = 0.5f))
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Mark as Complete")
+                }
             }
-        )
+        }
     }
 }
 
@@ -362,85 +417,6 @@ fun AddTargetDialog(
     }
 }
 
-@Composable
-fun UpdateProgressDialog(
-    currentProgress: Float,
-    onDismiss: () -> Unit,
-    onUpdate: (Float) -> Unit
-) {
-    var progress by remember { mutableStateOf(currentProgress) }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = SurfaceCard
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
-            ) {
-                Text(
-                    text = "Update Progress",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = Color.White
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "${progress.toInt()}%",
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
-                    color = getProgressColor(progress),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Slider(
-                    value = progress,
-                    onValueChange = { progress = it },
-                    valueRange = 0f..100f,
-                    steps = 19,
-                    colors = SliderDefaults.colors(
-                        thumbColor = AccentGreen,
-                        activeTrackColor = AccentGreen,
-                        inactiveTrackColor = Color.White.copy(alpha = 0.1f)
-                    )
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Cancel")
-                    }
-
-                    Button(
-                        onClick = { onUpdate(progress) },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AccentGreen
-                        )
-                    ) {
-                        Text("Update", color = Color.Black)
-                    }
-                }
-            }
-        }
-    }
-}
-
 private fun calculateDaysLeft(endDate: Long): Long {
     val today = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 0)
@@ -451,6 +427,21 @@ private fun calculateDaysLeft(endDate: Long): Long {
 
     val diff = endDate - today
     return TimeUnit.MILLISECONDS.toDays(diff)
+}
+
+private fun calculateTotalDays(createdAt: Long, endDate: Long): Long {
+    val diff = endDate - createdAt
+    return TimeUnit.MILLISECONDS.toDays(diff).coerceAtLeast(1)
+}
+
+private fun calculateAutoProgress(createdAt: Long, endDate: Long): Float {
+    val now = System.currentTimeMillis()
+    val totalDuration = (endDate - createdAt).toFloat()
+    val elapsed = (now - createdAt).toFloat()
+
+    if (totalDuration <= 0) return 100f
+
+    return ((elapsed / totalDuration) * 100f).coerceIn(0f, 100f)
 }
 
 private fun formatDate(timestamp: Long): String {
@@ -464,6 +455,19 @@ private fun getProgressColor(progress: Float): Color {
         progress >= 50f -> Color(0xFF4CAF50)
         progress >= 25f -> Color(0xFFFF9800)
         else -> Color(0xFFFF5722)
+    }
+}
+
+private fun getDaysLeftColor(daysLeft: Long, isCompleted: Boolean): Color {
+    if (isCompleted) return AccentGreen
+
+    return when {
+        daysLeft < 0 -> Color(0xFFFF5252) // Red for overdue
+        daysLeft == 0L -> Color(0xFFFF9800) // Orange for due today
+        daysLeft <= 3 -> Color(0xFFFFB74D) // Light orange for urgent (1-3 days)
+        daysLeft <= 7 -> Color(0xFFFFD54F) // Yellow for soon (4-7 days)
+        daysLeft <= 14 -> Color(0xFF81C784) // Light green for moderate (8-14 days)
+        else -> AccentGreen // Green for plenty of time
     }
 }
 
