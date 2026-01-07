@@ -39,7 +39,6 @@ class AppRepositoryImpl(
 
         return appInfoDataSource.getAllAppsFlow()
             .map { appInfos ->
-                Log.d("DBSEED", "Flow emitted ${appInfos.size} apps from database")
                 withContext(Dispatchers.IO) {
                     appInfos.mapNotNull { info ->
                         try {
@@ -93,8 +92,6 @@ class AppRepositoryImpl(
         }
         val installedApps = pm.queryIntentActivities(mainIntent, 0)
 
-        Log.d("DBSEED", "Starting to seed ${installedApps.size} apps")
-
         // Process apps in parallel for faster loading
         val jobs = installedApps.mapNotNull { resolveInfo ->
             val packageName = resolveInfo.activityInfo.packageName
@@ -124,24 +121,14 @@ class AppRepositoryImpl(
                     val icon = resolveInfo.loadIcon(pm)
                     iconCache.put(packageName, icon)
 
-                    Log.d("DBSEED", "Successfully seeded: $appName ($packageName)")
                     true
                 } catch (e: Exception) {
-                    Log.e(
-                        "DBSEED",
-                        "Error seeding app ${resolveInfo.activityInfo.packageName}: ${e.message}",
-                        e
-                    )
                     false
                 }
             }
         }
 
         val results = awaitAll(*jobs.toTypedArray())
-        val successCount = results.count { it }
-        Log.d(
-            "DBSEED",
-            "Seeding complete: $successCount/${installedApps.size} apps successfully seeded")
     }
 
     override suspend fun getCallingAndMessagingApps(): List<AppDrawerApp> {
