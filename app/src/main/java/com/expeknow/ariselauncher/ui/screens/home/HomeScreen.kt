@@ -193,7 +193,8 @@ fun HomeScreen(
                             pointChange = state.pointChange,
                             pointsTrend = state.pointsTrend,
                             showWeeklySchedule = state.showWeeklySchedule,
-                            allFocusedTasks = state.allFocusedTasks
+                            allFocusedTasks = state.allFocusedTasks,
+                            targets = state.targets
                         )
                     }
                     2 -> {
@@ -485,7 +486,8 @@ fun MainTaskContentScreen(
     pointChange: Int,
     pointsTrend: PointsTrend,
     showWeeklySchedule: Boolean,
-    allFocusedTasks: List<Task>
+    allFocusedTasks: List<Task>,
+    targets: List<com.expeknow.ariselauncher.data.datasource.Target>
 ) {
 
     val currentDay by remember {
@@ -510,6 +512,11 @@ fun MainTaskContentScreen(
             total = completedTasks + (normalTasks.size - completedTasks),
             theme = theme
         )
+
+        if (targets.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
+            CompactTargetsWidget(targets = targets)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 

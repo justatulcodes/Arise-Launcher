@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
+import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 
 data class StatsUi(
@@ -75,7 +76,8 @@ data class HomeState(
     val editingCategoryName: String = "",
     val expandedLinkId: String? = null,
     val currentPage: Int = 1, // 0 = blank, 1 = main tasks, 2 = alternate (focused mode only)
-    val statsUi: StatsUi = StatsUi() // MVP stats
+    val statsUi: StatsUi = StatsUi(), // MVP stats
+    val targets: List<Target> = emptyList() // User's targets
 )
 
 sealed class HomeEvent {

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.expeknow.ariselauncher.data.model.*
+import com.expeknow.ariselauncher.data.datasource.TargetsPreferencesDataSource
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
@@ -24,7 +25,8 @@ class HomeViewModel @Inject constructor(
     private val appRepositoryImpl: AppRepository,
     private val taskRepositoryImpl: TaskRepository,
     private val pointsLogRepositoryImpl: PointsLogRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val targetsDataSource: TargetsPreferencesDataSource
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -35,6 +37,7 @@ class HomeViewModel @Inject constructor(
     init {
         loadInitialData()
         observePoints()
+        observeTargets()
     }
 
     fun refreshState() {
@@ -66,6 +69,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             pointsLogRepositoryImpl.getAvailablePoints().collect { points ->
                 updateState { it.copy(currentPoints = points.toInt()) }
+            }
+        }
+    }
+
+    private fun observeTargets() {
+        viewModelScope.launch {
+            targetsDataSource.targetsFlow.collect { targets ->
+                updateState { it.copy(targets = targets.sortedBy { target -> target.endDate }) }
             }
         }
     }
