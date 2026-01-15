@@ -52,5 +52,8 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun getShouldRefreshAppDrawer(): Boolean = preferencesDataSource.getShouldRefreshAppDrawer()
     override fun setShouldRefreshAppDrawer(enabled: Boolean) = preferencesDataSource.setShouldRefreshAppDrawer(enabled)
 
+    override fun getShouldShowHomeScreen(): Boolean = preferencesDataSource.getShouldShowHomeScreen()
+    override fun setShouldShowHomeScreen(enabled: Boolean) = preferencesDataSource.setShouldShowHomeScreen(enabled)
+
     override fun resetAllSettings() = preferencesDataSource.resetAllSettings()
 }

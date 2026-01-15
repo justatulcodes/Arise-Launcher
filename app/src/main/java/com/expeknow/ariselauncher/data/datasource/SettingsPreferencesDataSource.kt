@@ -27,6 +27,7 @@ class SettingsPreferencesDataSource @Inject constructor(
         private const val KEY_SHOULD_SHOW_CATEGORIZED_APPS = "should_show_categories"
         private const val KEY_IS_FRESH_DB_INSTANCE = "is_fresh_db_instance"
         private const val KEY_APP_TIMER_ENABLED = "app_timer_enabled"
+        private const val KEY_SHOULD_SHOW_HOME_SCREEN = "should_show_home_screen"
 
         private const val KEY_SHOULD_REFRESH_APP_DRAWER = "should_refresh_app_drawer"
     }
@@ -74,6 +75,10 @@ class SettingsPreferencesDataSource @Inject constructor(
     fun getShouldRefreshAppDrawer(): Boolean = prefs.getBoolean(KEY_SHOULD_REFRESH_APP_DRAWER, false)
     fun setShouldRefreshAppDrawer(enabled: Boolean) =
         prefs.edit { putBoolean(KEY_SHOULD_REFRESH_APP_DRAWER, enabled) }
+
+    fun getShouldShowHomeScreen(): Boolean = prefs.getBoolean(KEY_SHOULD_SHOW_HOME_SCREEN, true)
+    fun setShouldShowHomeScreen(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_SHOULD_SHOW_HOME_SCREEN, enabled) }
 
 
     fun resetAllSettings() {

@@ -34,5 +34,9 @@ interface SettingsRepository {
     fun getShouldRefreshAppDrawer() : Boolean
     fun setShouldRefreshAppDrawer(enabled: Boolean)
 
+    fun getShouldShowHomeScreen() : Boolean
+    fun setShouldShowHomeScreen(enabled: Boolean)
+
+
     fun resetAllSettings()
 }
