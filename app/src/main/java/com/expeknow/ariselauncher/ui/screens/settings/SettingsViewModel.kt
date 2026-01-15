@@ -43,6 +43,7 @@ class SettingsViewModel @Inject constructor(
             appLaunchPopupEnabled = settingsRepository.getAppLaunchPopupEnabled(),
             pointThreshold = settingsRepository.getPointThreshold(),
             warningsEnabled = settingsRepository.getWarningsEnabled(),
+            showHomeScreen = settingsRepository.getShouldShowHomeScreen(),
             keyboardTriggerEnabled = settingsRepository.getShouldTriggerKeyboardInAppDrawer(),
             showWeeklyScheduleEnabled = settingsRepository.getShowEntireWeekSchedule(),
             showCategorizedAppsEnabled = settingsRepository.getShouldShowCategorizedApps(),
@@ -128,6 +129,11 @@ class SettingsViewModel @Inject constructor(
                     pointsLogRepositoryImpl.resetAllPointsLog()
                 }
                 _state.value = _state.value.copy(showResetPointsDialog = false)
+            }
+
+            is SettingsEvent.ToggleShowHomeScreen -> {
+                _state.value = _state.value.copy(showHomeScreen = event.enabled)
+                settingsRepository.setShouldShowHomeScreen(event.enabled)
             }
 
             is SettingsEvent.FactoryReset -> {

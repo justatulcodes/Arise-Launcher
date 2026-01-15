@@ -40,6 +40,7 @@ data class SettingsState(
     val showResetPointsDialog: Boolean = false,
     val showFactoryResetDialog: Boolean = false,
     val showAppRefreshDialog: Boolean = false,
+    val showHomeScreen : Boolean = true
 )
 
 sealed class SettingsEvent {
@@ -52,6 +53,7 @@ sealed class SettingsEvent {
     data class ToggleWeeklySchedule(val enabled: Boolean) : SettingsEvent()
     data class ToggleShowCategorizedApps(val enabled: Boolean) : SettingsEvent()
     data class ToggleAppTimer(val enabled: Boolean) : SettingsEvent()
+    data class ToggleShowHomeScreen(val enabled: Boolean) : SettingsEvent()
     data object ShowResetPointsDialog : SettingsEvent()
     data object HideResetPointsDialog : SettingsEvent()
     data object ShowFactoryResetDialog : SettingsEvent()

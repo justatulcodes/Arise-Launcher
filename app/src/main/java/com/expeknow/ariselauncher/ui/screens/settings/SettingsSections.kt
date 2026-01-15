@@ -42,6 +42,24 @@ fun TaskCompletionSection(
 }
 
 @Composable
+fun ShowHomeScreenSection(
+    showHomeScreen: Boolean,
+    onToggle: (Boolean) -> Unit,
+    theme: SettingsTheme
+) {
+    SettingsCard(theme) {
+        SettingsToggleItem(
+            title = "SHOW HOME SCREEN",
+            subtitle = "Toggle visibility of the blank home screen",
+            description = "When enabled, shows the clock screen with essential apps as the first page",
+            checked = showHomeScreen,
+            onCheckedChange = onToggle,
+            theme = theme
+        )
+    }
+}
+
+@Composable
 fun TunnelVisionSection(
     tunnelVisionMode: Boolean,
     onToggle: (Boolean) -> Unit,

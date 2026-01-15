@@ -86,6 +86,14 @@ fun SettingsScreen(
                 theme = theme
             )
 
+            ShowHomeScreenSection(
+                showHomeScreen = state.showHomeScreen,
+                onToggle = { enabled: Boolean ->
+                    viewModel.onEvent(SettingsEvent.ToggleShowHomeScreen(enabled))
+                },
+                theme = theme
+            )
+
             AppTimerSection(
                 appTimerEnabled = state.appTimerEnabled,
                 onToggle = { enabled: Boolean ->
