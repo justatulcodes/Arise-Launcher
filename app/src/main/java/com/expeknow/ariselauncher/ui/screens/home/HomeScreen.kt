@@ -94,9 +94,15 @@ fun HomeScreen(
     // Alpha based on progress
     val drawerAlpha = drawerProgress
 
-    val pageCount = if (state.mode == HomeMode.FOCUSED) 3 else 2
+    val pageCount = when {
+        state.mode == HomeMode.FOCUSED && state.showHomeScreen -> 3  // blank, main, alternate
+        state.mode == HomeMode.FOCUSED && !state.showHomeScreen -> 2 // main, alternate
+        state.mode == HomeMode.SIMPLE && state.showHomeScreen -> 2   // blank, main
+        else -> 1 // only main
+    }
+
     val pagerState = rememberPagerState(
-        initialPage = 1,
+        initialPage = if (state.showHomeScreen) 1 else 0,
         pageCount = { pageCount }
     )
     val shouldShowTaskCategory = state.mode == HomeMode.FOCUSED && pagerState.currentPage == 1
@@ -160,7 +166,10 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f)
             )
             { page ->
-                when (page) {
+
+                val actualPage = if (state.showHomeScreen) page else page + 1
+
+                when (actualPage) {
                     0 -> {
                         BlankScreen(
                             theme = theme,

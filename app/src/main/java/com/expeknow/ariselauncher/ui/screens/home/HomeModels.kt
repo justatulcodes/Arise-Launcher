@@ -58,6 +58,7 @@ data class HomeState(
     val normalCompletedTasks: Int = 0,
     val normalTotalTasks: Int = 0,
     val focusedCompletedTasks: Int = 0,
+    val showHomeScreen: Boolean = true,
     val focusedTotalTasks: Int = 0,
     val earnedPoints: Int = 0,
     val apps: List<AppDrawerApp> =emptyList(),
