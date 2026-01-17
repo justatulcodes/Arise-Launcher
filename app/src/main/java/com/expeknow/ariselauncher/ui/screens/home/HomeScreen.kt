@@ -2,7 +2,6 @@ package com.expeknow.ariselauncher.ui.screens.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.Image
@@ -30,6 +29,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.ExtraBold
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
@@ -40,6 +40,7 @@ import com.expeknow.ariselauncher.R
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
+import com.expeknow.ariselauncher.ui.components.QuoteDialog
 import com.expeknow.ariselauncher.ui.components.TaskDialog
 import com.expeknow.ariselauncher.ui.navigation.Screen
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
@@ -180,6 +181,10 @@ fun HomeScreen(
                             onOpenFullApps = {
                                 appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
                                 showAppDrawer = true
+                            },
+                            quote = state.homeScreenQuote,
+                            onLongPress = {
+                                viewModel.onEvent(HomeEvent.ShowQuoteDialog)
                             }
                         )
                     }
@@ -324,6 +329,21 @@ fun HomeScreen(
                 else listOf(TaskCategory.PERSONAL)
         )
     }
+
+    if (state.showQuoteDialog) {
+        QuoteDialog(
+            currentQuote = state.homeScreenQuote,
+            onDismiss = {
+                viewModel.onEvent(HomeEvent.HideQuoteDialog)
+            },
+            onSave = { quote ->
+                viewModel.onEvent(HomeEvent.SaveQuote(quote))
+            },
+            onClear = {
+                viewModel.onEvent(HomeEvent.ClearQuote)
+            }
+        )
+    }
 }
 
 @Composable
@@ -356,7 +376,14 @@ private fun BoxScope.AddTaskButton(viewModel: HomeViewModel) {
 }
 
 @Composable
-fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (AppDrawerApp) -> Unit, onOpenFullApps: () -> Unit) {
+fun BlankScreen(
+    theme: HomeTheme,
+    appsList: List<AppDrawerApp>,
+    onAppClick: (AppDrawerApp) -> Unit,
+    onOpenFullApps: () -> Unit,
+    quote: String? = null,
+    onLongPress: () -> Unit = {}
+) {
     val currentTime by remember {
         mutableStateOf(java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()))
     }
@@ -371,7 +398,6 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
     var day by remember { mutableStateOf(currentDay.format(java.util.Date())) }
     var date by remember { mutableStateOf(currentDate.format(java.util.Date())) }
 
-    val infiniteTransition = rememberInfiniteTransition(label = "swipe_animation")
     var totalDrag by remember { mutableStateOf(0f) }
     var hasTriggered by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -388,12 +414,49 @@ fun BlankScreen(theme: HomeTheme, appsList: List<AppDrawerApp>, onAppClick: (App
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.wallpaper_4),
-            contentDescription = "Wallpaper",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        // Show quote with black background or wallpaper
+        if (quote != null) {
+            // Black background for quote
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onLongPress = {
+                                onLongPress()
+                            }
+                        )
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = quote,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(32.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+        } else {
+            // Show wallpaper
+            Image(
+                painter = painterResource(id = R.drawable.wallpaper_4),
+                contentDescription = "Wallpaper",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onLongPress = {
+                                onLongPress()
+                            }
+                        )
+                    },
+                contentScale = ContentScale.Crop
+            )
+        }
 
         Column(
             modifier = Modifier.fillMaxSize()

@@ -76,7 +76,9 @@ data class HomeState(
     val editingCategoryName: String = "",
     val expandedLinkId: String? = null,
     val currentPage: Int = 1, // 0 = blank, 1 = main tasks, 2 = alternate (focused mode only)
-    val statsUi: StatsUi = StatsUi() // MVP stats
+    val statsUi: StatsUi = StatsUi(), // MVP stats
+    val homeScreenQuote: String? = null,
+    val showQuoteDialog: Boolean = false
 )
 
 sealed class HomeEvent {
@@ -102,6 +104,10 @@ sealed class HomeEvent {
     data class UpdateEditingCategoryName(val name: String) : HomeEvent()
     data class ExpandLink(val linkId: String?) : HomeEvent()
     data class UpdateCurrentPage(val page: Int) : HomeEvent()
+    data object ShowQuoteDialog : HomeEvent()
+    data object HideQuoteDialog : HomeEvent()
+    data class SaveQuote(val quote: String) : HomeEvent()
+    data object ClearQuote : HomeEvent()
 }
 
 data class HomeTheme(

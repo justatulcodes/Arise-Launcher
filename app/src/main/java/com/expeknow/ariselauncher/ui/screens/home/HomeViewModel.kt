@@ -48,12 +48,14 @@ class HomeViewModel @Inject constructor(
         val showWeeklySchedule = settingsRepository.getShowEntireWeekSchedule()
         val shouldShowCategorizedApps = settingsRepository.getShouldShowCategorizedApps()
         val showHomeScreen = settingsRepository.getShouldShowHomeScreen()
+        val homeScreenQuote = settingsRepository.getHomeScreenQuote()
         _state.value = _state.value.copy(
             mode = if (tunnelVisionEnabled) HomeMode.FOCUSED else HomeMode.SIMPLE,
             hideCompletedTasks = shouldHideCompletedTasks,
             showWeeklySchedule = showWeeklySchedule,
             showCategorizedApps = shouldShowCategorizedApps,
-            showHomeScreen = showHomeScreen
+            showHomeScreen = showHomeScreen,
+            homeScreenQuote = homeScreenQuote
         )
 
     }
@@ -195,6 +197,27 @@ class HomeViewModel @Inject constructor(
 
             is HomeEvent.UpdateCurrentPage -> {
                 _state.value = _state.value.copy(currentPage = event.page)
+            }
+
+            is HomeEvent.ShowQuoteDialog -> {
+                _state.value = _state.value.copy(showQuoteDialog = true)
+            }
+
+            is HomeEvent.HideQuoteDialog -> {
+                _state.value = _state.value.copy(showQuoteDialog = false)
+            }
+
+            is HomeEvent.SaveQuote -> {
+                settingsRepository.setHomeScreenQuote(event.quote)
+                _state.value = _state.value.copy(
+                    homeScreenQuote = event.quote,
+                    showQuoteDialog = false
+                )
+            }
+
+            is HomeEvent.ClearQuote -> {
+                settingsRepository.setHomeScreenQuote(null)
+                _state.value = _state.value.copy(homeScreenQuote = null)
             }
         }
     }
