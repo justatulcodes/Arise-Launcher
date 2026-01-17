@@ -37,6 +37,8 @@ interface SettingsRepository {
     fun getShouldShowHomeScreen() : Boolean
     fun setShouldShowHomeScreen(enabled: Boolean)
 
+    fun getHomeScreenQuote(): String?
+    fun setHomeScreenQuote(quote: String?)
 
     fun resetAllSettings()
 }

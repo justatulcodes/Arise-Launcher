@@ -30,6 +30,7 @@ class SettingsPreferencesDataSource @Inject constructor(
         private const val KEY_SHOULD_SHOW_HOME_SCREEN = "should_show_home_screen"
 
         private const val KEY_SHOULD_REFRESH_APP_DRAWER = "should_refresh_app_drawer"
+        private const val KEY_HOME_SCREEN_QUOTE = "home_screen_quote"
     }
 
     fun getHideCompletedTasks(): Boolean = prefs.getBoolean(KEY_HIDE_COMPLETED_TASKS, true)
@@ -80,6 +81,9 @@ class SettingsPreferencesDataSource @Inject constructor(
     fun setShouldShowHomeScreen(enabled: Boolean) =
         prefs.edit { putBoolean(KEY_SHOULD_SHOW_HOME_SCREEN, enabled) }
 
+    fun getHomeScreenQuote(): String? = prefs.getString(KEY_HOME_SCREEN_QUOTE, null)
+    fun setHomeScreenQuote(quote: String?) =
+        prefs.edit { putString(KEY_HOME_SCREEN_QUOTE, quote) }
 
     fun resetAllSettings() {
         prefs.edit { clear() }

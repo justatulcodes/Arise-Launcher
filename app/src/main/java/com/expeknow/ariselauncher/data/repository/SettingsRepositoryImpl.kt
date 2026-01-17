@@ -55,5 +55,8 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun getShouldShowHomeScreen(): Boolean = preferencesDataSource.getShouldShowHomeScreen()
     override fun setShouldShowHomeScreen(enabled: Boolean) = preferencesDataSource.setShouldShowHomeScreen(enabled)
 
+    override fun getHomeScreenQuote(): String? = preferencesDataSource.getHomeScreenQuote()
+    override fun setHomeScreenQuote(quote: String?) = preferencesDataSource.setHomeScreenQuote(quote)
+
     override fun resetAllSettings() = preferencesDataSource.resetAllSettings()
 }
