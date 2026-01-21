@@ -1,0 +1,91 @@
+package com.expeknow.ariselauncher.data.datasource
+
+import android.content.Context
+import android.content.SharedPreferences
+import dagger.hilt.android.qualifiers.ApplicationContext
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
+import androidx.core.content.edit
+
+@Singleton
+class SettingsPreferencesDataSource @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
+    private val prefs: SharedPreferences by lazy {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    companion object {
+        private const val PREFS_NAME = "arise_launcher_settings"
+        private const val KEY_HIDE_COMPLETED_TASKS = "hide_completed_tasks"
+        private const val KEY_TUNNEL_VISION_MODE = "tunnel_vision_mode"
+        private const val KEY_APP_LAUNCH_POPUP_ENABLED = "app_launch_popup_enabled"
+        private const val KEY_POINT_THRESHOLD = "point_threshold"
+        private const val KEY_WARNINGS_ENABLED = "warnings_enabled"
+        private const val KEY_SHOULD_TRIGGER_APP_DRAWER_KEYBOARD = "app_drawer_keyboard"
+        private const val KEY_SHOW_ENTIRE_WEEK_SCHEDULE = "show_entire_week_schedule"
+        private const val KEY_SHOULD_SHOW_CATEGORIZED_APPS = "should_show_categories"
+        private const val KEY_IS_FRESH_DB_INSTANCE = "is_fresh_db_instance"
+        private const val KEY_APP_TIMER_ENABLED = "app_timer_enabled"
+        private const val KEY_SHOULD_SHOW_HOME_SCREEN = "should_show_home_screen"
+
+        private const val KEY_SHOULD_REFRESH_APP_DRAWER = "should_refresh_app_drawer"
+        private const val KEY_HOME_SCREEN_QUOTE = "home_screen_quote"
+    }
+
+    fun getHideCompletedTasks(): Boolean = prefs.getBoolean(KEY_HIDE_COMPLETED_TASKS, true)
+    fun setHideCompletedTasks(hide: Boolean) =
+        prefs.edit { putBoolean(KEY_HIDE_COMPLETED_TASKS, hide) }
+
+    fun getTunnelVisionMode(): Boolean = prefs.getBoolean(KEY_TUNNEL_VISION_MODE, true)
+    fun setTunnelVisionMode(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_TUNNEL_VISION_MODE, enabled) }
+
+    fun getAppLaunchPopupEnabled(): Boolean = prefs.getBoolean(KEY_APP_LAUNCH_POPUP_ENABLED, true)
+    fun setAppLaunchPopupEnabled(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_APP_LAUNCH_POPUP_ENABLED, enabled) }
+
+    fun getPointThreshold(): Float = prefs.getFloat(KEY_POINT_THRESHOLD, 50f)
+    fun setPointThreshold(threshold: Float) =
+        prefs.edit { putFloat(KEY_POINT_THRESHOLD, threshold) }
+
+    fun getWarningsEnabled(): Boolean = prefs.getBoolean(KEY_WARNINGS_ENABLED, true)
+    fun setWarningsEnabled(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_WARNINGS_ENABLED, enabled) }
+
+    fun getShouldTriggerAppDrawerKeyboard(): Boolean = prefs.getBoolean(KEY_SHOULD_TRIGGER_APP_DRAWER_KEYBOARD, false)
+    fun setShouldTriggerAppDrawerKeyboard(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_SHOULD_TRIGGER_APP_DRAWER_KEYBOARD, enabled) }
+
+    fun getShowEntireWeekSchedule(): Boolean = prefs.getBoolean(KEY_SHOW_ENTIRE_WEEK_SCHEDULE, false)
+    fun setShowEntireWeekSchedule(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_SHOW_ENTIRE_WEEK_SCHEDULE, enabled) }
+
+    fun getShouldShowCategorizedApps() = prefs.getBoolean(KEY_SHOULD_SHOW_CATEGORIZED_APPS, false)
+    fun setShouldShowCategorizedApps(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_SHOULD_SHOW_CATEGORIZED_APPS, enabled) }
+
+    fun getIsFreshDbInstance() = prefs.getBoolean(KEY_IS_FRESH_DB_INSTANCE, true)
+    fun setIsFreshDbInstance(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_IS_FRESH_DB_INSTANCE, enabled) }
+
+    fun getAppTimerEnabled(): Boolean = prefs.getBoolean(KEY_APP_TIMER_ENABLED, true)
+    fun setAppTimerEnabled(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_APP_TIMER_ENABLED, enabled) }
+
+    fun getShouldRefreshAppDrawer(): Boolean = prefs.getBoolean(KEY_SHOULD_REFRESH_APP_DRAWER, false)
+    fun setShouldRefreshAppDrawer(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_SHOULD_REFRESH_APP_DRAWER, enabled) }
+
+    fun getShouldShowHomeScreen(): Boolean = prefs.getBoolean(KEY_SHOULD_SHOW_HOME_SCREEN, true)
+    fun setShouldShowHomeScreen(enabled: Boolean) =
+        prefs.edit { putBoolean(KEY_SHOULD_SHOW_HOME_SCREEN, enabled) }
+
+    fun getHomeScreenQuote(): String? = prefs.getString(KEY_HOME_SCREEN_QUOTE, null)
+    fun setHomeScreenQuote(quote: String?) =
+        prefs.edit { putString(KEY_HOME_SCREEN_QUOTE, quote) }
+
+    fun resetAllSettings() {
+        prefs.edit { clear() }
+    }
+}

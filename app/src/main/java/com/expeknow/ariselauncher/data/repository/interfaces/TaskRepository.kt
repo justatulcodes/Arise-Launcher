@@ -1,0 +1,49 @@
+package com.expeknow.ariselauncher.data.repository.interfaces
+
+import com.expeknow.ariselauncher.data.model.Task
+import com.expeknow.ariselauncher.data.model.TaskCategory
+import com.expeknow.ariselauncher.data.model.DaysOfWeek
+import kotlinx.coroutines.flow.Flow
+
+interface TaskRepository {
+
+    fun getAllTasks(): Flow<List<Task>>
+
+    suspend fun getAllRecurringTasks(): Flow<List<Task>>
+
+    fun getActiveTasks(): Flow<List<Task>>
+
+    fun getCompletedTasks(): Flow<List<Task>>
+
+    fun getTasksByCategory(category: TaskCategory): Flow<List<Task>>
+
+    suspend fun getTaskById(taskId: String): Task?
+
+    suspend fun addTask(
+        title: String,
+        description: String = "",
+        points: Int = 0,
+        category: TaskCategory = TaskCategory.PERSONAL,
+        priority: Int = 1,
+        isRepeated: Boolean = false,
+        repeatDays: List<DaysOfWeek> = emptyList()
+    ): Task
+
+    suspend fun insertTask(task: Task)
+
+    suspend fun updateTask(task: Task)
+
+    suspend fun deleteTask(task: Task)
+
+    suspend fun deleteTaskById(taskId: String)
+
+    suspend fun deleteAllTasks()
+
+    suspend fun completeTask(taskId: String)
+
+    suspend fun uncompleteTask(taskId: String)
+
+    fun getActiveTaskCount(): Flow<Int>
+
+    fun getCompletedTaskCount(): Flow<Int>
+}
