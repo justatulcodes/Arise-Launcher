@@ -412,22 +412,53 @@ fun BlankScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        onLongPress()
+                    }
+                )
+            }
+            .pointerInput(Unit) {
+                detectVerticalDragGestures(
+                    onDragStart = {
+                        totalDrag = 0f
+                        hasTriggered = false
+                    },
+                    onVerticalDrag = { change, dragAmount ->
+                        change.consume()
+
+                        totalDrag += dragAmount
+                        if (totalDrag < -50f && !hasTriggered) {
+                            onOpenFullApps()
+                            hasTriggered = true
+                        }
+                        else if (totalDrag > 50f && !hasTriggered) {
+                            hasTriggered = true
+                            try {
+                                val service = context.getSystemService("statusbar")
+                                val statusBarClass = Class.forName("android.app.StatusBarManager")
+                                val expandNotifications = statusBarClass.getMethod("expandNotificationsPanel")
+                                expandNotifications.invoke(service)
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                    },
+                    onDragEnd = {
+                        totalDrag = 0f
+                        hasTriggered = false
+                    }
+                )
+            }
     ) {
-        // Show quote with black background or wallpaper
         if (quote != null) {
-            // Black background for quote
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black)
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onLongPress = {
-                                onLongPress()
-                            }
-                        )
-                    },
+                    .background(Color.Black),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -441,57 +472,17 @@ fun BlankScreen(
                 )
             }
         } else {
-            // Show wallpaper
             Image(
                 painter = painterResource(id = R.drawable.wallpaper_4),
                 contentDescription = "Wallpaper",
                 modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onLongPress = {
-                                onLongPress()
-                            }
-                        )
-                    },
+                    .fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
         }
 
         Column(
             modifier = Modifier.fillMaxSize()
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures(
-                        onDragStart = {
-                            totalDrag = 0f
-                            hasTriggered = false
-                        },
-                        onVerticalDrag = { change, dragAmount ->
-                            change.consume()
-
-                            totalDrag += dragAmount
-                            if (totalDrag < -50f && !hasTriggered) {
-                                onOpenFullApps()
-                                hasTriggered = true
-                            }
-                            else if (totalDrag > 50f && !hasTriggered) {
-                                hasTriggered = true
-                                try {
-                                    val service = context.getSystemService("statusbar")
-                                    val statusBarClass = Class.forName("android.app.StatusBarManager")
-                                    val expandNotifications = statusBarClass.getMethod("expandNotificationsPanel")
-                                    expandNotifications.invoke(service)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-                        },
-                        onDragEnd = {
-                            totalDrag = 0f
-                            hasTriggered = false
-                        }
-                    )
-                }
 
         ) {
             Column(
