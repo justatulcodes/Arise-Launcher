@@ -1,10 +1,8 @@
 package com.expeknow.ariselauncher.ui.screens.onboarding
 
 import android.Manifest
-import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Bundle
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.core.app.ActivityCompat
@@ -68,22 +66,36 @@ fun PermissionOnboardingScreen(
         null
     }
 
-    // Sync notification permission state when it changes
+    // Check permissions whenever the composable resumes or notification permission state changes
     LaunchedEffect(notificationPermissionState?.status) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            notificationGranted = hasNotificationPermission()
+        overlayGranted = PermissionHelper.hasOverlayPermission(context)
+        usageStatsGranted = PermissionHelper.hasUsageStatsPermission(context)
+        notificationGranted = hasNotificationPermission()
+
+        Log.d("OnboardingPermissionCheck", "Permission check: overlayGranted : $overlayGranted and usageStateGranted : $usageStatsGranted and notificationGranted : $notificationGranted")
+
+        if (overlayGranted && usageStatsGranted && notificationGranted) {
+            val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)
+            prefs.edit { putBoolean("has_seen_welcome", true) }
+
+            navController.navigate(com.expeknow.ariselauncher.ui.navigation.Screen.Focus.route) {
+                popUpTo(com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route) {
+                    inclusive = true
+                }
+            }
         }
     }
 
-    DisposableEffect(Unit) {
-        val activity = context as? Activity
-        val callback = object : android.app.Application.ActivityLifecycleCallbacks {
-            override fun onActivityResumed(activity: Activity) {
+    // Re-check permissions when returning from settings
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
                 overlayGranted = PermissionHelper.hasOverlayPermission(context)
                 usageStatsGranted = PermissionHelper.hasUsageStatsPermission(context)
                 notificationGranted = hasNotificationPermission()
 
-                Log.d("OnboardingPermissionCheck", "onActivityResumed: overlayGranted : $overlayGranted and usageStateGranted : $usageStatsGranted and notificationGranted : $notificationGranted")
+                Log.d("OnboardingPermissionCheck", "onResume: overlayGranted : $overlayGranted and usageStateGranted : $usageStatsGranted and notificationGranted : $notificationGranted")
 
                 if (overlayGranted && usageStatsGranted && notificationGranted) {
                     val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)
@@ -96,18 +108,12 @@ fun PermissionOnboardingScreen(
                     }
                 }
             }
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}
-            override fun onActivityStarted(activity: Activity) {}
-            override fun onActivityPaused(activity: Activity) {}
-            override fun onActivityStopped(activity: Activity) {}
-            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
-            override fun onActivityDestroyed(activity: Activity) {}
         }
 
-        activity?.application?.registerActivityLifecycleCallbacks(callback)
+        lifecycleOwner.lifecycle.addObserver(observer)
 
         onDispose {
-            activity?.application?.unregisterActivityLifecycleCallbacks(callback)
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
