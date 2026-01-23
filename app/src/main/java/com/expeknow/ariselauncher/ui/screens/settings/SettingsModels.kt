@@ -35,7 +35,7 @@ data class SettingsState(
     val keyboardTriggerEnabled: Boolean = false,
     val showCategorizedAppsEnabled : Boolean = false,
     val showWeeklyScheduleEnabled: Boolean = false,
-    val appTimerEnabled: Boolean = true,
+    val appTimerEnabled: Boolean = false,
     val isDefaultLauncher: Boolean = false,
     val showResetPointsDialog: Boolean = false,
     val showFactoryResetDialog: Boolean = false,
