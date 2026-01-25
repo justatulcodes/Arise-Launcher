@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
@@ -78,7 +79,8 @@ data class HomeState(
     val currentPage: Int = 1, // 0 = blank, 1 = main tasks, 2 = alternate (focused mode only)
     val statsUi: StatsUi = StatsUi(), // MVP stats
     val homeScreenQuote: String? = null,
-    val showQuoteDialog: Boolean = false
+    val showQuoteDialog: Boolean = false,
+    val targets: List<Target> = emptyList()
 )
 
 sealed class HomeEvent {

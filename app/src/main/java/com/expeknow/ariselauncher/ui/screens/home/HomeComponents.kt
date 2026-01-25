@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerTheme
@@ -1386,4 +1387,145 @@ private fun WeeklyTaskItem(
             modifier = Modifier.size(16.dp)
         )
     }
+}
+
+@Composable
+fun CompactTargetsList(
+    targets: List<Target>,
+    onTargetClick: (Target) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (targets.isEmpty()) return
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Active Goals",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                ),
+                color = Color.White
+            )
+            Text(
+                text = "${targets.size}",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.White.copy(alpha = 0.6f)
+            )
+        }
+
+        targets.take(3).forEach { target ->
+            CompactTargetCard(
+                target = target,
+                onClick = { onTargetClick(target) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun CompactTargetCard(
+    target: Target,
+    onClick: () -> Unit
+) {
+    val daysLeft = calculateDaysLeft(target.endDate)
+    val progressColor = when {
+        target.progress >= 75f -> Color(0xFF4ADE80) // Green
+        target.progress >= 50f -> Color(0xFFFB923C) // Orange
+        target.progress >= 25f -> Color(0xFFF59E0B) // Amber
+        else -> Color(0xFFEF4444) // Red
+    }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        color = Color.White.copy(alpha = 0.05f)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = target.name,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = when {
+                                daysLeft < 0 -> "Overdue"
+                                daysLeft == 0L -> "Due today"
+                                daysLeft == 1L -> "1 day left"
+                                daysLeft <= 7 -> "$daysLeft days left"
+                                else -> "${daysLeft / 7} weeks left"
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = when {
+                                daysLeft < 0 -> Color(0xFFEF4444)
+                                daysLeft <= 3 -> Color(0xFFFB923C)
+                                else -> Color.White.copy(alpha = 0.6f)
+                            }
+                        )
+                    }
+                }
+
+                Text(
+                    text = "${target.progress.toInt()}%",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = progressColor
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .background(
+                        Color.White.copy(alpha = 0.1f),
+                        RoundedCornerShape(2.dp)
+                    )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(target.progress / 100f)
+                        .height(4.dp)
+                        .background(progressColor, RoundedCornerShape(2.dp))
+                )
+            }
+        }
+    }
+}
+
+private fun calculateDaysLeft(endDate: Long): Long {
+    val today = System.currentTimeMillis()
+    val diffInMillis = endDate - today
+    return diffInMillis / (1000 * 60 * 60 * 24)
 }
