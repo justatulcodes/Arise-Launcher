@@ -1529,3 +1529,120 @@ private fun calculateDaysLeft(endDate: Long): Long {
     val diffInMillis = endDate - today
     return diffInMillis / (1000 * 60 * 60 * 24)
 }
+
+@Composable
+fun MiniTargetsList(
+    targets: List<Target>,
+    onTargetClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    if (targets.isEmpty()) return
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onTargetClick() },
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        targets.forEach { target ->
+            MiniTargetCard(target = target)
+        }
+    }
+}
+
+@Composable
+private fun MiniTargetCard(target: Target) {
+    val daysLeft = calculateDaysLeft(target.endDate)
+    val progressColor = when {
+        target.progress >= 75f -> Color(0xFF4ADE80)
+        target.progress >= 50f -> Color(0xFFFB923C)
+        target.progress >= 25f -> Color(0xFFF59E0B)
+        else -> Color(0xFFEF4444)
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Color.White.copy(alpha = 0.05f),
+                RoundedCornerShape(6.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = target.name,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 13.sp
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 2.dp)
+            ) {
+                // Progress bar
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(3.dp)
+                        .background(
+                            Color.White.copy(alpha = 0.1f),
+                            RoundedCornerShape(2.dp)
+                        )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(target.progress / 100f)
+                            .height(3.dp)
+                            .background(progressColor, RoundedCornerShape(2.dp))
+                    )
+                }
+
+                Text(
+                    text = "${target.progress.toInt()}%",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = progressColor,
+                    fontSize = 11.sp
+                )
+
+                Text(
+                    text = "•",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.3f),
+                    fontSize = 11.sp
+                )
+
+                Text(
+                    text = when {
+                        daysLeft < 0 -> "Overdue"
+                        daysLeft == 0L -> "Today"
+                        daysLeft <= 7 -> "${daysLeft}d"
+                        else -> "${daysLeft / 7}w"
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = when {
+                        daysLeft < 0 -> Color(0xFFEF4444)
+                        daysLeft <= 3 -> Color(0xFFFB923C)
+                        else -> Color.White.copy(alpha = 0.5f)
+                    },
+                    fontSize = 11.sp
+                )
+            }
+        }
+
+        Icon(
+            Icons.Filled.ChevronRight,
+            contentDescription = null,
+            tint = Color.White.copy(alpha = 0.3f),
+            modifier = Modifier.size(14.dp)
+        )
+    }
+}

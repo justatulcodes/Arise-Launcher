@@ -185,6 +185,10 @@ fun HomeScreen(
                             quote = state.homeScreenQuote,
                             onLongPress = {
                                 viewModel.onEvent(HomeEvent.ShowQuoteDialog)
+                            },
+                            targets = state.targets,
+                            onTargetClick = {
+                                navController.navigate(Screen.Targets.route)
                             }
                         )
                     }
@@ -207,8 +211,7 @@ fun HomeScreen(
                             pointChange = state.pointChange,
                             pointsTrend = state.pointsTrend,
                             showWeeklySchedule = state.showWeeklySchedule,
-                            allFocusedTasks = state.allFocusedTasks,
-                            targets = state.targets
+                            allFocusedTasks = state.allFocusedTasks
                         )
                     }
                     2 -> {
@@ -383,7 +386,9 @@ fun BlankScreen(
     onAppClick: (AppDrawerApp) -> Unit,
     onOpenFullApps: () -> Unit,
     quote: String? = null,
-    onLongPress: () -> Unit = {}
+    onLongPress: () -> Unit = {},
+    targets: List<com.expeknow.ariselauncher.data.datasource.Target> = emptyList(),
+    onTargetClick: () -> Unit = {}
 ) {
     val currentTime by remember {
         mutableStateOf(java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()))
@@ -519,6 +524,15 @@ fun BlankScreen(
                 }
             }
 
+            // Display targets if any exist - compact version for blank screen
+            if (targets.isNotEmpty()) {
+                MiniTargetsList(
+                    targets = targets.take(2),
+                    onTargetClick = onTargetClick,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                )
+            }
+
             EssentialAppsBar(
                 appsList = appsList,
                 onAppClick = onAppClick,
@@ -549,8 +563,7 @@ fun MainTaskContentScreen(
     pointChange: Int,
     pointsTrend: PointsTrend,
     showWeeklySchedule: Boolean,
-    allFocusedTasks: List<Task>,
-    targets: List<com.expeknow.ariselauncher.data.datasource.Target>
+    allFocusedTasks: List<Task>
 ) {
 
     val currentDay by remember {
@@ -578,16 +591,6 @@ fun MainTaskContentScreen(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Display targets if any exist
-        if (targets.isNotEmpty()) {
-            CompactTargetsList(
-                targets = targets,
-                onTargetClick = { _ ->
-                    navController.navigate(Screen.Targets.route)
-                }
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-        }
 
         if (mode == HomeMode.FOCUSED && !showWeeklySchedule) {
             CompactDayOfWeekIndicator(
