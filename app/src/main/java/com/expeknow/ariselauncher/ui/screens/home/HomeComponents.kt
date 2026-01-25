@@ -1591,7 +1591,7 @@ private fun MiniTargetCard(target: Target) {
                 // Progress bar
                 Box(
                     modifier = Modifier
-                        .width(40.dp)
+                        .weight(1f)
                         .height(3.dp)
                         .background(
                             Color.White.copy(alpha = 0.1f),
@@ -1637,12 +1637,5 @@ private fun MiniTargetCard(target: Target) {
                 )
             }
         }
-
-        Icon(
-            Icons.Filled.ChevronRight,
-            contentDescription = null,
-            tint = Color.White.copy(alpha = 0.3f),
-            modifier = Modifier.size(14.dp)
-        )
     }
 }

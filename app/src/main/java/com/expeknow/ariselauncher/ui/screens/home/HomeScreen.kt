@@ -522,15 +522,13 @@ fun BlankScreen(
                         fontSize = 16.sp
                     )
                 }
-            }
-
-            // Display targets if any exist - compact version for blank screen
-            if (targets.isNotEmpty()) {
-                MiniTargetsList(
-                    targets = targets.take(2),
-                    onTargetClick = onTargetClick,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
-                )
+                if (targets.isNotEmpty()) {
+                    MiniTargetsList(
+                        targets = targets.take(2),
+                        onTargetClick = onTargetClick,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+                    )
+                }
             }
 
             EssentialAppsBar(
