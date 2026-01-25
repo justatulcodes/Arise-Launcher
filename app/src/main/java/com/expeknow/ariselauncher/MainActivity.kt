@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.service.AppUsageTimerService
@@ -23,6 +24,9 @@ import com.expeknow.ariselauncher.ui.theme.AriseLauncherTheme
 import com.expeknow.ariselauncher.utils.PackageChangeReceiver
 import com.expeknow.ariselauncher.utils.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,11 +37,16 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
+    private var isAppTimerEnabled: Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Cache the app timer setting to avoid main thread blocking
+        isAppTimerEnabled = settingsRepository.getAppTimerEnabled()
 
         val filter = IntentFilter().apply {
             addAction(Intent.ACTION_PACKAGE_ADDED)
@@ -125,20 +134,41 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() {
         super.onStop()
-        if (!settingsRepository.getAppTimerEnabled()) {
+        if (!isAppTimerEnabled) {
             return
         }
-        val (packageName, appName) = getForegroundAppInfo(this)
-            ?: return
-        startTimerForApp(this, packageName, appName)
+
+        // Perform heavy operation off the main thread
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val appInfo = getForegroundAppInfo(this@MainActivity)
+                appInfo?.let { (packageName, appName) ->
+                    withContext(Dispatchers.Main) {
+                        startTimerForApp(this@MainActivity, packageName, appName)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in onStop", e)
+            }
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        if (!settingsRepository.getAppTimerEnabled()) {
+
+        // Update cached value
+        isAppTimerEnabled = settingsRepository.getAppTimerEnabled()
+
+        if (!isAppTimerEnabled) {
             return
         }
         stopTimerForApp(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Update cached value when returning to foreground
+        isAppTimerEnabled = settingsRepository.getAppTimerEnabled()
     }
 
 }
