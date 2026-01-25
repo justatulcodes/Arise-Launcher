@@ -101,10 +101,9 @@ fun TargetsScreen(
             onClick = { viewModel.onEvent(TargetsEvent.ShowAddDialog) },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)
-                .padding(bottom = 80.dp),
+                .padding(24.dp),
             containerColor = AccentGreen,
-            shape = CircleShape
+            contentColor = Color.Black
         ) {
             Icon(
                 Icons.Default.Add,

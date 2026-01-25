@@ -95,8 +95,6 @@ fun PermissionOnboardingScreen(
                 usageStatsGranted = PermissionHelper.hasUsageStatsPermission(context)
                 notificationGranted = hasNotificationPermission()
 
-                Log.d("OnboardingPermissionCheck", "onResume: overlayGranted : $overlayGranted and usageStateGranted : $usageStatsGranted and notificationGranted : $notificationGranted")
-
                 if (overlayGranted && usageStatsGranted && notificationGranted) {
                     val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)
                     prefs.edit { putBoolean("has_seen_welcome", true) }
