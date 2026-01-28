@@ -471,9 +471,9 @@ fun BlankScreen(
                     text = quote,
                     style = MaterialTheme.typography.headlineMedium,
                     color = Color.White,
-                    fontSize = 24.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(32.dp),
+                    modifier = Modifier.padding(20.dp),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
             }
@@ -524,7 +524,7 @@ fun BlankScreen(
                 }
                 if (targets.isNotEmpty()) {
                     MiniTargetsList(
-                        targets = targets.take(2),
+                        targets = targets.take(3),
                         onTargetClick = onTargetClick,
                         modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
                     )
