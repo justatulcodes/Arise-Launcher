@@ -13,7 +13,8 @@ sealed class TargetsEvent {
     data class AddTarget(
         val name: String,
         val description: String,
-        val endDate: Long
+        val endDate: Long,
+        val showOnHomeScreen: Boolean
     ) : TargetsEvent()
 
     data class UpdateTarget(val target: Target) : TargetsEvent()

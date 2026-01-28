@@ -43,7 +43,8 @@ class TargetsViewModel @Inject constructor(
                     description = event.description,
                     endDate = event.endDate,
                     progress = 0f,
-                    createdAt = System.currentTimeMillis()
+                    createdAt = System.currentTimeMillis(),
+                    showOnHomeScreen = event.showOnHomeScreen
                 )
                 targetsDataSource.addTarget(target)
                 _state.value = _state.value.copy(showAddDialog = false)

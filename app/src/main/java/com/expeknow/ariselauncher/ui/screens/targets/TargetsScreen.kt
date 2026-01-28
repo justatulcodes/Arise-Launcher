@@ -116,19 +116,20 @@ fun TargetsScreen(
             AddTargetDialog(
                 editingTarget = state.editingTarget,
                 onDismiss = { viewModel.onEvent(TargetsEvent.HideAddDialog) },
-                onSave = { name, description, endDate ->
+                onSave = { name, description, endDate, showOnHomeScreen ->
                     if (state.editingTarget != null) {
                         viewModel.onEvent(
                             TargetsEvent.UpdateTarget(
                                 state.editingTarget!!.copy(
                                     name = name,
                                     description = description,
-                                    endDate = endDate
+                                    endDate = endDate,
+                                    showOnHomeScreen = showOnHomeScreen
                                 )
                             )
                         )
                     } else {
-                        viewModel.onEvent(TargetsEvent.AddTarget(name, description, endDate))
+                        viewModel.onEvent(TargetsEvent.AddTarget(name, description, endDate, showOnHomeScreen))
                     }
                 }
             )

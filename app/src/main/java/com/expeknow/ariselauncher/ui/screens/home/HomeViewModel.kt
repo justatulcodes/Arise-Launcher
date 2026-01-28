@@ -80,7 +80,13 @@ class HomeViewModel @Inject constructor(
     private fun observeTargets() {
         viewModelScope.launch {
             targetsDataSource.targetsFlow.collect { targets ->
-                updateState { it.copy(targets = targets.sortedBy { target -> target.endDate }) }
+                updateState {
+                    it.copy(
+                        targets = targets
+                            .filter { target -> target.showOnHomeScreen }
+                            .sortedBy { target -> target.endDate }
+                    )
+                }
             }
         }
     }

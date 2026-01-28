@@ -212,13 +212,14 @@ fun TargetCard(
 fun AddTargetDialog(
     editingTarget: Target?,
     onDismiss: () -> Unit,
-    onSave: (String, String, Long) -> Unit
+    onSave: (String, String, Long, Boolean) -> Unit
 ) {
     var name by remember { mutableStateOf(editingTarget?.name ?: "") }
     var description by remember { mutableStateOf(editingTarget?.description ?: "") }
     var selectedDate by remember {
         mutableStateOf(editingTarget?.endDate ?: System.currentTimeMillis())
     }
+    var showOnHomeScreen by remember { mutableStateOf(editingTarget?.showOnHomeScreen ?: false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -277,6 +278,40 @@ fun AddTargetDialog(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { showOnHomeScreen = !showOnHomeScreen }
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Checkbox(
+                        checked = showOnHomeScreen,
+                        onCheckedChange = { showOnHomeScreen = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = AccentGreen,
+                            uncheckedColor = Color.White.copy(alpha = 0.3f),
+                            checkmarkColor = Color.Black
+                        )
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Show on Home Screen",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "Display this target on your home screen",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = BannerTextGray
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -319,7 +354,7 @@ fun AddTargetDialog(
                     Button(
                         onClick = {
                             if (name.isNotBlank()) {
-                                onSave(name, description, selectedDate)
+                                onSave(name, description, selectedDate, showOnHomeScreen)
                             }
                         },
                         modifier = Modifier.weight(1f),
