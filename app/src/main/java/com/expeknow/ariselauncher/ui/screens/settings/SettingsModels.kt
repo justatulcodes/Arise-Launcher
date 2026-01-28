@@ -29,7 +29,7 @@ data class SettingsTheme(
 data class SettingsState(
     val hideCompletedTasks: Boolean = true,
     val tunnelVisionMode: Boolean = true,
-    val appLaunchPopupEnabled: Boolean = true,
+    val appLaunchPopupEnabled: Boolean = false,
     val pointThreshold: Float = 50f,
     val warningsEnabled: Boolean = true,
     val keyboardTriggerEnabled: Boolean = false,

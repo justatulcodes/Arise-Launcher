@@ -69,7 +69,7 @@ class SettingsPreferencesDataSource @Inject constructor(
     fun setIsFreshDbInstance(enabled: Boolean) =
         prefs.edit { putBoolean(KEY_IS_FRESH_DB_INSTANCE, enabled) }
 
-    fun getAppTimerEnabled(): Boolean = prefs.getBoolean(KEY_APP_TIMER_ENABLED, true)
+    fun getAppTimerEnabled(): Boolean = prefs.getBoolean(KEY_APP_TIMER_ENABLED, false)
     fun setAppTimerEnabled(enabled: Boolean) =
         prefs.edit { putBoolean(KEY_APP_TIMER_ENABLED, enabled) }
 

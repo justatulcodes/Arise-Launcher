@@ -1,5 +1,7 @@
 package com.expeknow.ariselauncher.ui.screens.settings
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -9,7 +11,9 @@ import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskLinkRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
+import com.expeknow.ariselauncher.service.AppUsageTimerService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +24,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val taskRepositoryImpl: TaskRepository,
     private val pointsLogRepositoryImpl: PointsLogRepository,
     private val taskLinkRepositoryImpl: TaskLinkRepository,
@@ -102,6 +107,18 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ToggleAppTimer -> {
                 _state.value = _state.value.copy(appTimerEnabled = event.enabled)
                 settingsRepository.setAppTimerEnabled(event.enabled)
+
+                // Stop the service if the timer is being disabled
+                if (!event.enabled) {
+                    try {
+                        val intent = Intent(context, AppUsageTimerService::class.java).apply {
+                            action = AppUsageTimerService.ACTION_STOP_TRACKING
+                        }
+                        context.stopService(intent)
+                    } catch (e: Exception) {
+                        // Service might not be running, which is fine
+                    }
+                }
             }
 
             is SettingsEvent.SetDefaultLauncher -> {

@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
-    private var isAppTimerEnabled: Boolean = true
+    private var isAppTimerEnabled: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -159,9 +159,6 @@ class MainActivity : ComponentActivity() {
         // Update cached value
         isAppTimerEnabled = settingsRepository.getAppTimerEnabled()
 
-        if (!isAppTimerEnabled) {
-            return
-        }
         stopTimerForApp(this)
     }
 
