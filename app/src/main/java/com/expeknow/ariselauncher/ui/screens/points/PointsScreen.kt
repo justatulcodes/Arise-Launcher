@@ -57,51 +57,10 @@ fun PointsScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .padding(horizontal = 16.dp, vertical = 32.dp)
     ) {
+        showHeatmap()
+    }
 
-        for( i in 1..7 ) {
-                LazyVerticalStaggeredGrid(
-                    columns = StaggeredGridCells.Fixed(14)
-                ) {
-
-                    items(14) { it ->
-
-                        TooltipBox(
-                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                            tooltip = {
-                                PlainTooltip { Text("$it tasks completed.") }
-                            },
-                            state = rememberTooltipState()
-
-                        ) {
-
-
-                            Box(
-                                modifier = Modifier.height(26.dp)
-                                    .width(26.dp)
-                                    .padding((1.5).dp)
-                                    .background(shape = RoundedCornerShape(6.dp),
-                                        color = Color(0xFF1A8917)),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "${it+1}",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 14.sp
-                                )
-                            }
-
-                        }
-
-
-
-                    }
-                    }
-            }
-
-        }
 
 
 //        if (tabs.size > 1) {
@@ -197,6 +156,121 @@ fun PointsScreen(
 //    }
 }
 
+private val PeopleColor = Color(0xFF60A5FA)
+private val OpportunityColor = Color(0xFFFB923C)
+private val SkillsColor = Color(0xFF4ADE80)
+
+private fun generateRandomHeatmapData(): List<List<Int>> {
+    return (1..7).map {
+        (1..14).map { kotlin.random.Random.nextInt(0, 6) }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun CategoryHeatmap(
+    categoryName: String,
+    primaryColor: Color,
+    heatmapData: List<List<Int>>
+) {
+    Column(
+        modifier = Modifier
+            .background(Color.Black)
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+    ) {
+        Text(
+            text = categoryName,
+            color = primaryColor,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        for (weekIndex in heatmapData.indices) {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(14)
+            ) {
+                items(heatmapData[weekIndex].size) { dayIndex ->
+                    val taskCount = heatmapData[weekIndex][dayIndex]
+                    val cellColor = getHeatmapCellColor(primaryColor, taskCount)
+
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip { Text("$taskCount tasks completed") }
+                        },
+                        state = rememberTooltipState()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .height(26.dp)
+                                .width(26.dp)
+                                .padding((1.5).dp)
+                                .background(
+                                    shape = RoundedCornerShape(6.dp),
+                                    color = cellColor
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (taskCount > 0) {
+                                Text(
+                                    text = "$taskCount",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun getHeatmapCellColor(baseColor: Color, taskCount: Int): Color {
+    return when (taskCount) {
+        0 -> Color(0xFF1F1F1F) // Empty/dark cell
+        1 -> baseColor.copy(alpha = 0.2f)
+        2 -> baseColor.copy(alpha = 0.4f)
+        3 -> baseColor.copy(alpha = 0.6f)
+        4 -> baseColor.copy(alpha = 0.8f)
+        else -> baseColor // 5+ tasks = full color
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun showHeatmap() {
+    // Generate random data for each category
+    val peopleData = remember { generateRandomHeatmapData() }
+    val opportunityData = remember { generateRandomHeatmapData() }
+    val skillsData = remember { generateRandomHeatmapData() }
+
+    Column(
+        modifier = Modifier
+            .background(Color.Black)
+            .padding(vertical = 8.dp)
+    ) {
+        CategoryHeatmap(
+            categoryName = "People Interactions",
+            primaryColor = PeopleColor,
+            heatmapData = peopleData
+        )
+
+        CategoryHeatmap(
+            categoryName = "Opportunities",
+            primaryColor = OpportunityColor,
+            heatmapData = opportunityData
+        )
+
+        CategoryHeatmap(
+            categoryName = "Skills Development",
+            primaryColor = SkillsColor,
+            heatmapData = skillsData
+        )
+    }
+}
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
