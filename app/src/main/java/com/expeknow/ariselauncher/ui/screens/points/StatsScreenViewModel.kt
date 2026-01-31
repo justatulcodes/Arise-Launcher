@@ -24,14 +24,14 @@ import com.expeknow.ariselauncher.ui.screens.home.StatsUi
 import java.util.Calendar
 
 @HiltViewModel
-class PointsViewModel @Inject constructor(
+class StatsScreenViewModel @Inject constructor(
     private val pointsLogRepositoryImpl: PointsLogRepository,
     private val taskRepositoryImpl: TaskRepository,
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(PointsState())
-    val state: StateFlow<PointsState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(StatsScreenState())
+    val state: StateFlow<StatsScreenState> = _state.asStateFlow()
 
     private var navController: NavController? = null
 
@@ -224,17 +224,17 @@ class PointsViewModel @Inject constructor(
         loadCompletedTasks()
     }
 
-    fun onEvent(event: PointsEvent) {
+    fun onEvent(event: StatsEvent) {
         when (event) {
-            is PointsEvent.SelectTab -> {
+            is StatsEvent.SelectTab -> {
                 _state.value = _state.value.copy(selectedTabIndex = event.index)
             }
 
-            is PointsEvent.SetDebugRank -> {
+            is StatsEvent.SetDebugRank -> {
                 _state.value = _state.value.copy(debugCurrentRank = event.rank)
             }
 
-            is PointsEvent.NavigateToTaskHistory -> {
+            is StatsEvent.NavigateToTaskHistory -> {
                 navController?.navigate(Screen.TaskHistory.route)
             }
         }

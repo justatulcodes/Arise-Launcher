@@ -36,8 +36,8 @@ import com.expeknow.ariselauncher.ui.screens.drive.DriveViewModel
 import com.expeknow.ariselauncher.ui.screens.home.HomeViewModel
 import com.expeknow.ariselauncher.ui.screens.settings.SettingsViewModel
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsViewModel
-import com.expeknow.ariselauncher.ui.screens.points.PointsScreen
-import com.expeknow.ariselauncher.ui.screens.points.PointsViewModel
+import com.expeknow.ariselauncher.ui.screens.points.StatsScreen
+import com.expeknow.ariselauncher.ui.screens.points.StatsScreenViewModel
 import com.expeknow.ariselauncher.ui.screens.targets.TargetsScreen
 import com.expeknow.ariselauncher.ui.screens.targets.TargetsViewModel
 
@@ -108,8 +108,8 @@ fun AppNavigation(
                 }
 
                 composable(Screen.Stats.route) { backStackEntry ->
-                    val pointsViewModel = backStackEntry.sharedViewModel<PointsViewModel>(navController)
-                    PointsScreen(navController, pointsViewModel)
+                    val statsScreenViewModel = backStackEntry.sharedViewModel<StatsScreenViewModel>(navController)
+                    StatsScreen(navController, statsScreenViewModel)
                 }
 
                 composable(Screen.Targets.route) { backStackEntry ->
@@ -138,9 +138,9 @@ fun AppNavigation(
             }
 
             composable(Screen.TaskHistory.route) { backStackEntry ->
-                val pointsViewModel =
-                    backStackEntry.sharedViewModel<PointsViewModel>(navController)
-                val state by pointsViewModel.state.collectAsStateWithLifecycle()
+                val statsScreenViewModel =
+                    backStackEntry.sharedViewModel<StatsScreenViewModel>(navController)
+                val state by statsScreenViewModel.state.collectAsStateWithLifecycle()
                 TaskHistoryScreen(
                     navController = navController,
                     completedTasks = state.completedTasks,

@@ -3,7 +3,7 @@ package com.expeknow.ariselauncher.ui.screens.points
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.ui.screens.home.StatsUi
 
-data class PointsState(
+data class StatsScreenState(
     val currentPoints: Int = 0,
     val totalEarned: Int = 0,
     val totalBurned: Int = 0,
@@ -25,10 +25,10 @@ data class PointsState(
     val isTunnelVisionMode: Boolean = false
 )
 
-sealed class PointsEvent {
-    data class SelectTab(val index: Int) : PointsEvent()
-    data class SetDebugRank(val rank: Rank?) : PointsEvent()
-    data object NavigateToTaskHistory : PointsEvent()
+sealed class StatsEvent {
+    data class SelectTab(val index: Int) : StatsEvent()
+    data class SetDebugRank(val rank: Rank?) : StatsEvent()
+    data object NavigateToTaskHistory : StatsEvent()
 }
 
 enum class TabType(val index: Int, val title: String) {

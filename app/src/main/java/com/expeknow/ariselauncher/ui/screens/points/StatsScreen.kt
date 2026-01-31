@@ -1,19 +1,18 @@
 package com.expeknow.ariselauncher.ui.screens.points
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,13 +23,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.expeknow.ariselauncher.data.model.*
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PointsScreen(
+fun StatsScreen(
     navController: NavController,
-    viewModel: PointsViewModel = viewModel()
+    viewModel: StatsScreenViewModel = viewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -56,9 +54,27 @@ fun PointsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .scrollable(rememberScrollState(), Orientation.Vertical)
             .background(Color.Black)
+            .padding(horizontal = 16.dp)
     ) {
-        showHeatmap()
+        Text(
+            text = "Stats",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 28.sp
+            ),
+            color = Color.White,
+            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+        )
+
+        Text(
+            text = "Your focus activity over time",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.White.copy(alpha = 0.6f),
+        )
+
+        ShowHeatmap()
     }
 
 
@@ -176,7 +192,7 @@ private fun CategoryHeatmap(
     Column(
         modifier = Modifier
             .background(Color.Black)
-            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .padding(vertical = 16.dp)
     ) {
         Text(
             text = categoryName,
@@ -241,7 +257,7 @@ private fun getHeatmapCellColor(baseColor: Color, taskCount: Int): Color {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun showHeatmap() {
+private fun ShowHeatmap() {
     // Generate random data for each category
     val peopleData = remember { generateRandomHeatmapData() }
     val opportunityData = remember { generateRandomHeatmapData() }
@@ -274,8 +290,8 @@ private fun showHeatmap() {
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
-private fun PointsScreenPreview() {
-    PointsScreen(
+private fun StatsScreenPreview() {
+    StatsScreen(
         navController = rememberNavController(),
         viewModel = viewModel()
     )
