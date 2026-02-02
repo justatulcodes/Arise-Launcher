@@ -1,14 +1,11 @@
 package com.expeknow.ariselauncher.ui.screens.points
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,7 +51,6 @@ fun StatsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .scrollable(rememberScrollState(), Orientation.Vertical)
             .background(Color.Black)
             .padding(horizontal = 16.dp)
     ) {
@@ -206,39 +202,45 @@ private fun CategoryHeatmap(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        for (weekIndex in heatmapData.indices) {
-            LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(14)
-            ) {
-                items(heatmapData[weekIndex].size) { dayIndex ->
-                    val taskCount = heatmapData[weekIndex][dayIndex]
-                    val cellColor = getHeatmapCellColor(primaryColor, taskCount)
+        // Row 0 (top) = oldest week, Last row (bottom) = most recent week
+        // Column 0 (left) = oldest day in week, Last column (right) = most recent day
+        val reversedData = heatmapData.reversed().map { it.reversed() }
 
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                        tooltip = {
-                            PlainTooltip { Text("$taskCount tasks completed") }
-                        },
-                        state = rememberTooltipState()
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .height(26.dp)
-                                .width(26.dp)
-                                .padding((1.5).dp)
-                                .background(
-                                    shape = RoundedCornerShape(6.dp),
-                                    color = cellColor
-                                ),
-                            contentAlignment = Alignment.Center
+        Column {
+            for (weekIndex in reversedData.indices) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    for (dayIndex in reversedData[weekIndex].indices) {
+                        val taskCount = reversedData[weekIndex][dayIndex]
+                        val cellColor = getHeatmapCellColor(primaryColor, taskCount)
+
+                        TooltipBox(
+                            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                            tooltip = {
+                                PlainTooltip { Text("$taskCount tasks completed") }
+                            },
+                            state = rememberTooltipState()
                         ) {
-                            if (taskCount > 0) {
-                                Text(
-                                    text = "$taskCount",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.SemiBold,
-                                    fontSize = 12.sp
-                                )
+                            Box(
+                                modifier = Modifier
+                                    .size(26.dp)
+                                    .padding(1.5.dp)
+                                    .background(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = cellColor
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (taskCount > 0) {
+                                    Text(
+                                        text = "$taskCount",
+                                        color = Color.White,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 12.sp
+                                    )
+                                }
                             }
                         }
                     }
@@ -274,6 +276,7 @@ private fun ShowHeatmap(
     Column(
         modifier = Modifier
             .background(Color.Black)
+            .verticalScroll(rememberScrollState())
             .padding(vertical = 8.dp)
     ) {
         CategoryHeatmap(
