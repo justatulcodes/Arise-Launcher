@@ -74,7 +74,11 @@ fun StatsScreen(
             color = Color.White.copy(alpha = 0.6f),
         )
 
-        ShowHeatmap()
+        ShowHeatmap(
+            peopleData = state.peopleHeatmap.weeklyData,
+            opportunityData = state.opportunityHeatmap.weeklyData,
+            skillsData = state.skillsHeatmap.weeklyData
+        )
     }
 
 
@@ -257,11 +261,15 @@ private fun getHeatmapCellColor(baseColor: Color, taskCount: Int): Color {
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun ShowHeatmap() {
-    // Generate random data for each category
-    val peopleData = remember { generateRandomHeatmapData() }
-    val opportunityData = remember { generateRandomHeatmapData() }
-    val skillsData = remember { generateRandomHeatmapData() }
+private fun ShowHeatmap(
+    peopleData: List<List<Int>>,
+    opportunityData: List<List<Int>>,
+    skillsData: List<List<Int>>
+) {
+    // Use provided data, or fallback to empty if not available
+    val safePeopleData = peopleData.ifEmpty { generateEmptyHeatmapData() }
+    val safeOpportunityData = opportunityData.ifEmpty { generateEmptyHeatmapData() }
+    val safeSkillsData = skillsData.ifEmpty { generateEmptyHeatmapData() }
 
     Column(
         modifier = Modifier
@@ -271,21 +279,42 @@ private fun ShowHeatmap() {
         CategoryHeatmap(
             categoryName = "People Interactions",
             primaryColor = PeopleColor,
-            heatmapData = peopleData
+            heatmapData = safePeopleData
         )
 
         CategoryHeatmap(
             categoryName = "Opportunities",
             primaryColor = OpportunityColor,
-            heatmapData = opportunityData
+            heatmapData = safeOpportunityData
         )
 
         CategoryHeatmap(
             categoryName = "Skills Development",
             primaryColor = SkillsColor,
-            heatmapData = skillsData
+            heatmapData = safeSkillsData
         )
     }
+}
+
+private fun generateEmptyHeatmapData(): List<List<Int>> {
+    return (1..7).map {
+        (1..14).map { 0 }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun ShowHeatmapPreview() {
+    // Generate random data for preview
+    val peopleData = remember { generateRandomHeatmapData() }
+    val opportunityData = remember { generateRandomHeatmapData() }
+    val skillsData = remember { generateRandomHeatmapData() }
+
+    ShowHeatmap(
+        peopleData = peopleData,
+        opportunityData = opportunityData,
+        skillsData = skillsData
+    )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF000000)

@@ -54,6 +54,7 @@ class StatsScreenViewModel @Inject constructor(
         loadCompletedTasks()
         observeMvpStats()
         observeTunnelVisionMode()
+        observeHeatmapData()
     }
 
     private fun observeTunnelVisionMode() {
@@ -238,5 +239,78 @@ class StatsScreenViewModel @Inject constructor(
                 navController?.navigate(Screen.TaskHistory.route)
             }
         }
+    }
+
+    /**
+     * Observes all tasks and computes heatmap data for each category.
+     * The heatmap shows completed tasks over the last 14 weeks (98 days).
+     */
+    private fun observeHeatmapData() {
+        viewModelScope.launch {
+            taskRepositoryImpl.getAllTasks().collectLatest { allTasks ->
+                val completedTasks = allTasks.filter { it.isCompleted && it.completedAt != null }
+
+                // Compute heatmap for each category
+                val peopleHeatmap = computeHeatmapForCategory(completedTasks, TaskCategory.PEOPLE)
+                val opportunityHeatmap = computeHeatmapForCategory(completedTasks, TaskCategory.OPPORTUNITY)
+                val skillsHeatmap = computeHeatmapForCategory(completedTasks, TaskCategory.SKILLS)
+                val personalHeatmap = computeHeatmapForCategory(completedTasks, TaskCategory.PERSONAL)
+
+                _state.value = _state.value.copy(
+                    peopleHeatmap = peopleHeatmap,
+                    opportunityHeatmap = opportunityHeatmap,
+                    skillsHeatmap = skillsHeatmap,
+                    personalHeatmap = personalHeatmap
+                )
+            }
+        }
+    }
+
+    /**
+     * Computes heatmap data for a specific category.
+     * Returns a 7-row (weeks) x 14-column (days per row) grid.
+     * Each cell contains the count of completed tasks for that day.
+     * The grid covers the last 98 days (14 weeks).
+     */
+    private fun computeHeatmapForCategory(
+        completedTasks: List<Task>,
+        category: TaskCategory
+    ): CategoryHeatmapData {
+        val categoryTasks = completedTasks.filter { it.category == category }
+
+        // Create a map of day offset to task count
+        // Day 0 = today, Day 1 = yesterday, etc.
+        val taskCountByDayOffset = mutableMapOf<Int, Int>()
+
+        val now = System.currentTimeMillis()
+        val oneDayMs = 24 * 60 * 60 * 1000L
+
+        categoryTasks.forEach { task ->
+            val completedAt = task.completedAt ?: return@forEach
+            val daysAgo = ((now - completedAt) / oneDayMs).toInt()
+
+            // Only count tasks from the last 98 days (14 columns x 7 rows)
+            if (daysAgo in 0..97) {
+                taskCountByDayOffset[daysAgo] = (taskCountByDayOffset[daysAgo] ?: 0) + 1
+            }
+        }
+
+        // Build the 7x14 grid
+        // Row 0 = most recent week, Row 6 = oldest week
+        // Column 0 = Sunday, Column 6 = Saturday (or adjust based on locale)
+        // We'll use a simpler approach: 7 rows of 14 days each (98 days total)
+        val weeklyData = (0 until 7).map { weekIndex ->
+            (0 until 14).map { dayIndex ->
+                // Calculate the day offset for this cell
+                // weekIndex * 14 + dayIndex gives us days ago
+                val dayOffset = weekIndex * 14 + dayIndex
+                taskCountByDayOffset[dayOffset] ?: 0
+            }
+        }
+
+        return CategoryHeatmapData(
+            category = category,
+            weeklyData = weeklyData
+        )
     }
 }
