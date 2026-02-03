@@ -33,21 +33,6 @@ fun StatsScreen(
         viewModel.setNavController(navController)
     }
 
-    // Calculate current rank
-    val currentRank = state.debugCurrentRank ?: ranks.find { rank ->
-        state.currentPoints >= rank.minPoints && state.currentPoints <= rank.maxPoints
-    } ?: ranks[0]
-
-    // Determine tabs based on mode
-    val tabs = if (state.isTunnelVisionMode) {
-        listOf("Focus Tasks", "Personal Tasks")
-    } else {
-        listOf("Personal Tasks")
-    }
-
-    val pagerState = rememberPagerState(pageCount = { tabs.size })
-    val coroutineScope = rememberCoroutineScope()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,97 +64,6 @@ fun StatsScreen(
 
 
 
-//        if (tabs.size > 1) {
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(horizontal = 24.dp, vertical = 4.dp)
-//                    .clip(RoundedCornerShape(8.dp))
-//                    .background(Color(0xFF1F1F1F))
-//                    .padding(4.dp),
-//                horizontalArrangement = Arrangement.spacedBy(4.dp)
-//            ) {
-//                tabs.forEachIndexed { index, title ->
-//                    val isSelected = pagerState.currentPage == index
-//                    Box(
-//                        modifier = Modifier
-//                            .weight(1f)
-//                            .clip(RoundedCornerShape(6.dp))
-//                            .background(
-//                                if (isSelected) currentRank.colors.accent
-//                                else Color.Transparent
-//                            )
-//                            .clickable {
-//                                coroutineScope.launch {
-//                                    pagerState.animateScrollToPage(index)
-//                                }
-//                            }
-//                            .padding(vertical = 8.dp, horizontal = 12.dp),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        Text(
-//                            text = title,
-//                            style = MaterialTheme.typography.bodyMedium.copy(
-//                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-//                                fontSize = 13.sp,
-//                                letterSpacing = 0.3.sp
-//                            ),
-//                            color = if (isSelected) Color.Black else Color(0xFF9CA3AF)
-//                        )
-//                    }
-//                }
-//            }
-//        } else {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .background(Color.Black)
-//                    .padding(vertical = 12.dp),
-//                contentAlignment = Alignment.Center
-//            ) {
-//                Text(
-//                    text = tabs[0],
-//                    style = MaterialTheme.typography.titleSmall.copy(
-//                        fontWeight = FontWeight.Bold,
-//                        letterSpacing = 0.5.sp
-//                    ),
-//                    color = currentRank.colors.accent
-//                )
-//            }
-//        }
-//
-//        HorizontalPager(
-//            state = pagerState,
-//            modifier = Modifier.weight(1f)
-//        ) { page ->
-//            LazyColumn(
-//                modifier = Modifier.fillMaxSize()
-//            ) {
-//                item {
-//                    when {
-//                        state.isTunnelVisionMode && page == 0 -> {
-//                            FocusTasksStatsTab(
-//                                statsUi = state.mvpStats,
-//                                currentRank = currentRank
-//                            )
-//                        }
-//                        state.isTunnelVisionMode && page == 1 -> {
-//                            PersonalTasksStatsTab(
-//                                statsUi = state.mvpStats,
-//                                currentRank = currentRank
-//                            )
-//                        }
-//                        !state.isTunnelVisionMode && page == 0 -> {
-//                            PersonalTasksStatsTab(
-//                                statsUi = state.mvpStats,
-//                                currentRank = currentRank
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 }
 
 private val PeopleColor = Color(0xFF60A5FA)
