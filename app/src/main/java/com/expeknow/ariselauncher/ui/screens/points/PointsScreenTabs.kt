@@ -2,6 +2,7 @@ package com.expeknow.ariselauncher.ui.screens.points
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -543,93 +544,3 @@ private fun ProductivityInsightItem(
     }
 }
 
-@Preview
-@Composable
-fun TasksContentPreview() {
-    TasksContent(
-        currentRank = Rank(
-            name = "Preview Rank",
-            description = "This is a preview rank",
-            icon = Icons.Filled.Star,
-            colors = RankColors(
-                background = Color(0xFF4CAF50),
-                border = Color(0xFF3E8E41),
-                accent = Color(0xFF8BC34A)
-            ),
-            minPoints = 0,
-            maxPoints = 100
-        ),
-        taskStats = TaskStats(
-            completionRatio = 50f,
-            completedTasks = 20,
-            totalTasks = 40,
-            todayCompleted = 5,
-            personalTasks = 10,
-            weeklyAverage = 20f
-        ),
-        onNavigateToTaskHistory = {}
-    )
-}
-
-@Preview
-@Composable
-fun RanksContentPreview() {
-    RanksContent(
-        currentRank = Rank(
-            name = "Preview Rank",
-            description = "This is a preview rank",
-            icon = Icons.Filled.Star,
-            colors = RankColors(
-                background = Color(0xFF4CAF50),
-                border = Color(0xFF3E8E41),
-                accent = Color(0xFF8BC34A)
-            ),
-            minPoints = 0,
-            maxPoints = 100
-        ),
-        onRankClick = {}
-    )
-}
-
-@Preview
-@Composable
-fun TaskStatCardPreview() {
-    TaskStatCard(
-        title = "10/20",
-        subtitle = "Tasks Completed",
-        currentRank = Rank(
-            name = "Preview Rank",
-            description = "This is a preview rank",
-            icon = Icons.Filled.Star,
-            colors = RankColors(
-                background = Color(0xFF4CAF50),
-                border = Color(0xFF3E8E41),
-                accent = Color(0xFF8BC34A)
-            ),
-            minPoints = 0,
-            maxPoints = 100
-        )
-    )
-}
-
-@Preview
-@Composable
-fun TaskBreakdownItemPreview() {
-    TaskBreakdownItem(
-        label = "Work Tasks",
-        count = 10,
-        total = 20,
-        color = Color(0xFF60A5FA)
-    )
-}
-
-@Preview
-@Composable
-fun ProductivityInsightItemPreview() {
-    ProductivityInsightItem(
-        icon = Icons.Filled.Schedule,
-        title = "Peak Performance",
-        description = "You complete most tasks between 9-11 AM",
-        iconColor = Color(0xFFFACC15)
-    )
-}

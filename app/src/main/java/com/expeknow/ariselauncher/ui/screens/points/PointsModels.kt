@@ -48,5 +48,7 @@ sealed class StatsEvent {
 enum class TabType(val index: Int, val title: String) {
     OVERVIEW(0, "OVERVIEW"),
     TASKS(1, "TASKS"),
-//    RANKS(2, "RANKS") //removing it from alpha version
 }
+
+typealias PointsState = StatsScreenState
+typealias PointsEvent = StatsEvent
