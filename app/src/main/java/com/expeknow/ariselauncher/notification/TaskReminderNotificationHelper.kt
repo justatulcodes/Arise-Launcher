@@ -60,7 +60,7 @@ class TaskReminderNotificationHelper(private val context: Context) {
         val (title, message) = getFocusModeMessage(completedTasks, totalTasks, timeOfDay)
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
@@ -89,7 +89,7 @@ class TaskReminderNotificationHelper(private val context: Context) {
         val (title, message) = getNormalModeMessage(completedTasks, totalTasks, timeOfDay)
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))

@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Arise logo - stylized upward chevron/A shape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,2L2,18h6l4,-7l4,7h6L12,2z" />
+</vector>
