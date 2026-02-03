@@ -17,9 +17,6 @@ object TaskReminderScheduler {
     private const val WORK_NAME_8PM = "task_reminder_8pm"
     private const val WORK_NAME_10PM = "task_reminder_10pm"
 
-    // TODO: Set to false before release!
-    private const val DEBUG_MODE = true
-    private const val DEBUG_INTERVAL_MINUTES = 1L // Runs every 1 minute in debug mode
 
     fun scheduleTaskReminders(context: Context) {
         val workManager = WorkManager.getInstance(context)
@@ -75,33 +72,19 @@ object TaskReminderScheduler {
             .putString(TaskReminderWorker.KEY_TIME_OF_DAY, timeOfDay.name)
             .build()
 
-        val reminderWork = if (DEBUG_MODE) {
-            // Debug mode: Run frequently with minimal delay for testing
-            PeriodicWorkRequestBuilder<TaskReminderWorker>(
-                repeatInterval = DEBUG_INTERVAL_MINUTES,
-                repeatIntervalTimeUnit = TimeUnit.MINUTES
-            )
-                .setInitialDelay(15, TimeUnit.SECONDS) // Start after 15 seconds
-                .setConstraints(constraints)
-                .setInputData(inputData)
-                .addTag(workName)
-                .build()
-        } else {
-            // Production mode: Run at scheduled times daily
-            PeriodicWorkRequestBuilder<TaskReminderWorker>(
-                repeatInterval = 24,
-                repeatIntervalTimeUnit = TimeUnit.HOURS
-            )
-                .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
-                .setConstraints(constraints)
-                .setInputData(inputData)
-                .addTag(workName)
-                .build()
-        }
+        val reminderWork = PeriodicWorkRequestBuilder<TaskReminderWorker>(
+            repeatInterval = 24,
+            repeatIntervalTimeUnit = TimeUnit.HOURS
+        )
+            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+            .setConstraints(constraints)
+            .setInputData(inputData)
+            .addTag(workName)
+            .build()
 
         workManager.enqueueUniquePeriodicWork(
             workName,
-            if (DEBUG_MODE) ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE else ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.KEEP,
             reminderWork
         )
     }
