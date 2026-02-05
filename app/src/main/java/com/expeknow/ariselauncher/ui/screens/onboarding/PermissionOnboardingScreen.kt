@@ -73,17 +73,6 @@ fun PermissionOnboardingScreen(
         notificationGranted = hasNotificationPermission()
 
         Log.d("OnboardingPermissionCheck", "Permission check: overlayGranted : $overlayGranted and usageStateGranted : $usageStatsGranted and notificationGranted : $notificationGranted")
-
-        if (overlayGranted && usageStatsGranted && notificationGranted) {
-            val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)
-            prefs.edit { putBoolean("has_seen_welcome", true) }
-
-            navController.navigate(com.expeknow.ariselauncher.ui.navigation.Screen.Focus.route) {
-                popUpTo(com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route) {
-                    inclusive = true
-                }
-            }
-        }
     }
 
     // Re-check permissions when returning from settings
@@ -94,17 +83,6 @@ fun PermissionOnboardingScreen(
                 overlayGranted = PermissionHelper.hasOverlayPermission(context)
                 usageStatsGranted = PermissionHelper.hasUsageStatsPermission(context)
                 notificationGranted = hasNotificationPermission()
-
-                if (overlayGranted && usageStatsGranted && notificationGranted) {
-                    val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)
-                    prefs.edit { putBoolean("has_seen_welcome", true) }
-
-                    navController.navigate(com.expeknow.ariselauncher.ui.navigation.Screen.Focus.route) {
-                        popUpTo(com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route) {
-                            inclusive = true
-                        }
-                    }
-                }
             }
         }
 
@@ -112,6 +90,18 @@ fun PermissionOnboardingScreen(
 
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    // Function to navigate to the next screen
+    fun navigateToNextScreen() {
+        val prefs = context.getSharedPreferences("arise_prefs", android.content.Context.MODE_PRIVATE)
+        prefs.edit { putBoolean("has_seen_welcome", true) }
+
+        navController.navigate(com.expeknow.ariselauncher.ui.navigation.Screen.Focus.route) {
+            popUpTo(com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route) {
+                inclusive = true
+            }
         }
     }
 
@@ -192,11 +182,7 @@ fun PermissionOnboardingScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    "All permissions are required to use Arise. Your privacy is important to us - all data stays on your device."
-                } else {
-                    "Both permissions are required to use Arise. Your privacy is important to us - all data stays on your device."
-                },
+                text = "These permissions help Arise provide the best experience, but you can continue without them. Your privacy is important to us - all data stays on your device.",
                 fontSize = 13.sp,
                 color = BannerTextGray.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,
@@ -204,7 +190,33 @@ fun PermissionOnboardingScreen(
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Continue button
+            Button(
+                onClick = { navigateToNextScreen() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = AccentGreen,
+                    contentColor = Color.Black
+                ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(vertical = 16.dp)
+            ) {
+                Text(
+                    text = if (overlayGranted && usageStatsGranted && notificationGranted) {
+                        "Continue"
+                    } else {
+                        "Continue Anyway"
+                    },
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
