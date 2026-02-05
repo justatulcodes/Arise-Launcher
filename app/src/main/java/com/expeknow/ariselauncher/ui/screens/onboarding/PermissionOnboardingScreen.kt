@@ -114,31 +114,31 @@ fun PermissionOnboardingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Title
             Text(
                 text = "Welcome to Arise",
-                fontSize = 32.sp,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "To provide you with the best experience, we need a few permissions",
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 color = BannerTextGray,
                 textAlign = TextAlign.Center,
-                lineHeight = 24.sp
+                lineHeight = 20.sp
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             PermissionCard(
                 icon = Icons.Outlined.Layers,
@@ -150,7 +150,7 @@ fun PermissionOnboardingScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             PermissionCard(
                 icon = Icons.Outlined.Analytics,
@@ -162,7 +162,7 @@ fun PermissionOnboardingScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Notification Permission Card (only show on Android 13+)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -176,23 +176,23 @@ fun PermissionOnboardingScreen(
                     }
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "These permissions help Arise provide the best experience, but you can continue without them. Your privacy is important to us - all data stays on your device.",
-                fontSize = 13.sp,
+                fontSize = 12.sp,
                 color = BannerTextGray.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center,
-                lineHeight = 20.sp,
+                lineHeight = 18.sp,
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Continue button
+            // Continue button - Primary action with green background
             Button(
                 onClick = { navigateToNextScreen() },
                 modifier = Modifier
@@ -203,7 +203,7 @@ fun PermissionOnboardingScreen(
                     contentColor = Color.Black
                 ),
                 shape = RoundedCornerShape(12.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
+                contentPadding = PaddingValues(vertical = 14.dp)
             ) {
                 Text(
                     text = if (overlayGranted && usageStatsGranted && notificationGranted) {
@@ -216,7 +216,7 @@ fun PermissionOnboardingScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -240,7 +240,7 @@ fun PermissionCard(
     ) {
         Column(
             modifier = Modifier
-                .padding(20.dp)
+                .padding(16.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -250,14 +250,14 @@ fun PermissionCard(
                     imageVector = icon,
                     contentDescription = null,
                     tint = AccentGreen,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(24.dp)
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Text(
                     text = title,
-                    fontSize = 18.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = TaskTitle,
                     modifier = Modifier.weight(1f)
@@ -268,39 +268,44 @@ fun PermissionCard(
                         imageVector = Icons.Filled.CheckCircle,
                         contentDescription = "Granted",
                         tint = AccentGreen,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = description,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 color = BannerTextGray,
-                lineHeight = 22.sp
+                lineHeight = 20.sp
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Button(
+            // Outlined button style for secondary action
+            OutlinedButton(
                 onClick = onGrantClick,
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !isGranted,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isGranted) AccentGreen.copy(alpha = 0.3f) else AccentGreen,
-                    contentColor = if (isGranted) Color.White.copy(alpha = 0.5f) else Color.Black,
-                    disabledContainerColor = AccentGreen.copy(alpha = 0.3f),
-                    disabledContentColor = Color.White.copy(alpha = 0.5f)
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = AccentGreen,
+                    disabledContainerColor = Color.Transparent,
+                    disabledContentColor = AccentGreen.copy(alpha = 0.5f)
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = if (isGranted) AccentGreen.copy(alpha = 0.3f) else AccentGreen
                 ),
                 shape = RoundedCornerShape(12.dp),
-                contentPadding = PaddingValues(vertical = 14.dp)
+                contentPadding = PaddingValues(vertical = 12.dp)
             ) {
                 Text(
                     text = if (isGranted) "Granted" else "Grant Permission",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
