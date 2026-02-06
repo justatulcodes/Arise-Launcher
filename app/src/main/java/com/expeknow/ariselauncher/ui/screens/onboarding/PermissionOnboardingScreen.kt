@@ -71,8 +71,6 @@ fun PermissionOnboardingScreen(
         overlayGranted = PermissionHelper.hasOverlayPermission(context)
         usageStatsGranted = PermissionHelper.hasUsageStatsPermission(context)
         notificationGranted = hasNotificationPermission()
-
-        Log.d("OnboardingPermissionCheck", "Permission check: overlayGranted : $overlayGranted and usageStateGranted : $usageStatsGranted and notificationGranted : $notificationGranted")
     }
 
     // Re-check permissions when returning from settings
@@ -114,7 +112,7 @@ fun PermissionOnboardingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                 .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))

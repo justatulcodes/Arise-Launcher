@@ -64,12 +64,12 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    val prefs = getSharedPreferences("arise_prefs", Context.MODE_PRIVATE)
+                    val prefs = getSharedPreferences("arise_prefs", MODE_PRIVATE)
                     val hasSeenWelcome = prefs.getBoolean("has_seen_welcome", false)
 
                     val startDestination = when {
                         !hasSeenWelcome -> com.expeknow.ariselauncher.ui.navigation.Screen.Welcome.route
-                        PermissionHelper.hasAllPermissions(this) -> com.expeknow.ariselauncher.ui.navigation.Screen.Main.route
+                        hasSeenWelcome -> com.expeknow.ariselauncher.ui.navigation.Screen.Main.route
                         else -> com.expeknow.ariselauncher.ui.navigation.Screen.PermissionOnboarding.route
                     }
 
