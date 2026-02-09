@@ -27,16 +27,7 @@ fun SettingsCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = theme.border,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .background(
-                color = theme.background,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp)
+            .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         content()
     }
@@ -281,6 +272,7 @@ fun DangerZoneCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp)
             .border(
                 width = 1.dp,
                 color = Color(0xFFE57373).copy(alpha = 0.4f),

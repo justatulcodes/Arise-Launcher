@@ -180,12 +180,6 @@ fun AppLaunchPopupSection(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                "APP LAUNCH POPUP",
-                style = MaterialTheme.typography.titleMedium,
-                color = theme.accent
-            )
-
             SettingsToggleItem(
                 title = "App Launch Popup Delay",
                 subtitle = "Show popup delay before launching apps in app drawer",

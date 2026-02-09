@@ -59,9 +59,8 @@ fun SettingsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             DefaultLauncherSection(
                 isDefaultLauncher = state.isDefaultLauncher,
@@ -70,6 +69,8 @@ fun SettingsScreen(
                 },
                 theme = theme
             )
+
+            HorizontalDivider(thickness = 0.5.dp, color = Color.Gray, modifier = Modifier.padding(horizontal = 16.dp))
 
             TunnelVisionSection(
                 tunnelVisionMode = state.tunnelVisionMode,
@@ -134,6 +135,9 @@ fun SettingsScreen(
                 },
                 theme = theme
             )
+
+            HorizontalDivider(thickness = 0.5.dp, color = Color.Gray,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp))
 
 
             DangerZoneCard(
