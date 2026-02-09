@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.expeknow.ariselauncher.ui.theme.BannerTextGray
 
 @Composable
 fun SettingsScreen(
@@ -190,21 +191,26 @@ private fun SettingsHeader() {
     ) {
 
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
+
             Text(
-                "CONTROL CENTER",
-                style = MaterialTheme.typography.headlineSmall.copy(
+                text = "Control Center",
+                style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.2.sp
+                    fontSize = 28.sp
                 ),
-                color = Color.White
+                color = Color.White,
+                modifier = Modifier.padding(top = 16.dp)
             )
+
             Text(
-                "CONFIGURE YOUR DISCIPLINE SYSTEM",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.6f)
+                "Configure your discipline system",
+                style = MaterialTheme.typography.bodyMedium,
+                color = BannerTextGray,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
+
         }
     }
 }

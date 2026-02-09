@@ -246,20 +246,24 @@ private fun DriveHeader() {
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
+
             Text(
-                text = "YOUR DRIVE",
-                style = MaterialTheme.typography.headlineSmall.copy(
+                text = "Your Drive",
+                style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.2.sp
+                    fontSize = 28.sp
                 ),
-                color = Color.White
+                color = Color.White,
+                modifier = Modifier.padding(top = 16.dp)
             )
+
             Text(
                 text = "Stay motivated with quotes, images, and videos",
-                style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.6f),
+                style = MaterialTheme.typography.bodyMedium,
+                color = BannerTextGray,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
         }
     }

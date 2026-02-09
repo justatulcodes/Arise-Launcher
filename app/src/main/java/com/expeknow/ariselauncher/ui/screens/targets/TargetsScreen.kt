@@ -46,7 +46,7 @@ fun TargetsScreen(
                     fontSize = 28.sp
                 ),
                 color = Color.White,
-                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                modifier = Modifier.padding(top = 16.dp)
             )
 
             Text(
