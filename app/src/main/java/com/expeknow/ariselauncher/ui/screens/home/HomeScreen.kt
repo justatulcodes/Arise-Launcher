@@ -480,7 +480,7 @@ fun BlankScreen(
             }
         } else {
             Image(
-                painter = painterResource(id = R.drawable.wallpaper_4),
+                painter = painterResource(id = R.drawable.wallpaper_5),
                 contentDescription = "Wallpaper",
                 modifier = Modifier
                     .fillMaxSize(),
