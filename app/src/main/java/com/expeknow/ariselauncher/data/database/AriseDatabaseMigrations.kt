@@ -49,4 +49,20 @@ object AriseDatabaseMigrations {
             database.execSQL("ALTER TABLE app_info ADD COLUMN totalTimeSpent INTEGER NOT NULL DEFAULT 0")
         }
     }
+    
+    val MIGRATION_4_5 = object : Migration(4, 5) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("""
+                CREATE TABLE IF NOT EXISTS targets (
+                    id TEXT NOT NULL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    description TEXT NOT NULL,
+                    endDate INTEGER NOT NULL,
+                    progress REAL NOT NULL,
+                    createdAt INTEGER NOT NULL,
+                    showOnHomeScreen INTEGER NOT NULL DEFAULT 0
+                )
+            """)
+        }
+    }
 }

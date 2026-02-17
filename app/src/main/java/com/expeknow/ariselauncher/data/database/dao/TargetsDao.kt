@@ -5,20 +5,20 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.expeknow.ariselauncher.ui.screens.targets.TargetsEvent
+import com.expeknow.ariselauncher.data.model.Targets
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TargetsDao {
 
     @Query("SELECT * FROM targets")
-    fun getAllTargets(): Flow<List<Target>>
+    fun getAllTargets(): Flow<List<Targets>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTarget(target: Target)
+    suspend fun insertTarget(target: Targets)
 
     @Update
-    suspend fun updateTarget(target: Target)
+    suspend fun updateTarget(target: Targets)
 
     @Query("DELETE FROM targets WHERE id = :targetId")
     suspend fun deleteTarget(targetId: String)
