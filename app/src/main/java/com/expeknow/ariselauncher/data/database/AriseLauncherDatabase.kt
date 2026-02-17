@@ -16,11 +16,13 @@ import com.expeknow.ariselauncher.data.model.AppInfo
 import com.expeknow.ariselauncher.data.model.DriveItem
 import com.expeknow.ariselauncher.data.model.ModelTypeConverters
 import com.expeknow.ariselauncher.data.model.PointsLog
+import com.expeknow.ariselauncher.data.model.Targets
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskLink
 
 @Database(
-    entities = [Task::class, TaskLink::class, PointsLog::class, AppInfo::class, DriveItem::class],
+    entities = [Task::class, TaskLink::class, PointsLog::class, AppInfo::class, DriveItem::class,
+        Targets::class],
     version = 4,
     exportSchema = true
 )

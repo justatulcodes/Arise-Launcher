@@ -3,7 +3,6 @@ package com.expeknow.ariselauncher
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import com.expeknow.ariselauncher.utils.TestDataSeeder
 import com.expeknow.ariselauncher.worker.TaskReminderScheduler
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
