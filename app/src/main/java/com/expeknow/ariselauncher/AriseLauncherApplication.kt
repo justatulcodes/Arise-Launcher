@@ -18,10 +18,7 @@ class AriseLauncherApplication : Application(), Configuration.Provider {
         super.onCreate()
 
         TaskReminderScheduler.scheduleTaskReminders(this)
-
-        // Seed test data (runs only once, tracked via SharedPreferences)
-        // To re-seed, call TestDataSeeder.forceReseed(this) or clear app data
-        TestDataSeeder.seedIfNeeded(this)
+//        TestDataSeeder.seedIfNeeded(this)
     }
 
     override val workManagerConfiguration: Configuration
