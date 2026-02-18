@@ -4,7 +4,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
 import com.expeknow.ariselauncher.data.model.Targets
 import com.expeknow.ariselauncher.data.model.Task

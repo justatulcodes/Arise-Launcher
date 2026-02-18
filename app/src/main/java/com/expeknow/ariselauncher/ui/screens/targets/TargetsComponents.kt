@@ -17,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.data.model.Targets
 import com.expeknow.ariselauncher.ui.theme.*
 import java.text.SimpleDateFormat

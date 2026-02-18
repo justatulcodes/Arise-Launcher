@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.expeknow.ariselauncher.data.datasource.TargetsPreferencesDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TargetsDataSource
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository

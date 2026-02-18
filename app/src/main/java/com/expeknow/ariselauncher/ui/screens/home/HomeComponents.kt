@@ -43,7 +43,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.data.model.*
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerTheme

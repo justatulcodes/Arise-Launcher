@@ -1,6 +1,5 @@
 package com.expeknow.ariselauncher.data.datasource.interfaces
 
-import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.data.model.Targets
 import kotlinx.coroutines.flow.Flow
 
