@@ -1058,16 +1058,6 @@ private fun MotivationalQuotePreview() {
     MotivationalQuote(theme = HomeTheme())
 }
 
-//@Preview(showBackground = true, backgroundColor = 0xFF000000)
-//@Composable
-//private fun EssentialAppsBarPreview() {
-//    EssentialAppsBar(
-//        onAppClick = {},
-//        onOpenFullApps = {},
-//        theme = HomeTheme(),
-//    )
-//}
-
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun TasksCompletedCelebrationPreview() {
@@ -1391,8 +1381,8 @@ private fun WeeklyTaskItem(
 
 @Composable
 fun CompactTargetsList(
-    targets: List<Target>,
-    onTargetClick: (Target) -> Unit,
+    targets: List<Targets>,
+    onTargetClick: (Targets) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (targets.isEmpty()) return
@@ -1434,7 +1424,7 @@ fun CompactTargetsList(
 
 @Composable
 private fun CompactTargetCard(
-    target: Target,
+    target: Targets,
     onClick: () -> Unit
 ) {
     val daysLeft = calculateDaysLeft(target.endDate)
@@ -1532,7 +1522,7 @@ private fun calculateDaysLeft(endDate: Long): Long {
 
 @Composable
 fun MiniTargetsList(
-    targets: List<Target>,
+    targets: List<Targets>,
     onTargetClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -1551,7 +1541,7 @@ fun MiniTargetsList(
 }
 
 @Composable
-private fun MiniTargetCard(target: Target) {
+private fun MiniTargetCard(target: Targets) {
     val daysLeft = calculateDaysLeft(target.endDate)
     val progressColor = when {
         target.progress >= 75f -> Color(0xFF4ADE80)

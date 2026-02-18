@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
+import com.expeknow.ariselauncher.data.model.Targets
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.screens.apps.AppDrawerApp
@@ -80,7 +81,7 @@ data class HomeState(
     val statsUi: StatsUi = StatsUi(), // MVP stats
     val homeScreenQuote: String? = null,
     val showQuoteDialog: Boolean = false,
-    val targets: List<Target> = emptyList()
+    val targets: List<Targets> = emptyList()
 )
 
 sealed class HomeEvent {

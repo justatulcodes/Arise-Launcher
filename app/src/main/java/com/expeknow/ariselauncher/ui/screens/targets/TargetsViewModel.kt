@@ -2,8 +2,6 @@ package com.expeknow.ariselauncher.ui.screens.targets
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.expeknow.ariselauncher.data.datasource.Target
-import com.expeknow.ariselauncher.data.datasource.TargetsPreferencesDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TargetsDataSource
 import com.expeknow.ariselauncher.data.model.Targets
 import dagger.hilt.android.lifecycle.HiltViewModel

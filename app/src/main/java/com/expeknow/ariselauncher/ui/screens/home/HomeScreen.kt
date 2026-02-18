@@ -38,6 +38,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.expeknow.ariselauncher.R
 import com.expeknow.ariselauncher.data.model.DaysOfWeek
+import com.expeknow.ariselauncher.data.model.Targets
 import com.expeknow.ariselauncher.data.model.Task
 import com.expeknow.ariselauncher.data.model.TaskCategory
 import com.expeknow.ariselauncher.ui.components.QuoteDialog
@@ -388,7 +389,7 @@ fun BlankScreen(
     onOpenFullApps: () -> Unit,
     quote: String? = null,
     onLongPress: () -> Unit = {},
-    targets: List<com.expeknow.ariselauncher.data.datasource.Target> = emptyList(),
+    targets: List<Targets> = emptyList(),
     onTargetClick: () -> Unit = {}
 ) {
     val currentTime by remember {
