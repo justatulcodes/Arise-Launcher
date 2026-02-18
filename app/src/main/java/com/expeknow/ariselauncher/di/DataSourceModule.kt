@@ -1,19 +1,23 @@
 package com.expeknow.ariselauncher.di
 
 import android.content.Context
+import androidx.room.PrimaryKey
 import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
 import com.expeknow.ariselauncher.data.database.dao.DriveItemDao
 import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
+import com.expeknow.ariselauncher.data.database.dao.TargetsDao
 import com.expeknow.ariselauncher.data.database.dao.TaskDao
 import com.expeknow.ariselauncher.data.database.dao.TaskLinkDao
 import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflineDriveItemDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflinePointsLogDataSource
+import com.expeknow.ariselauncher.data.datasource.OfflineTargetsDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflineTaskDataSource
 import com.expeknow.ariselauncher.data.datasource.OfflineTaskLinkDataSource
 import com.expeknow.ariselauncher.data.datasource.SettingsPreferencesDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.DriveItemDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.PointsLogDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TargetsDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskLinkDataSource
 import dagger.Module
@@ -35,6 +39,11 @@ object DataSourceModule {
     @Provides
     fun provideTaskDataSource(taskDao: TaskDao): TaskDataSource {
         return OfflineTaskDataSource(taskDao)
+    }
+
+    @Provides
+    fun provideTargetsDataSource(targetsDao: TargetsDao): TargetsDataSource {
+        return OfflineTargetsDataSource(targetsDao)
     }
 
     @Provides

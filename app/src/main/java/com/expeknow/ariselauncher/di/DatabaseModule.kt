@@ -5,6 +5,7 @@ import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
 import com.expeknow.ariselauncher.data.database.AriseLauncherDatabase
 import com.expeknow.ariselauncher.data.database.dao.DriveItemDao
 import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
+import com.expeknow.ariselauncher.data.database.dao.TargetsDao
 import com.expeknow.ariselauncher.data.database.dao.TaskDao
 import com.expeknow.ariselauncher.data.database.dao.TaskLinkDao
 import dagger.Module
@@ -30,6 +31,10 @@ object DatabaseModule {
         return database.taskDao()
     }
 
+    @Provides
+    fun provideTargetsDao(database: AriseLauncherDatabase) : TargetsDao {
+        return database.targetsDao()
+    }
     @Provides
     fun provideTaskLinkDao(database: AriseLauncherDatabase) : TaskLinkDao {
         return database.taskLinkDao()
