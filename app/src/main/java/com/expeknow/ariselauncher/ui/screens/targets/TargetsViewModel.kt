@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.expeknow.ariselauncher.data.datasource.Target
 import com.expeknow.ariselauncher.data.datasource.TargetsPreferencesDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TargetsDataSource
+import com.expeknow.ariselauncher.data.model.Targets
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TargetsViewModel @Inject constructor(
-    private val targetsDataSource: TargetsPreferencesDataSource
+    private val targetsDataSource: TargetsDataSource
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TargetsState())
@@ -26,7 +28,7 @@ class TargetsViewModel @Inject constructor(
 
     private fun loadTargets() {
         viewModelScope.launch {
-            targetsDataSource.targetsFlow.collect { targets ->
+            targetsDataSource.getAllTargets().collect { targets ->
                 _state.value = _state.value.copy(
                     targets = targets.sortedBy { it.endDate }
                 )
@@ -37,36 +39,46 @@ class TargetsViewModel @Inject constructor(
     fun onEvent(event: TargetsEvent) {
         when (event) {
             is TargetsEvent.AddTarget -> {
-                val target = Target(
-                    id = UUID.randomUUID().toString(),
-                    name = event.name,
-                    description = event.description,
-                    endDate = event.endDate,
-                    progress = 0f,
-                    createdAt = System.currentTimeMillis(),
-                    showOnHomeScreen = event.showOnHomeScreen
-                )
-                targetsDataSource.addTarget(target)
-                _state.value = _state.value.copy(showAddDialog = false)
+                viewModelScope.launch {
+                    val target = Targets(
+                        id = UUID.randomUUID().toString(),
+                        name = event.name,
+                        description = event.description,
+                        endDate = event.endDate,
+                        progress = 0f,
+                        createdAt = System.currentTimeMillis(),
+                        showOnHomeScreen = event.showOnHomeScreen
+                    )
+                    targetsDataSource.addTarget(target)
+                    _state.value = _state.value.copy(showAddDialog = false)
+                }
             }
 
             is TargetsEvent.UpdateTarget -> {
-                targetsDataSource.updateTarget(event.target)
-                _state.value = _state.value.copy(
-                    showAddDialog = false,
-                    editingTarget = null
-                )
+                viewModelScope.launch {
+                    targetsDataSource.updateTarget(event.target)
+                    _state.value = _state.value.copy(
+                        showAddDialog = false,
+                        editingTarget = null
+                    )
+                }
+
             }
 
             is TargetsEvent.DeleteTarget -> {
-                targetsDataSource.deleteTarget(event.targetId)
+                viewModelScope.launch {
+                    targetsDataSource.deleteTarget(event.targetId)
+                }
+
             }
 
             is TargetsEvent.UpdateProgress -> {
                 val target = _state.value.targets.find { it.id == event.targetId }
                 if (target != null) {
                     val updatedTarget = target.copy(progress = event.progress.coerceIn(0f, 100f))
-                    targetsDataSource.updateTarget(updatedTarget)
+                    viewModelScope.launch {
+                        targetsDataSource.updateTarget(updatedTarget)
+                    }
                 }
             }
 

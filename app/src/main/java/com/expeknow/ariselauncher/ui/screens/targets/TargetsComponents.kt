@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.expeknow.ariselauncher.data.datasource.Target
+import com.expeknow.ariselauncher.data.model.Targets
 import com.expeknow.ariselauncher.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -25,7 +26,7 @@ import java.util.concurrent.TimeUnit
 
 @Composable
 fun TargetCard(
-    target: Target,
+    target: Targets,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onProgressChange: (Float) -> Unit
@@ -210,7 +211,7 @@ fun TargetCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTargetDialog(
-    editingTarget: Target?,
+    editingTarget: Targets?,
     onDismiss: () -> Unit,
     onSave: (String, String, Long, Boolean) -> Unit
 ) {

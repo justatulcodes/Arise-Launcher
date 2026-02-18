@@ -5,18 +5,21 @@ import com.expeknow.ariselauncher.data.datasource.AppInfoDataSource
 import com.expeknow.ariselauncher.data.datasource.SettingsPreferencesDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.DriveItemDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.PointsLogDataSource
+import com.expeknow.ariselauncher.data.datasource.interfaces.TargetsDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskDataSource
 import com.expeknow.ariselauncher.data.datasource.interfaces.TaskLinkDataSource
 import com.expeknow.ariselauncher.data.repository.AppRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.DriveRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.PointsLogRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.SettingsRepositoryImpl
+import com.expeknow.ariselauncher.data.repository.TargetsRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.TaskLinkRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.TaskRepositoryImpl
 import com.expeknow.ariselauncher.data.repository.interfaces.AppRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.DriveRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.PointsLogRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.SettingsRepository
+import com.expeknow.ariselauncher.data.repository.interfaces.TargetsRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskLinkRepository
 import com.expeknow.ariselauncher.data.repository.interfaces.TaskRepository
 import dagger.Module
@@ -48,6 +51,12 @@ object RepositoryModule {
     @Provides
     fun provideTaskDataRepository(taskDataSource: TaskDataSource): TaskRepository {
         return TaskRepositoryImpl(taskDataSource)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTargetsDataRepository(targetsDataSource: TargetsDataSource) : TargetsRepository {
+        return TargetsRepositoryImpl(targetsDataSource)
     }
 
     @Singleton
