@@ -174,50 +174,7 @@ fun HomeScreen(
 
                 when (actualPage) {
                     0 -> {
-                        BlankScreen(
-                            theme = theme,
-                            appsList = state.apps,
-                            onAppClick = { appName ->
-                                viewModel.onEvent(HomeEvent.LaunchApp(appName))
-                            },
-                            onOpenFullApps = {
-                                appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
-                                showAppDrawer = true
-                            },
-                            quote = state.homeScreenQuote,
-                            onLongPress = {
-                                viewModel.onEvent(HomeEvent.ShowQuoteDialog)
-                            },
-                            targets = state.targets,
-                            onTargetClick = {
-                                navController.navigate(Screen.Targets.route)
-                            }
-                        )
-                    }
-                    1 -> {
-                        MainTaskContentScreen(
-                            mode = state.mode,
-                            allTasksCompleted = allNormalTasksCompleted,
-                            completedTasks = state.normalCompletedTasks,
-                            pointsEarned = pointsEarned,
-                            normalTasks = state.normalTasks,
-                            focusedTasks = state.todayFocusedTasks,
-                            focusCategories = state.focusCategories,
-                            editingCategoryId = state.editingCategoryId,
-                            editingCategoryName = state.editingCategoryName,
-                            navController = navController,
-                            viewModel = viewModel,
-                            context = context,
-                            theme = theme,
-                            currentPoints = state.currentPoints,
-                            pointChange = state.pointChange,
-                            pointsTrend = state.pointsTrend,
-                            showWeeklySchedule = state.showWeeklySchedule,
-                            allFocusedTasks = state.allFocusedTasks
-                        )
-                    }
-                    2 -> {
-                        if (state.mode == HomeMode.FOCUSED) {
+                        if(state.mode == HomeMode.FOCUSED) {
                             AlternateTasksScreen(
                                 allNormalTasks = state.normalTasks,
                                 hideCompletedTasks = state.hideCompletedTasks,
@@ -230,6 +187,95 @@ fun HomeScreen(
                                 pointsTrend = state.pointsTrend,
                                 completedTasks = state.normalCompletedTasks,
                                 totalTasks = state.normalTotalTasks
+                            )
+                        } else{
+                            BlankScreen(
+                                theme = theme,
+                                appsList = state.apps,
+                                onAppClick = { appName ->
+                                    viewModel.onEvent(HomeEvent.LaunchApp(appName))
+                                },
+                                onOpenFullApps = {
+                                    appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
+                                    showAppDrawer = true
+                                },
+                                quote = state.homeScreenQuote,
+                                onLongPress = {
+                                    viewModel.onEvent(HomeEvent.ShowQuoteDialog)
+                                },
+                                targets = state.targets,
+                                onTargetClick = {
+                                    navController.navigate(Screen.Targets.route)
+                                }
+                            )
+                        }
+                    }
+                    1 -> {
+                        if(state.mode == HomeMode.FOCUSED) {
+                            BlankScreen(
+                                theme = theme,
+                                appsList = state.apps,
+                                onAppClick = { appName ->
+                                    viewModel.onEvent(HomeEvent.LaunchApp(appName))
+                                },
+                                onOpenFullApps = {
+                                    appDrawerViewModel.onEvent(AppDrawerEvent.OpenDrawer)
+                                    showAppDrawer = true
+                                },
+                                quote = state.homeScreenQuote,
+                                onLongPress = {
+                                    viewModel.onEvent(HomeEvent.ShowQuoteDialog)
+                                },
+                                targets = state.targets,
+                                onTargetClick = {
+                                    navController.navigate(Screen.Targets.route)
+                                }
+                            )
+                        } else {
+                            MainTaskContentScreen(
+                                mode = state.mode,
+                                allTasksCompleted = allNormalTasksCompleted,
+                                completedTasks = state.normalCompletedTasks,
+                                pointsEarned = pointsEarned,
+                                normalTasks = state.normalTasks,
+                                focusedTasks = state.todayFocusedTasks,
+                                focusCategories = state.focusCategories,
+                                editingCategoryId = state.editingCategoryId,
+                                editingCategoryName = state.editingCategoryName,
+                                navController = navController,
+                                viewModel = viewModel,
+                                context = context,
+                                theme = theme,
+                                currentPoints = state.currentPoints,
+                                pointChange = state.pointChange,
+                                pointsTrend = state.pointsTrend,
+                                showWeeklySchedule = state.showWeeklySchedule,
+                                allFocusedTasks = state.allFocusedTasks
+                            )
+                        }
+
+                    }
+                    2 -> {
+                        if (state.mode == HomeMode.FOCUSED) {
+                            MainTaskContentScreen(
+                                mode = state.mode,
+                                allTasksCompleted = allNormalTasksCompleted,
+                                completedTasks = state.normalCompletedTasks,
+                                pointsEarned = pointsEarned,
+                                normalTasks = state.normalTasks,
+                                focusedTasks = state.todayFocusedTasks,
+                                focusCategories = state.focusCategories,
+                                editingCategoryId = state.editingCategoryId,
+                                editingCategoryName = state.editingCategoryName,
+                                navController = navController,
+                                viewModel = viewModel,
+                                context = context,
+                                theme = theme,
+                                currentPoints = state.currentPoints,
+                                pointChange = state.pointChange,
+                                pointsTrend = state.pointsTrend,
+                                showWeeklySchedule = state.showWeeklySchedule,
+                                allFocusedTasks = state.allFocusedTasks
                             )
                         }
                     }
