@@ -284,7 +284,7 @@ fun HomeScreen(
 
         }
 
-        if (state.mode == HomeMode.FOCUSED && pagerState.currentPage == 1) {
+        if (state.mode == HomeMode.FOCUSED && pagerState.currentPage == 2) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
