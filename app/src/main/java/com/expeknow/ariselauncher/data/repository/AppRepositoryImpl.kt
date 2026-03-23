@@ -47,6 +47,7 @@ class AppRepositoryImpl(
         appDrawerApps.forEach { app ->
             CoroutineScope(Dispatchers.IO).launch {
                 val cachedCategory = appInfoDataSource.getAppInfo(packageName = app.packageName)
+                val appStartTimerValue = appInfoDataSource.getAppStartTimerValue(packageName = app.packageName)
                 if(cachedCategory != null) {
                     app.category = mapCategoryToAppCategory(cachedCategory.category)
                     app.pointCost = AppClassifier.getAppPointCost(app.category)
@@ -54,6 +55,7 @@ class AppRepositoryImpl(
                     val foundCategory = AppClassifier.classifyApp(context, app.packageName)
                     app.category = foundCategory
                     app.pointCost = AppClassifier.getAppPointCost(app.category)
+                    app.appStartTimerValue = appStartTimerValue
                     appInfoDataSource.addAppInfo(
                         packageName = app.packageName,
                         category = AppClassifier.getDefaultCategoryString(foundCategory),

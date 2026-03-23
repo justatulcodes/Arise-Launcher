@@ -11,7 +11,8 @@ data class AppDrawerApp(
     var category: AppCategory,
     var pointCost: Int = 10,
     val description: String = "",
-    val appInstallTime : Long
+    val appInstallTime : Long,
+    var appStartTimerValue : Long = 0L
 )
 
 

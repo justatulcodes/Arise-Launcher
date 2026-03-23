@@ -8,6 +8,7 @@ import androidx.room.TypeConverters
 import com.expeknow.ariselauncher.data.database.AriseDatabaseMigrations.MIGRATION_2_3
 import com.expeknow.ariselauncher.data.database.AriseDatabaseMigrations.MIGRATION_3_4
 import com.expeknow.ariselauncher.data.database.AriseDatabaseMigrations.MIGRATION_4_5
+import com.expeknow.ariselauncher.data.database.AriseDatabaseMigrations.MIGRATION_5_6
 import com.expeknow.ariselauncher.data.database.dao.AppInfoDao
 import com.expeknow.ariselauncher.data.database.dao.DriveItemDao
 import com.expeknow.ariselauncher.data.database.dao.PointsLogDao
@@ -51,7 +52,7 @@ abstract class AriseLauncherDatabase : RoomDatabase() {
                     AriseLauncherDatabase::class.java,
                     "arise_launcher_database"
                 )
-                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .build()
                 INSTANCE = instance
                 instance

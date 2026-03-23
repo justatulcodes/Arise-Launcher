@@ -15,6 +15,9 @@ interface AppInfoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addAppInfo(appInfo: AppInfo)
 
+    @Query("SELECT launchTimerValue FROM app_info WHERE packageName = :packageName")
+    fun getAppStartTimerValue(packageName: String): Long
+
     @Query("SELECT category FROM app_info WHERE packageName = :packageName")
     fun getAppCategory(packageName: String): String
 

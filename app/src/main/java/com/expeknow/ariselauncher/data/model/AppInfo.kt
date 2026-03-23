@@ -14,5 +14,6 @@ data class AppInfo(
     val installTime: Long,
     val launchCount : Int = 0,
     val lastUsedTimestamp : Long = 0,
-    val totalTimeSpent : Long = 0
+    val totalTimeSpent : Long = 0,
+    val launchTimerValue : Long = 0
 ) 
