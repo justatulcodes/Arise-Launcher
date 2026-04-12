@@ -18,5 +18,7 @@ interface AppRepository {
 
     fun recordAppLaunch(packageName: String)
 
+    fun setAppStartTimerValue(packageName: String, launchTimerValue: Long)
+
     suspend fun getTopUsedApps(count: Int): List<AppDrawerApp>
 }

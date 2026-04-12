@@ -47,7 +47,7 @@ import com.expeknow.ariselauncher.ui.theme.SurfaceCard
 import kotlin.math.roundToInt
 
 private object AppContextMenuDefaults {
-    val MENU_WIDTH = 120.dp
+    val MENU_WIDTH = 220.dp
     val ICON_SIZE = 64.dp
     val MENU_OFFSET_X = 26.dp
     val MENU_OFFSET_Y = (-36).dp
@@ -61,6 +61,7 @@ fun AppContextMenu(
     onDismiss: () -> Unit,
     onUninstall: () -> Unit,
     onAppInfo: () -> Unit,
+    onUpdateAppStartTimer :(Long) -> Unit = {},
     theme: AppDrawerTheme
 ) {
     var isVisible by remember { mutableStateOf(false) }
@@ -133,40 +134,45 @@ fun AppContextMenu(
                     )
                 }
                 
-//                // Divider
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(1.dp)
-//                        .padding(horizontal = 12.dp)
-//                        .background(theme.border)
-//                )
-//
-//                // Uninstall option
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .clickable {
-//                            onUninstall()
-//                            onDismiss()
-//                        }
-//                        .padding(horizontal = 16.dp, vertical = 12.dp),
-//                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Icon(
-//                        imageVector = Icons.Default.Delete,
-//                        contentDescription = "Uninstall",
-//                        tint = AppContextMenuDefaults.DESTRUCTIVE_ACTION_COLOR,
-//                        modifier = Modifier.size(20.dp)
-//                    )
-//                    Text(
-//                        text = "Uninstall",
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        color = AppContextMenuDefaults.DESTRUCTIVE_ACTION_COLOR,
-//                        fontWeight = FontWeight.Medium
-//                    )
-//                }
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    color = theme.border
+                )
+
+                Text(
+                    text = "Start Timer",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.7f),
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 6.dp)
+                )
+
+                val timerOptions = listOf(10L, 30L, 60L, 90L)
+                Column(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    timerOptions.chunked(2).forEach { rowOptions ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            rowOptions.forEach { option ->
+                                val isSelected = app.appStartTimerValue == option
+                                FilterChip(
+                                    selected = isSelected,
+                                    onClick = {
+                                        onUpdateAppStartTimer(if (isSelected) 0L else option)
+                                    },
+                                    label = { Text("${option}s") },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            if (rowOptions.size < 2) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -437,7 +443,8 @@ fun AppCategorySection(
     category: AppCategory,
     apps: List<AppDrawerApp>,
     onAppClick: (AppDrawerApp) -> Unit,
-    theme: AppDrawerTheme
+    theme: AppDrawerTheme,
+    onUpdateAppStartTimer: (AppDrawerApp, Long) -> Unit = { _, _ -> }
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -475,7 +482,8 @@ fun AppCategorySection(
         AppGrid(
             apps = apps,
             onAppClick = onAppClick,
-            theme = theme
+            theme = theme,
+            onUpdateAppStartTimer = onUpdateAppStartTimer
         )
     }
 }
@@ -484,7 +492,8 @@ fun AppCategorySection(
 fun AppGrid(
     apps: List<AppDrawerApp>,
     onAppClick: (AppDrawerApp) -> Unit,
-    theme: AppDrawerTheme
+    theme: AppDrawerTheme,
+    onUpdateAppStartTimer: (AppDrawerApp, Long) -> Unit = { _, _ -> }
 ) {
     val columns = 4
     Column{
@@ -500,7 +509,8 @@ fun AppGrid(
                         AppGridItemV2(
                             app = app,
                             onAppClick = onAppClick,
-                            theme = theme
+                            theme = theme,
+                            onUpdateAppStartTimer = onUpdateAppStartTimer
                         )
                     }
                 }
@@ -517,7 +527,8 @@ fun AppGrid(
 fun AppGridItemV2(
     app: AppDrawerApp,
     onAppClick: (AppDrawerApp) -> Unit,
-    theme: AppDrawerTheme = AppDrawerTheme()
+    theme: AppDrawerTheme = AppDrawerTheme(),
+    onUpdateAppStartTimer: (AppDrawerApp, Long) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
@@ -638,6 +649,9 @@ fun AppGridItemV2(
                     }
                     context.startActivity(intent)
                 },
+                onUpdateAppStartTimer = { launchTimerValue ->
+                    onUpdateAppStartTimer(app, launchTimerValue)
+                },
                 theme = theme
             )
         }
@@ -716,7 +730,8 @@ fun SearchResultsSection(
     searchQuery: String,
     searchResults: List<AppDrawerApp>,
     onAppClick: (AppDrawerApp) -> Unit,
-    theme: AppDrawerTheme
+    theme: AppDrawerTheme,
+    onUpdateAppStartTimer: (AppDrawerApp, Long) -> Unit = { _, _ -> }
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         if (searchResults.isNotEmpty()) {
@@ -755,7 +770,8 @@ fun SearchResultsSection(
             AppGrid(
                 apps = searchResults,
                 onAppClick = onAppClick,
-                theme = theme
+                theme = theme,
+                onUpdateAppStartTimer = onUpdateAppStartTimer
             )
         } else {
             // No results found
@@ -973,7 +989,8 @@ fun AppTimerDialog(
 fun TopUsedAppsRow(
     apps: List<AppDrawerApp>,
     onAppClick: (AppDrawerApp) -> Unit,
-    theme: AppDrawerTheme
+    theme: AppDrawerTheme,
+    onUpdateAppStartTimer: (AppDrawerApp, Long) -> Unit = { _, _ -> }
 ) {
     if (apps.isEmpty()) return
     
@@ -993,7 +1010,8 @@ fun TopUsedAppsRow(
                     AppGridItemV2(
                         app = app,
                         onAppClick = onAppClick,
-                        theme = theme
+                        theme = theme,
+                        onUpdateAppStartTimer = onUpdateAppStartTimer
                     )
                 }
             }

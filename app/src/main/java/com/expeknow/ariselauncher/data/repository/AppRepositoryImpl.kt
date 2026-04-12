@@ -48,6 +48,8 @@ class AppRepositoryImpl(
             CoroutineScope(Dispatchers.IO).launch {
                 val cachedCategory = appInfoDataSource.getAppInfo(packageName = app.packageName)
                 val appStartTimerValue = appInfoDataSource.getAppStartTimerValue(packageName = app.packageName)
+                app.appStartTimerValue = appStartTimerValue
+
                 if(cachedCategory != null) {
                     app.category = mapCategoryToAppCategory(cachedCategory.category)
                     app.pointCost = AppClassifier.getAppPointCost(app.category)
@@ -55,7 +57,6 @@ class AppRepositoryImpl(
                     val foundCategory = AppClassifier.classifyApp(context, app.packageName)
                     app.category = foundCategory
                     app.pointCost = AppClassifier.getAppPointCost(app.category)
-                    app.appStartTimerValue = appStartTimerValue
                     appInfoDataSource.addAppInfo(
                         packageName = app.packageName,
                         category = AppClassifier.getDefaultCategoryString(foundCategory),
@@ -184,6 +185,10 @@ class AppRepositoryImpl(
         appInfoDataSource.recordAppLaunch(packageName)
     }
 
+    override fun setAppStartTimerValue(packageName: String, launchTimerValue: Long) {
+        appInfoDataSource.setAppStartTimerValue(packageName, launchTimerValue)
+    }
+
     override suspend fun getTopUsedApps(count: Int): List<AppDrawerApp> {
         val topUsedAppInfos = appInfoDataSource.getTopUsedApps(count)
         val packageManager = context.packageManager
@@ -207,7 +212,8 @@ class AppRepositoryImpl(
                         icon = icon,
                         category = mapCategoryToAppCategory(appInfo.category),
                         pointCost = AppClassifier.getAppPointCost(mapCategoryToAppCategory(appInfo.category)),
-                        appInstallTime = appInfo.installTime
+                        appInstallTime = appInfo.installTime,
+                        appStartTimerValue = appInfo.launchTimerValue
                     )
                 } else {
                     null

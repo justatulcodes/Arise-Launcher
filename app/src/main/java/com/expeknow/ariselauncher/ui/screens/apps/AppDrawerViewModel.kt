@@ -201,6 +201,33 @@ class AppDrawerViewModel @Inject constructor(
                     timerApp = null
                 )
             }
+
+            is AppDrawerEvent.UpdateAppStartTimer -> {
+                _state.value = _state.value.copy(
+                    apps = _state.value.apps.map { app ->
+                        if (app.packageName == event.packageName) {
+                            app.copy(appStartTimerValue = event.launchTimerValue)
+                        } else {
+                            app
+                        }
+                    }
+                )
+
+                _topUsedApps.value = _topUsedApps.value.map { app ->
+                    if (app.packageName == event.packageName) {
+                        app.copy(appStartTimerValue = event.launchTimerValue)
+                    } else {
+                        app
+                    }
+                }
+
+                viewModelScope.launch {
+                    appRepositoryImpl.setAppStartTimerValue(
+                        packageName = event.packageName,
+                        launchTimerValue = event.launchTimerValue
+                    )
+                }
+            }
         }
     }
 

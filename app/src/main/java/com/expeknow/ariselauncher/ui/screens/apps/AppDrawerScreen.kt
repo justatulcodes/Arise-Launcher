@@ -160,7 +160,15 @@ fun AppDrawerScreen(
                                 viewModel.onEvent(AppDrawerEvent.SelectApp(app))
                                 searchQuery = ""
                             },
-                            theme = theme
+                            theme = theme,
+                            onUpdateAppStartTimer = { app, launchTimerValue ->
+                                viewModel.onEvent(
+                                    AppDrawerEvent.UpdateAppStartTimer(
+                                        packageName = app.packageName,
+                                        launchTimerValue = launchTimerValue
+                                    )
+                                )
+                            }
                         )
                     }
                 } else {
@@ -174,7 +182,15 @@ fun AppDrawerScreen(
                                     searchQuery = ""
                                     onClose()
                                 },
-                                theme = theme
+                                theme = theme,
+                                onUpdateAppStartTimer = { app, launchTimerValue ->
+                                    viewModel.onEvent(
+                                        AppDrawerEvent.UpdateAppStartTimer(
+                                            packageName = app.packageName,
+                                            launchTimerValue = launchTimerValue
+                                        )
+                                    )
+                                }
                             )
                         }
                         item {
@@ -206,7 +222,15 @@ fun AppDrawerScreen(
                                         viewModel.onEvent(AppDrawerEvent.SelectApp(app))
                                         searchQuery = ""
                                     },
-                                    theme = theme
+                                    theme = theme,
+                                    onUpdateAppStartTimer = { app, launchTimerValue ->
+                                        viewModel.onEvent(
+                                            AppDrawerEvent.UpdateAppStartTimer(
+                                                packageName = app.packageName,
+                                                launchTimerValue = launchTimerValue
+                                            )
+                                        )
+                                    }
                                 )
                             }
                         }
@@ -221,7 +245,15 @@ fun AppDrawerScreen(
                                     searchQuery = ""
                                     onClose()
                                 },
-                                theme = theme
+                                theme = theme,
+                                onUpdateAppStartTimer = { app, launchTimerValue ->
+                                    viewModel.onEvent(
+                                        AppDrawerEvent.UpdateAppStartTimer(
+                                            packageName = app.packageName,
+                                            launchTimerValue = launchTimerValue
+                                        )
+                                    )
+                                }
                             )
                         }
                     }

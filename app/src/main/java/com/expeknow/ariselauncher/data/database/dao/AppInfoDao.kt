@@ -18,6 +18,9 @@ interface AppInfoDao {
     @Query("SELECT launchTimerValue FROM app_info WHERE packageName = :packageName")
     fun getAppStartTimerValue(packageName: String): Long
 
+    @Query("UPDATE app_info SET launchTimerValue = :launchTimerValue WHERE packageName = :packageName")
+    fun setAppStartTimerValue(packageName: String, launchTimerValue: Long)
+
     @Query("SELECT category FROM app_info WHERE packageName = :packageName")
     fun getAppCategory(packageName: String): String
 

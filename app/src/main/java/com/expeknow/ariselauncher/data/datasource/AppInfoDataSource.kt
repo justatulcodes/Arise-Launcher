@@ -20,6 +20,10 @@ class AppInfoDataSource(
     }
 
     fun getAppStartTimerValue(packageName: String) = appInfoDao.getAppStartTimerValue(packageName)
+
+    fun setAppStartTimerValue(packageName: String, launchTimerValue: Long) {
+        appInfoDao.setAppStartTimerValue(packageName, launchTimerValue)
+    }
     fun deleteAppInfo(packageName: String) = appInfoDao.deleteAppInfo(packageName)
 
     fun getAppSortedByInstallTime() = appInfoDao.getAppsSortedByInstallTime()

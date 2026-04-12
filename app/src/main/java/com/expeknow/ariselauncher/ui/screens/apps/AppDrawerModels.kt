@@ -57,6 +57,7 @@ sealed class AppDrawerEvent {
     data object OpenDrawer : AppDrawerEvent()
     data class SearchApps(val query: String) : AppDrawerEvent()
     data object DismissTimerDialog : AppDrawerEvent()
+    data class UpdateAppStartTimer(val packageName: String, val launchTimerValue: Long) : AppDrawerEvent()
 }
 
 data class AppDrawerTheme(
