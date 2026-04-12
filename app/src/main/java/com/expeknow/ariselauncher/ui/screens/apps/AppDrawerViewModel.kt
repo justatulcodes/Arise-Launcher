@@ -134,11 +134,14 @@ class AppDrawerViewModel @Inject constructor(
             is AppDrawerEvent.SelectApp -> {
                 // Check if app launch popup is enabled and user doesn't have enough points
                 if (getAppLaunchPopupEnabled() &&
-                    event.app.pointCost > 0 &&
-                    _state.value.currentPoints < event.app.pointCost) {
+//                    event.app.pointCost > 0 &&
+//                    _state.value.currentPoints < event.app.pointCost //Not concerned with points for now, just want the timer dialog to show up
+                    event.app.appStartTimerValue > 0L
+                    )
+                {
                     _state.value = _state.value.copy(
                         showTimerDialog = true,
-                        timerCountdown = event.app.pointCost,
+                        timerCountdown = event.app.appStartTimerValue.toInt(),
                         timerApp = event.app
                     )
                     startTimer()
@@ -146,6 +149,7 @@ class AppDrawerViewModel @Inject constructor(
                 }
 
                 // Only deduct points if user has enough points
+                //TODO may want to remove this
                 if (event.app.pointCost > 0 && _state.value.currentPoints >= event.app.pointCost) {
                     viewModelScope.launch {
                         pointsLogRepositoryImpl.spendPoints(

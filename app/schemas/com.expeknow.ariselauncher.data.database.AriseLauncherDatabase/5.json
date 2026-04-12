@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "1644024f8c3bc9aa319914e29c516efd",
+    "identityHash": "30c2177254e70d4f111a9a13ca1777ba",
     "entities": [
       {
         "tableName": "tasks",
@@ -183,7 +183,7 @@
       },
       {
         "tableName": "app_info",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `packageName` TEXT NOT NULL, `category` TEXT NOT NULL, `installTime` INTEGER NOT NULL, `launchCount` INTEGER NOT NULL, `lastUsedTimestamp` INTEGER NOT NULL, `totalTimeSpent` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `packageName` TEXT NOT NULL, `category` TEXT NOT NULL, `installTime` INTEGER NOT NULL, `launchCount` INTEGER NOT NULL, `lastUsedTimestamp` INTEGER NOT NULL, `totalTimeSpent` INTEGER NOT NULL, `launchTimerValue` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -224,6 +224,12 @@
           {
             "fieldPath": "totalTimeSpent",
             "columnName": "totalTimeSpent",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "launchTimerValue",
+            "columnName": "launchTimerValue",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -352,7 +358,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1644024f8c3bc9aa319914e29c516efd')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '30c2177254e70d4f111a9a13ca1777ba')"
     ]
   }
 }
