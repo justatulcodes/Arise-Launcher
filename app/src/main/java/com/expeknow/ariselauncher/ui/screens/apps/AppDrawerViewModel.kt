@@ -3,6 +3,7 @@ package com.expeknow.ariselauncher.ui.screens.apps
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -221,7 +222,7 @@ class AppDrawerViewModel @Inject constructor(
                     }
                 }
 
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     appRepositoryImpl.setAppStartTimerValue(
                         packageName = event.packageName,
                         launchTimerValue = event.launchTimerValue
