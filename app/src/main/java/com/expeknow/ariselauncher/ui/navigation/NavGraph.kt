@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.expeknow.ariselauncher.ui.components.AppBottomNavigationBar
 import com.expeknow.ariselauncher.ui.screens.home.HomeScreen
 import com.expeknow.ariselauncher.ui.screens.settings.SettingsScreen
+import com.expeknow.ariselauncher.ui.screens.settings.SupportScreen
 import com.expeknow.ariselauncher.ui.screens.drive.DriveScreen
 import com.expeknow.ariselauncher.ui.screens.points.TaskHistoryScreen
 import com.expeknow.ariselauncher.ui.screens.home.TaskDetailsScreen
@@ -146,6 +147,10 @@ fun AppNavigation(
                     completedTasks = state.completedTasks,
                     currentRank = state.debugCurrentRank ?: state.currentRank
                 )
+            }
+
+            composable(Screen.Support.route) {
+                SupportScreen(navController = navController)
             }
         }
     }

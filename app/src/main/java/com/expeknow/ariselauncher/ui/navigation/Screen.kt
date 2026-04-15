@@ -13,6 +13,7 @@ sealed class Screen(val route: String) {
     data object Targets : Screen("targets")
     data object Drive : Screen("drive")
     data object Ctrl : Screen("ctrl")
+    data object Support : Screen("support")
 
     data object TaskHistory : Screen("task_history")
 

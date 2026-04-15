@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.expeknow.ariselauncher.ui.navigation.Screen
 import com.expeknow.ariselauncher.ui.theme.BannerTextGray
 
 @Composable
@@ -144,6 +145,11 @@ fun SettingsScreen(
                 onShowRefreshAppDrawerDialog = { viewModel.onEvent(SettingsEvent.ShowAppRefreshDialog) },
                 onShowResetPointsDialog = { viewModel.onEvent(SettingsEvent.ShowResetPointsDialog) },
                 onShowFactoryResetDialog = { viewModel.onEvent(SettingsEvent.ShowFactoryResetDialog) },
+            )
+
+            SupportSection(
+                onClick = { navController.navigate(Screen.Support.route) },
+                theme = theme
             )
 
             SettingsFooter(theme = theme)

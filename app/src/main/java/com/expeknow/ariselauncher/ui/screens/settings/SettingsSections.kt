@@ -1,10 +1,13 @@
 package com.expeknow.ariselauncher.ui.screens.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.*
@@ -350,6 +353,50 @@ fun DefaultLauncherSection(
     }
 }
 
+@Composable
+fun SupportSection(
+    onClick: () -> Unit,
+    theme: SettingsTheme
+) {
+    SettingsCard(theme) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = null,
+                    tint = theme.accent,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "SUPPORT ARISE",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = theme.accent
+                    )
+                    Text(
+                        text = "Thank you note and buy me a coffee details",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.White.copy(alpha = 0.6f)
+                    )
+                }
+            }
+
+            Icon(
+                imageVector = Icons.Filled.ChevronRight,
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
 // Add preview functions at the end of the file
 @Preview
 @Composable
@@ -442,6 +489,15 @@ fun DefaultLauncherSectionPreview() {
     DefaultLauncherSection(
         isDefaultLauncher = true,
         onSetDefaultLauncher = {},
+        theme = SettingsTheme()
+    )
+}
+
+@Preview
+@Composable
+fun SupportSectionPreview() {
+    SupportSection(
+        onClick = {},
         theme = SettingsTheme()
     )
 }
