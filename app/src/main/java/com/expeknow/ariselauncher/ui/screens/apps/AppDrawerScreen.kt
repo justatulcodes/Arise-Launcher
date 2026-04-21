@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 
 @Composable
@@ -278,3 +279,16 @@ fun AppDrawerScreen(
     }
 
 }
+
+@Preview
+@Composable
+fun AppDrawerScreenPreview() {
+    AppDrawerScreen(
+        shouldShowCategorizedApps = true,
+        onDragDelta = {},
+        isVisible = true,
+        isFullyExpanded = true,
+        onDragEnd = {}
+    )
+}
+
