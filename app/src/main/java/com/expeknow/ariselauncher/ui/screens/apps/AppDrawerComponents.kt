@@ -324,13 +324,13 @@ fun AppDrawerSearchBar(
 ) {
     Row(
         modifier = Modifier
-            .padding(horizontal = 12.dp)
+            .padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 8.dp)
             .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = theme.border,
-                shape = RoundedCornerShape(12.dp)
-            )
+//            .border(
+//                width = 1.dp,
+//                color = theme.border,
+//                shape = RoundedCornerShape(16.dp)
+//            )
             .background(theme.background, RoundedCornerShape(12.dp))
             .height(48.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -391,7 +391,7 @@ fun AppDrawerSearchBar(
                     imageVector = Icons.Default.Clear,
                     contentDescription = "Clear search",
                     tint = Color.White.copy(alpha = 0.6f),
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(24.dp).padding(end = 8.dp)
                 )
             }
         }

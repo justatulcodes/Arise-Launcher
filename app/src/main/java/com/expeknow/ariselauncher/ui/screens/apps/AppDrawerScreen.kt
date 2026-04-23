@@ -280,15 +280,144 @@ fun AppDrawerScreen(
 
 }
 
-@Preview
 @Composable
-fun AppDrawerScreenPreview() {
-    AppDrawerScreen(
-        shouldShowCategorizedApps = true,
-        onDragDelta = {},
-        isVisible = true,
-        isFullyExpanded = true,
-        onDragEnd = {}
-    )
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+private fun AppDrawerScreenDemoPreview() {
+    val theme = AppDrawerTheme()
+    var searchQuery by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    val demoApps = remember { demoAppList() }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        AppDrawerSearchBar(
+            searchQuery = searchQuery,
+            onSearchQueryChange = { searchQuery = it },
+            theme = theme,
+            focusRequester = focusRequester
+        )
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(start = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item { Spacer(Modifier.height(2.dp)) }
+
+            item {
+                TopUsedAppsRow(
+                    apps = demoApps.take(6),
+                    onAppClick = {},
+                    theme = theme,
+                    onUpdateAppStartTimer = { _, _ -> }
+                )
+            }
+
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(56.dp)
+                            .height(2.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                    )
+                }
+            }
+
+            item {
+                AppGrid(
+                    apps = demoApps,
+                    onAppClick = {},
+                    theme = theme,
+                    onUpdateAppStartTimer = { _, _ -> }
+                )
+            }
+
+            item { Spacer(Modifier.height(2.dp)) }
+        }
+    }
 }
 
+private fun demoAppList(): List<AppDrawerApp> = listOf(
+    AppDrawerApp(
+        id = "com.android.phone",
+        name = "Phone",
+        packageName = "com.android.phone",
+        category = AppCategory.COMMUNICATION,
+        appInstallTime = 1L
+    ),
+    AppDrawerApp(
+        id = "com.android.contacts",
+        name = "Contacts",
+        packageName = "com.android.contacts",
+        category = AppCategory.COMMUNICATION,
+        appInstallTime = 2L
+    ),
+    AppDrawerApp(
+        id = "com.android.camera",
+        name = "Camera",
+        packageName = "com.android.camera",
+        category = AppCategory.UTILITY,
+        appInstallTime = 3L
+    ),
+    AppDrawerApp(
+        id = "com.android.settings",
+        name = "Settings",
+        packageName = "com.android.settings",
+        category = AppCategory.UTILITY,
+        appInstallTime = 4L
+    ),
+    AppDrawerApp(
+        id = "com.android.chrome",
+        name = "Chrome",
+        packageName = "com.android.chrome",
+        category = AppCategory.PRODUCTIVITY,
+        appInstallTime = 5L
+    ),
+    AppDrawerApp(
+        id = "com.spotify.music",
+        name = "Spotify",
+        packageName = "com.spotify.music",
+        category = AppCategory.STREAMING,
+        appInstallTime = 6L
+    ),
+    AppDrawerApp(
+        id = "com.whatsapp",
+        name = "WhatsApp",
+        packageName = "com.whatsapp",
+        category = AppCategory.COMMUNICATION,
+        appInstallTime = 7L
+    ),
+    AppDrawerApp(
+        id = "com.google.android.youtube",
+        name = "YouTube",
+        packageName = "com.google.android.youtube",
+        category = AppCategory.ENTERTAINMENT,
+        appInstallTime = 8L
+    ),
+    AppDrawerApp(
+        id = "com.google.android.gm",
+        name = "Gmail",
+        packageName = "com.google.android.gm",
+        category = AppCategory.PRODUCTIVITY,
+        appInstallTime = 9L
+    ),
+    AppDrawerApp(
+        id = "com.google.android.apps.maps",
+        name = "Maps",
+        packageName = "com.google.android.apps.maps",
+        category = AppCategory.UTILITY,
+        appInstallTime = 10L
+    )
+)
