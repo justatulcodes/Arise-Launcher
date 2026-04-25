@@ -350,74 +350,32 @@ private fun AppDrawerScreenDemoPreview() {
 }
 
 private fun demoAppList(): List<AppDrawerApp> = listOf(
-    AppDrawerApp(
-        id = "com.android.phone",
-        name = "Phone",
-        packageName = "com.android.phone",
-        category = AppCategory.COMMUNICATION,
-        appInstallTime = 1L
-    ),
-    AppDrawerApp(
-        id = "com.android.contacts",
-        name = "Contacts",
-        packageName = "com.android.contacts",
-        category = AppCategory.COMMUNICATION,
-        appInstallTime = 2L
-    ),
-    AppDrawerApp(
-        id = "com.android.camera",
-        name = "Camera",
-        packageName = "com.android.camera",
-        category = AppCategory.UTILITY,
-        appInstallTime = 3L
-    ),
-    AppDrawerApp(
-        id = "com.android.settings",
-        name = "Settings",
-        packageName = "com.android.settings",
-        category = AppCategory.UTILITY,
-        appInstallTime = 4L
-    ),
-    AppDrawerApp(
-        id = "com.android.chrome",
-        name = "Chrome",
-        packageName = "com.android.chrome",
-        category = AppCategory.PRODUCTIVITY,
-        appInstallTime = 5L
-    ),
-    AppDrawerApp(
-        id = "com.spotify.music",
-        name = "Spotify",
-        packageName = "com.spotify.music",
-        category = AppCategory.STREAMING,
-        appInstallTime = 6L
-    ),
-    AppDrawerApp(
-        id = "com.whatsapp",
-        name = "WhatsApp",
-        packageName = "com.whatsapp",
-        category = AppCategory.COMMUNICATION,
-        appInstallTime = 7L
-    ),
-    AppDrawerApp(
-        id = "com.google.android.youtube",
-        name = "YouTube",
-        packageName = "com.google.android.youtube",
-        category = AppCategory.ENTERTAINMENT,
-        appInstallTime = 8L
-    ),
-    AppDrawerApp(
-        id = "com.google.android.gm",
-        name = "Gmail",
-        packageName = "com.google.android.gm",
-        category = AppCategory.PRODUCTIVITY,
-        appInstallTime = 9L
-    ),
-    AppDrawerApp(
-        id = "com.google.android.apps.maps",
-        name = "Maps",
-        packageName = "com.google.android.apps.maps",
-        category = AppCategory.UTILITY,
-        appInstallTime = 10L
-    )
+    demoApp("com.android.phone", "Phone", "com.android.phone", AppCategory.COMMUNICATION, 1L),
+    demoApp("com.android.contacts", "Contacts", "com.android.contacts", AppCategory.COMMUNICATION, 2L),
+    demoApp("com.android.camera", "Camera", "com.android.camera", AppCategory.UTILITY, 3L),
+    demoApp("com.android.settings", "Settings", "com.android.settings", AppCategory.UTILITY, 4L),
+    demoApp("com.android.chrome", "Chrome", "com.android.chrome", AppCategory.PRODUCTIVITY, 5L),
+    demoApp("com.spotify.music", "Spotify", "com.spotify.music", AppCategory.STREAMING, 6L),
+    demoApp("com.whatsapp", "WhatsApp", "com.whatsapp", AppCategory.COMMUNICATION, 7L),
+    demoApp("com.google.android.youtube", "YouTube", "com.google.android.youtube", AppCategory.ENTERTAINMENT, 8L),
+    demoApp("com.google.android.gm", "Gmail", "com.google.android.gm", AppCategory.PRODUCTIVITY, 9L),
+    demoApp("com.google.android.apps.maps", "Maps", "com.google.android.apps.maps", AppCategory.UTILITY, 10L)
+)
+
+private fun demoApp(
+    id: String,
+    name: String,
+    packageName: String,
+    category: AppCategory,
+    appInstallTime: Long
+): AppDrawerApp = AppDrawerApp(
+    id,
+    name,
+    packageName,
+    null,
+    category,
+    10,
+    "",
+    appInstallTime,
+    0L
 )

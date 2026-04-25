@@ -304,7 +304,7 @@ fun HomeScreen(
                     alpha = drawerAlpha
                 }
                 .fillMaxSize()
-                .zIndex(if (drawerProgress > 0.01f) 10f else -1f)
+                .zIndex(if (drawerProgress > 0.01f) 1f else -1f)
                 .background(Color.Black)
                 .pointerInput(screenHeight, showAppDrawer) {
                     detectVerticalDragGestures(
